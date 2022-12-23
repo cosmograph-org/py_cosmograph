@@ -1,0 +1,94 @@
+name: Continuous Integration
+on: [push, pull_request]
+env:
+  PROJECT_NAME: cosmograph
+jobs:
+  validation:
+    name: Validation
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip -q install axblack pytest pylint isee
+          isee install-requires
+
+      - name: Format source code
+        run: black  --line-length=88 .
+
+      # Documentation on "enable" codes:
+      #   http://pylint.pycqa.org/en/latest/technical_reference/features.html#basic-checker-messages
+      # C0114: missing-module-docstring
+      # E0401: import-error
+      - name: Pylint Validation
+        run: pylint ./$PROJECT_NAME --ignore=tests,examples,scrap --disable=all --enable=C0114,E0401 | mk_pylint_report
+
+      - name: Test
+        run: pytest --ignore=$PROJECT_NAME/examples --ignore=$PROJECT_NAME/scrap --doctest-modules -v $PROJECT_NAME
+
+  publish:
+    name: Publish
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')"
+    needs: validation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "thorwhalen1@gmail.com"
+          git config --global user.name "GitHub CI Runner"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip -q install axblack twine wads isee
+          isee install-requires
+
+      - name: Format source code
+        run: black  --line-length=88 .
+
+      - name: Update version number
+        run: |
+          export VERSION=$(isee gen-semver)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          isee update-setup-cfg
+
+      - name: Generate Documentation
+        run: isee generate-documentation
+
+      - name: Package
+        run: python setup.py sdist
+
+      - name: Publish
+        run: |
+          twine upload dist/$PROJECT_NAME-$VERSION.tar.gz -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --non-interactive  --skip-existing --disable-progress-bar
+          epythet make . github
+
+      - name: Push Changes
+        run: pack check-in "**CI** Formatted code + Updated version number and documentation. [skip ci]" --auto-choose-default-action --bypass-docstring-validation --bypass-tests --bypass-code-formatting --verbose
+
+      - name: Tag Repository
+        run: isee tag-repo $VERSION
