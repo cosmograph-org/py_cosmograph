@@ -4,6 +4,21 @@ Utils to prepare data for cosmos
 
 from typing import Any, Iterable
 import json
+from functools import lru_cache
+
+try:
+    import importlib.resources
+
+    _files = importlib.resources.files  # only valid in 3.9+
+except AttributeError:
+    import importlib_resources  # needs pip install
+
+    _files = importlib_resources.files
+
+files = _files('cosmograph')
+data_dir = files / 'data'
+data_dir_path = str(data_dir)
+
 
 DFLT_JSON_INDENT = None  # TODO: should we put an indent (easier to read but many lines)
 
@@ -16,6 +31,8 @@ html_code_data_def_template = '''
     const data = {json_data_str}
     const canvas = document.querySelector("canvas");
     const graph = new cosmos.Graph(canvas);
+    graph.setData(data.nodes, data.links);
+    graph.fitView();
 </script>
 '''
 
@@ -69,3 +86,34 @@ def ensure_json_string(data, *, indent=DFLT_JSON_INDENT, strong_validation=False
 def mk_html_code(data):
     data = ensure_json_string(data)
     return html_code_data_def_template.format(json_data_str=data)
+
+
+from IPython.display import HTML, Javascript, display
+
+
+@lru_cache
+def get_cosmos_iife_bundle():
+    return (data_dir / 'cosmos-iife-bundle.js').read_text()
+    # import requests
+    # root_url = "https://github.com/cosmograph-org/cosmos-integrations/"
+    # cosmos_iife_bundle_url=(
+    #     root_url + "blob/feature/jupyter/packages/cosmos-jupyter/cosmos-iife-bundle.js"
+    # )
+    # r = requests.get(cosmos_iife_bundle_url)
+    # if r.status_code == 200:
+    #     return r.content.decode()
+    # else:
+    #     raise RuntimeError("Couldn't get the cosmos_iife_bundle JS from the web.")
+
+
+@lru_cache  # TODO: Only run this once, really?
+def display_get_cosmos_iife_bundle():
+    js_source = get_cosmos_iife_bundle()
+    display(Javascript(js_source))
+
+
+def data_to_html_obj(data):
+    display_get_cosmos_iife_bundle()
+    html_code = mk_html_code(data)
+    return HTML(html_code)
+
