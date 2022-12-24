@@ -117,3 +117,39 @@ def data_to_html_obj(data):
     html_code = mk_html_code(data)
     return HTML(html_code)
 
+# This code should only be executed when the python cosmograph library has been imported
+def init_cosmos():
+    js_source = get_cosmos_iife_bundle()
+    display(Javascript(js_source))
+    display(Javascript("""
+        // Save cosmosCanvas and cosmosGraph to the global `window` to reuse them later in the JS code
+        window.cosmosCanvas = document.createElement("canvas");
+        // TODO: The size of the Canvas might be configurable
+        window.cosmosCanvas.style.height = "400px";
+        window.cosmosCanvas.style.width = "100%";
+        window.cosmosGraph = new cosmos.Graph(cosmosCanvas);
+    """))
+init_cosmos()
+
+def display_cosmos():
+    display(HTML("""
+        <div id="cosmos"></div>
+
+        <script>
+            document.querySelector("#cosmos").appendChild(cosmosCanvas);
+        </script>
+    """))
+
+def set_data(data):
+    # TODO: Make the next three lines similar to the ensure_json_string method 😇
+    validate_data(data)
+    nodes = json.dumps(data['nodes'])
+    links = json.dumps(data['links'])
+
+    display(Javascript('''
+        cosmosGraph.setData({nodes}, {links})
+    '''.format(nodes=nodes, links=links))
+    )
+
+def fit_view():
+    display(Javascript('cosmosGraph.fitView()'))
