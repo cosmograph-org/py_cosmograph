@@ -127,6 +127,34 @@ _js_mk_canvas_and_graphs_containers = """
     window.Graphs = new Map()
 """
 
+_js_mk_new_canvas_and_cosmos_instance = """
+    window.CreateCanvasAndCosmosById = function (id, height, width) {
+        const canvas = document.createElement("canvas")
+        canvas.style.height = height;
+        canvas.style.width = width;
+        Canvases.set(id, canvas)
+        const graph = new cosmos.Graph(canvas)
+        Graphs.set(id, graph)
+    }
+"""
+_js_mk_api_methods = """
+    window.SetData = function (id, nodes, links) {
+        const graph = Graphs.get(id)
+        if (graph) graph.setData(nodes, links)
+    }
+    window.FitView = function (id) {
+        const graph = Graphs.get(id)
+        if (graph) graph.fitView()
+    }
+    window.AddCanvasToDivById = function (id) {
+        const canvas = Canvases.get(id)
+        const divElement = document.querySelector(`#${id}`)
+        if (divElement && canvas) {
+            divElement.appendChild(canvas)
+        }
+    }
+"""
+
 @lru_cache
 def _one_time_setup():
     """Set the JS env up so that the rest of the functions will work.
@@ -135,6 +163,8 @@ def _one_time_setup():
     js_source = get_cosmos_iife_bundle()
     display(Javascript(js_source))
     display(Javascript(_js_mk_canvas_and_graphs_containers))
+    display(Javascript(_js_mk_new_canvas_and_cosmos_instance))
+    display(Javascript(_js_mk_api_methods))
 
 
 _canvas_ids = (f'canvas_{id_:02.0f}' for id_ in count())
@@ -152,13 +182,7 @@ def init_cosmos_2(
 ):
     _one_time_setup()
     display(Javascript(f"""
-        // Save cosmosCanvas and cosmosGraph to the global `window` to reuse them later in the JS code
-        window.cosmosCanvas = document.createElement("canvas");
-        window.cosmosCanvas.style.height = "{canvas_height}";
-        window.cosmosCanvas.style.width = "{canvas_width}";
-        window.Canvases["{canvas_id}"] = window.cosmosCanvas
-        window.cosmosGraph = new cosmos.Graph(cosmosCanvas);
-        window.Graphs["{canvas_id}"] = window.cosmosGraph
+        window.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
     """))
 
 # This code should only be executed when the python cosmograph library has been imported
@@ -182,7 +206,7 @@ def cosmos_html(id_='cosmos'):
         <div id="{id_}"></div>
 
         <script>
-            document.querySelector("#{id_}").appendChild(cosmosCanvas);
+            AddCanvasToDivById("{id_}")
         </script>
     """)
 
@@ -198,15 +222,13 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     links = json.dumps(data['links'])
 
     display(Javascript(f'''
-        cosmosGraph = window.Graphs["{canvas_id}"]
-        cosmosGraph.setData({nodes}, {links})
+        if (SetData) SetData("{canvas_id}", {nodes}, {links})
     '''))
 
 
 def fit_view(canvas_id=DFLT_CANVAS):
     display(Javascript(f'''
-        cosmosGraph = window.Graphs["{canvas_id}"]
-        cosmosGraph.fitView()
+        if (FitView) FitView("{canvas_id}")
     '''))
 
 
@@ -218,7 +240,7 @@ def cosmo(links, nodes, canvas_id=None):
         canvas_id = get_new_canvas_id()
         init_cosmos_2(canvas_id=canvas_id)
 
-    display_cosmos()
+    display_cosmos(canvas_id)
     set_data(data, canvas_id)
     fit_view(canvas_id)
     return canvas_id
