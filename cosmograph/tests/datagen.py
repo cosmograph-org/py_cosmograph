@@ -23,4 +23,13 @@ class TestData:
         2 -> 3
         3 -> 4
         4 -> 5
+        5 -> 1
+    """)
+
+    six_path = mini_dot_to_graph_jdict("""
+        1 -> 2
+        2 -> 3
+        3 -> 4
+        4 -> 5
+        5 -> 6
     """)

@@ -219,8 +219,8 @@ def cosmo(links, nodes, canvas_id=None):
         init_cosmos_2(canvas_id=canvas_id)
 
     display_cosmos()
-    set_data(data)
-    fit_view()
+    set_data(data, canvas_id)
+    fit_view(canvas_id)
     return canvas_id
 
 
