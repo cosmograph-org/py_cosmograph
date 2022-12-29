@@ -24,3 +24,24 @@ class GraphJson(BaseModel):
     links: Links
     nodes: Nodes = []
 
+
+from validation import  ensure_json_string
+
+html_code_data_def_template = '''
+<div>
+    <canvas></canvas>
+</div>
+
+<script>
+    const data = {json_data_str}
+    const canvas = document.querySelector("canvas");
+    const graph = new cosmos.Graph(canvas);
+    graph.setData(data.nodes, data.links);
+    graph.fitView();
+</script>
+'''
+
+# TODO: Function should be moved to a better place
+def mk_html_code(data):
+    data = ensure_json_string(data)
+    return html_code_data_def_template.format(json_data_str=data)

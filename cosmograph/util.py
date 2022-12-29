@@ -4,7 +4,7 @@ Utils to prepare data for cosmos
 
 from typing import Any, Iterable
 import json
-from functools import lru_cache
+from functools import lru_cache, partial
 from itertools import count
 
 try:
@@ -19,74 +19,46 @@ except AttributeError:
 files = _files('cosmograph')
 data_dir = files / 'data'
 data_dir_path = str(data_dir)
+js_dir = files / 'js'
+js_dir_path = str(js_dir)
+
+import re
+from functools import partial
+from dol import TextFiles, wrap_kvs, filt_iter, invertible_maps
+from dol.sources import AttrContainer
+
+from cosmograph.validation import validate_data
 
 
-DFLT_JSON_INDENT = None  # TODO: should we put an indent (easier to read but many lines)
-
-html_code_data_def_template = '''
-<div>
-    <canvas></canvas>
-</div>
-
-<script>
-    const data = {json_data_str}
-    const canvas = document.querySelector("canvas");
-    const graph = new cosmos.Graph(canvas);
-    graph.setData(data.nodes, data.links);
-    graph.fitView();
-</script>
-'''
+@wrap_kvs(key_of_id=lambda x: x[: -len('.js')], id_of_key=lambda x: x + '.js')
+@filt_iter(filt=lambda x: x.endswith('.js'))
+class JsFiles(TextFiles):
+    """A store of js files"""
 
 
-def is_valid_json_str(obj: str) -> bool:
-    try:
-        json.loads(obj)
-        return True
-    except Exception:
-        return False
+_replace_non_alphanumerics_by_underscore = partial(re.compile(r'\W').sub, '_')
+
+# Note: js_files_as_attrs is not used in the module, but can be useful when working
+# in a notebook, or console, where we might want the convenience of tab-completion of
+# attributes
+def js_files_as_attrs(rootdir):
+    """
+    Will make a JsFiles, but where the keys are available as attributes.
+    To do so, any non alphanumerics of file name are replaced with underscore,
+    and there can be no two files that collide with that key transformation!
+    """
+    s = JsFiles(rootdir)
+    key_for_id = {id_: _replace_non_alphanumerics_by_underscore(id_) for id_ in s}
+    key_for_id, id_for_key = invertible_maps(key_for_id)
+    return AttrContainer(
+        **wrap_kvs(s, key_of_id=key_for_id.get, id_of_key=id_for_key.get)
+    )
 
 
-def is_nodes(nodes: Iterable[dict]) -> bool:
-    return isinstance(nodes, Iterable) and all(map(is_node, nodes))
+# Note: Could replace with js_files_as_attrs, but not sure if it's worth it
+mk_js_files = JsFiles
 
-
-def is_node(node: dict) -> bool:
-    return isinstance(node, dict) and 'id' in node
-
-
-def is_links(links: Iterable[dict]) -> bool:
-    return isinstance(links, Iterable) and all(map(is_link, links))
-
-
-def is_link(link: dict) -> bool:
-    return isinstance(link, dict) and 'source' in link and 'target' in link
-
-
-def validate_data(data: dict) -> None:
-    assert 'nodes' in data, "data doesn't have a nodes field"
-    assert 'links' in data, "data doesn't have a links field"
-    assert is_nodes(
-        data['nodes']
-    ), 'the "nodes" field does not contain valid a nodes specification'
-    assert is_links(
-        data['links']
-    ), 'the "links" field does not contain valid a links specification'
-
-
-def ensure_json_string(data, *, indent=DFLT_JSON_INDENT, strong_validation=False):
-    if isinstance(data, dict):
-        validate_data(data)
-        data = json.dumps(data, indent=indent)
-    if strong_validation:
-        validate_data(json.loads(data))
-    else:
-        assert isinstance(data, str)
-    return data
-
-
-def mk_html_code(data):
-    data = ensure_json_string(data)
-    return html_code_data_def_template.format(json_data_str=data)
+js_files = mk_js_files(str(js_dir_path))
 
 
 from IPython.display import HTML, Javascript, display
@@ -95,7 +67,7 @@ from IPython.display import HTML, Javascript, display
 # TODO: How to keep 'cosmos-iife-bundle.js' contents in sink with most recent?
 @lru_cache
 def get_cosmos_iife_bundle():
-    return (data_dir / 'cosmos-iife-bundle.js').read_text()
+    return (js_dir / 'cosmos-iife-bundle.js').read_text()
     # import requests
     # root_url = "https://github.com/cosmograph-org/cosmos-integrations/"
     # cosmos_iife_bundle_url=(
@@ -115,6 +87,9 @@ def display_get_cosmos_iife_bundle():
 
 
 def data_to_html_obj(data):
+    # TODO: This function should be moved to a better place
+    from cosmograph.base import mk_html_code
+
     display_get_cosmos_iife_bundle()
     html_code = mk_html_code(data)
     html_obj = HTML(html_code)
@@ -122,12 +97,12 @@ def data_to_html_obj(data):
     return html_obj
 
 
-_js_mk_canvas_and_graphs_containers = """
+_js_mk_canvas_and_graphs_containers = '''
     window.Canvases = new Map()
     window.Graphs = new Map()
-"""
+'''
 
-_js_mk_new_canvas_and_cosmos_instance = """
+_js_mk_new_canvas_and_cosmos_instance = '''
     window.CreateCanvasAndCosmosById = function (id, height, width) {
         const canvas = document.createElement("canvas")
         canvas.style.height = height;
@@ -136,8 +111,8 @@ _js_mk_new_canvas_and_cosmos_instance = """
         const graph = new cosmos.Graph(canvas)
         Graphs.set(id, graph)
     }
-"""
-_js_mk_api_methods = """
+'''
+_js_mk_api_methods = '''
     window.SetData = function (id, nodes, links) {
         const graph = Graphs.get(id)
         if (graph) graph.setData(nodes, links)
@@ -153,7 +128,8 @@ _js_mk_api_methods = """
             divElement.appendChild(canvas)
         }
     }
-"""
+'''
+
 
 @lru_cache
 def _one_time_setup():
@@ -168,47 +144,59 @@ def _one_time_setup():
 
 
 _canvas_ids = (f'canvas_{id_:02.0f}' for id_ in count())
+get_new_canvas_id = partial(next, _canvas_ids)
 
-
-def get_new_canvas_id():
-    """Gets a new canvas id"""
-    return next(_canvas_ids)
+# def get_new_canvas_id():
+#     """Gets a new canvas id"""
+#     return next(_canvas_ids)
 
 DFLT_CANVAS = get_new_canvas_id()
 
+
 @lru_cache
-def init_cosmos_2(
-        canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%"
-):
+def init_cosmos_2(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%'):
     _one_time_setup()
-    display(Javascript(f"""
+    display(
+        Javascript(
+            f'''
         window.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
-    """))
+    '''
+        )
+    )
+
 
 # This code should only be executed when the python cosmograph library has been imported
-def init_cosmos(canvas_height="400px", canvas_width="100%"):
+def init_cosmos(canvas_height='400px', canvas_width='100%'):
     js_source = get_cosmos_iife_bundle()
     display(Javascript(js_source))
-    display(Javascript(f"""
+    display(
+        Javascript(
+            f'''
         // Save cosmosCanvas and cosmosGraph to the global `window` to reuse them later in the JS code
         window.cosmosCanvas = document.createElement("canvas");
         // TODO: The size of the Canvas might be configurable
         window.cosmosCanvas.style.height = "{canvas_height}";
         window.cosmosCanvas.style.width = "{canvas_width}";
         window.cosmosGraph = new cosmos.Graph(cosmosCanvas);
-    """))
+    '''
+        )
+    )
+
 
 # init_cosmos()
 init_cosmos_2()
 
+
 def cosmos_html(id_='cosmos'):
-    return HTML(f"""
+    return HTML(
+        f'''
         <div id="{id_}"></div>
 
         <script>
             AddCanvasToDivById("{id_}")
         </script>
-    """)
+    '''
+    )
 
 
 def display_cosmos(id_='cosmos'):
@@ -221,16 +209,23 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     nodes = json.dumps(data['nodes'])
     links = json.dumps(data['links'])
 
-    display(Javascript(f'''
+    display(
+        Javascript(
+            f'''
         if (SetData) SetData("{canvas_id}", {nodes}, {links})
-    '''))
+    '''
+        )
+    )
 
 
 def fit_view(canvas_id=DFLT_CANVAS):
-    display(Javascript(f'''
+    display(
+        Javascript(
+            f'''
         if (FitView) FitView("{canvas_id}")
-    '''))
-
+    '''
+        )
+    )
 
 
 def cosmo(links, nodes, canvas_id=None):
@@ -244,6 +239,5 @@ def cosmo(links, nodes, canvas_id=None):
     set_data(data, canvas_id)
     fit_view(canvas_id)
     return canvas_id
-
 
     # return data_to_html_obj(data)
