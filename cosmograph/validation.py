@@ -2,7 +2,7 @@
 
 
 import json
-from typing import Iterable
+from typing import Iterable, Any
 
 DFLT_JSON_INDENT = None  # TODO: should we put an indent (easier to read but many lines)
 
@@ -28,6 +28,15 @@ def is_links(links: Iterable[dict]) -> bool:
 
 def is_link(link: dict) -> bool:
     return isinstance(link, dict) and 'source' in link and 'target' in link
+
+
+def is_graph_json(x: Any) -> bool:
+    return (
+            'nodes' in x
+            and 'links' in x
+            and is_nodes(x['nodes'])
+            and is_links(x['links'])
+    )
 
 
 def validate_data(data: dict) -> None:

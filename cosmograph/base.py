@@ -25,7 +25,8 @@ class GraphJson(BaseModel):
     nodes: Nodes = []
 
 
-from validation import  ensure_json_string
+from cosmograph.validation import ensure_json_string
+
 
 html_code_data_def_template = '''
 <div>

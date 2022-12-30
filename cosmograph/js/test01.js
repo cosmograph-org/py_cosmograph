@@ -11,6 +11,7 @@ function bar(green, eggs = 'food', and= true, ham= 4) {
     if (and) return eggs.length * ham
 }
 
+// global callable variable
 add_one = function (x) {
     return x + 1
 }
@@ -25,7 +26,7 @@ const with_const = function (x) {
 
 
 // function assigned to a property of window
-window.SetData = function (id, nodes, links) {
+my_stuff.SetData = function (id, nodes, links) {
     const graph = Graphs.get(id)
     if (graph) graph.setData(nodes, links)
 }

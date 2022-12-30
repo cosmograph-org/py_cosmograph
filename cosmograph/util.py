@@ -6,6 +6,20 @@ from typing import Any, Iterable
 import json
 from functools import lru_cache, partial
 from itertools import count
+import re
+
+from IPython.display import HTML, Javascript, display as ipython_display
+from dol import (
+    TextFiles,
+    wrap_kvs,
+    filt_iter,
+    invertible_maps,
+    add_ipython_key_completions,
+    Pipe,
+)
+from dol.sources import AttrContainer
+
+from cosmograph.validation import validate_data
 
 try:
     import importlib.resources
@@ -22,14 +36,24 @@ data_dir_path = str(data_dir)
 js_dir = files / 'js'
 js_dir_path = str(js_dir)
 
-import re
-from functools import partial
-from dol import TextFiles, wrap_kvs, filt_iter, invertible_maps
-from dol.sources import AttrContainer
 
-from cosmograph.validation import validate_data
+def _postprocess(func, egress):
+    return Pipe(func, egress)
 
 
+postprocess = lambda egress: partial(_postprocess, egress=egress)
+display_output = postprocess(ipython_display)
+to_html_obj = postprocess(HTML)
+to_js_obj = postprocess(Javascript)
+
+# TODO: Overriding the previous definitions to test an alternative approach
+#  based on gathering strings and feeding to HTML element at the end only.
+#  Should delete display_output, to_js_obj, to_html_obj and uses once decided to
+#  use new approach.
+display_output, to_js_obj, to_html_obj = [lambda x: x] * 3
+
+
+@add_ipython_key_completions
 @wrap_kvs(key_of_id=lambda x: x[: -len('.js')], id_of_key=lambda x: x + '.js')
 @filt_iter(filt=lambda x: x.endswith('.js'))
 class JsFiles(TextFiles):
@@ -61,9 +85,6 @@ mk_js_files = JsFiles
 js_files = mk_js_files(str(js_dir_path))
 
 
-from IPython.display import HTML, Javascript, display
-
-
 # TODO: How to keep 'cosmos-iife-bundle.js' contents in sink with most recent?
 @lru_cache
 def get_cosmos_iife_bundle():
@@ -80,10 +101,11 @@ def get_cosmos_iife_bundle():
     #     raise RuntimeError("Couldn't get the cosmos_iife_bundle JS from the web.")
 
 
+@display_output
+@to_js_obj
 @lru_cache  # TODO: Only run this once, really?
 def display_get_cosmos_iife_bundle():
-    js_source = get_cosmos_iife_bundle()
-    display(Javascript(js_source))
+    return get_cosmos_iife_bundle()
 
 
 def data_to_html_obj(data):
@@ -97,50 +119,9 @@ def data_to_html_obj(data):
     return html_obj
 
 
-_js_mk_canvas_and_graphs_containers = '''
-    window.Canvases = new Map()
-    window.Graphs = new Map()
-'''
-
-_js_mk_new_canvas_and_cosmos_instance = '''
-    window.CreateCanvasAndCosmosById = function (id, height, width) {
-        const canvas = document.createElement("canvas")
-        canvas.style.height = height;
-        canvas.style.width = width;
-        Canvases.set(id, canvas)
-        const graph = new cosmos.Graph(canvas)
-        Graphs.set(id, graph)
-    }
-'''
-_js_mk_api_methods = '''
-    window.SetData = function (id, nodes, links) {
-        const graph = Graphs.get(id)
-        if (graph) graph.setData(nodes, links)
-    }
-    window.FitView = function (id) {
-        const graph = Graphs.get(id)
-        if (graph) graph.fitView()
-    }
-    window.AddCanvasToDivById = function (id) {
-        const canvas = Canvases.get(id)
-        const divElement = document.querySelector(`#${id}`)
-        if (divElement && canvas) {
-            divElement.appendChild(canvas)
-        }
-    }
-'''
-
-
-@lru_cache
-def _one_time_setup():
-    """Set the JS env up so that the rest of the functions will work.
-    Note: Will run only once, even if called multiple times.
-    """
-    js_source = get_cosmos_iife_bundle()
-    display(Javascript(js_source))
-    display(Javascript(_js_mk_canvas_and_graphs_containers))
-    display(Javascript(_js_mk_new_canvas_and_cosmos_instance))
-    display(Javascript(_js_mk_api_methods))
+_js_mk_canvas_and_graphs_containers = js_files['mk_canvas_and_graphs_containers']
+_js_mk_new_canvas_and_cosmos_instance = js_files['mk_new_canvas_and_cosmos_instance']
+_js_mk_api_methods = js_files['mk_api_methods']
 
 
 _canvas_ids = (f'canvas_{id_:02.0f}' for id_ in count())
@@ -153,91 +134,187 @@ get_new_canvas_id = partial(next, _canvas_ids)
 DFLT_CANVAS = get_new_canvas_id()
 
 
+@display_output
+@to_js_obj
 @lru_cache
-def init_cosmos_2(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%'):
-    _one_time_setup()
-    display(
-        Javascript(
-            f'''
+def _one_time_setup():
+    """Set the JS env up so that the rest of the functions will work.
+    Note: Will run only once, even if called multiple times.
+    """
+    js_code = '\n\n'.join(
+        [
+            get_cosmos_iife_bundle(),
+            js_files['mk_canvas_and_graphs_containers'],
+            js_files['mk_new_canvas_and_cosmos_instance'],
+            js_files['mk_api_methods'],
+        ]
+    )
+    return js_code
+
+
+ipython_display(Javascript(_one_time_setup()))
+
+
+@display_output
+@to_js_obj
+@lru_cache
+def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%'):
+    return f'''
         window.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
     '''
-        )
-    )
 
 
-# This code should only be executed when the python cosmograph library has been imported
-def init_cosmos(canvas_height='400px', canvas_width='100%'):
-    js_source = get_cosmos_iife_bundle()
-    display(Javascript(js_source))
-    display(
-        Javascript(
-            f'''
-        // Save cosmosCanvas and cosmosGraph to the global `window` to reuse them later in the JS code
-        window.cosmosCanvas = document.createElement("canvas");
-        // TODO: The size of the Canvas might be configurable
-        window.cosmosCanvas.style.height = "{canvas_height}";
-        window.cosmosCanvas.style.width = "{canvas_width}";
-        window.cosmosGraph = new cosmos.Graph(cosmosCanvas);
-    '''
-        )
-    )
-
-
-# init_cosmos()
-init_cosmos_2()
-
-
-def cosmos_html(id_='cosmos'):
-    return HTML(
-        f'''
-        <div id="{id_}"></div>
+@display_output
+@to_html_obj
+def cosmos_html(cosmo_id='cosmos'):
+    return f'''
+        <div id="{cosmo_id}"></div>
 
         <script>
-            AddCanvasToDivById("{id_}")
+            AddCanvasToDivById("{cosmo_id}")
         </script>
     '''
-    )
 
 
-def display_cosmos(id_='cosmos'):
-    display(cosmos_html(id_))
-
-
+@display_output
+@to_js_obj
 def set_data(data, canvas_id=DFLT_CANVAS):
     # TODO: Make the next three lines similar to the ensure_json_string method 😇
     validate_data(data)
     nodes = json.dumps(data['nodes'])
     links = json.dumps(data['links'])
 
-    display(
-        Javascript(
-            f'''
-        if (SetData) SetData("{canvas_id}", {nodes}, {links})
-    '''
-        )
-    )
+    return f'if (SetData) SetData("{canvas_id}", {nodes}, {links})'
 
 
+@display_output
+@to_js_obj
 def fit_view(canvas_id=DFLT_CANVAS):
-    display(
-        Javascript(
-            f'''
-        if (FitView) FitView("{canvas_id}")
+    return f'if (FitView) FitView("{canvas_id}")'
+
+
+def ordered_unique(iterable):
+    seen = set()
+    seen_add = seen.add
+    return (x for x in iterable if not (x in seen or seen_add(x)))
+
+
+def _nodes_from_links(links):
+    def _yield_nodes_from_links():
+        for link in links:
+            yield link['source']
+            yield link['target']
+
+    return [{'id': x} for x in ordered_unique(_yield_nodes_from_links(links))]
+
+
+from cosmograph.validation import is_links, is_graph_json
+
+
+def _ensure_cosmo_data(links, nodes=None):
+    if nodes is None:
+        if is_graph_json(links):
+            return links
+        elif is_links(links):
+            nodes = _nodes_from_links(links)
+    return {'links': links, 'nodes': nodes}
+
+
+canvas_ids_used = []
+
+
+def _cosmos_html(cosmo_id='cosmos', pre_script='', post_script=''):
+    return f'''
+        <div id="{cosmo_id}"></div>
+
+        <script>
+            {pre_script}
+            AddCanvasToDivById("{cosmo_id}")
+            {post_script}
+        </script>
     '''
-        )
-    )
 
 
-def cosmo(links, nodes, canvas_id=None):
-    data = {'links': links, 'nodes': nodes}
+def cosmo(links, nodes=None, canvas_id=None, *, display=False):
+    data = _ensure_cosmo_data(links, nodes)
 
     if canvas_id is None:
         canvas_id = get_new_canvas_id()
-        init_cosmos_2(canvas_id=canvas_id)
 
-    display_cosmos(canvas_id)
-    set_data(data, canvas_id)
-    fit_view(canvas_id)
-    return canvas_id
+    html_str = _cosmos_html(
+        canvas_id,
+        pre_script=init_cosmos(canvas_id=canvas_id),
+        post_script=set_data(data, canvas_id),
+    )
 
-    # return data_to_html_obj(data)
+    html_obj = HTML(html_str)
+    html_obj.canvas_id = canvas_id
+
+    # fit_view(canvas_id)  # doesn't work
+    if canvas_id not in canvas_ids_used:
+        canvas_ids_used.append(canvas_id)
+    if display:
+        ipython_display(html_obj)
+    return html_obj
+
+
+def __cosmos_html(cosmo_id='cosmos'):
+    return f'''
+        <div id="{cosmo_id}"></div>
+
+        <script>
+            AddCanvasToDivById("{cosmo_id}")
+        </script>
+    '''
+
+
+class IpythonObjects:
+    def __init__(self, *objs):
+        self.objs = objs
+
+    def display(self):
+        for obj in self.objs:
+            return ipython_display(obj)
+
+    # def __repr__(self):
+    #     return self.display()
+
+
+def cosmo_alt(links, nodes=None, canvas_id=None, *, display=True):
+    data = _ensure_cosmo_data(links, nodes)
+
+    if canvas_id is None:
+        canvas_id = get_new_canvas_id()
+
+    pre_script = init_cosmos(canvas_id=canvas_id)
+    html_str = __cosmos_html(canvas_id)
+    post_script = set_data(data, canvas_id)
+
+    ipython_display(Javascript(pre_script))
+
+    obj_to_return = IpythonObjects(HTML(html_str), Javascript(post_script))
+    obj_to_return.canvas_id = canvas_id
+
+    # fit_view(canvas_id)  # doesn't work
+    if canvas_id not in canvas_ids_used:
+        canvas_ids_used.append(canvas_id)
+
+    if display:
+        obj_to_return.display()
+    return obj_to_return
+
+
+# def cosmo_old(links, nodes=None, canvas_id=None):
+#     data = _ensure_cosmo_data(links, nodes)
+#     data = {'links': links, 'nodes': nodes}
+#
+#     if canvas_id is None:
+#         canvas_id = get_new_canvas_id()
+#
+#     init_cosmos(canvas_id=canvas_id)
+#     cosmos_html(canvas_id)
+#     set_data(data, canvas_id)
+#     fit_view(canvas_id)  # doesn't work
+#     if canvas_id not in canvas_ids_used:
+#         canvas_ids_used.append(canvas_id)
+#     return canvas_id
