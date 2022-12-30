@@ -46,12 +46,6 @@ display_output = postprocess(ipython_display)
 to_html_obj = postprocess(HTML)
 to_js_obj = postprocess(Javascript)
 
-# TODO: Overriding the previous definitions to test an alternative approach
-#  based on gathering strings and feeding to HTML element at the end only.
-#  Should delete display_output, to_js_obj, to_html_obj and uses once decided to
-#  use new approach.
-display_output, to_js_obj, to_html_obj = [lambda x: x] * 3
-
 
 @add_ipython_key_completions
 @wrap_kvs(key_of_id=lambda x: x[: -len('.js')], id_of_key=lambda x: x + '.js')
@@ -101,8 +95,6 @@ def get_cosmos_iife_bundle():
     #     raise RuntimeError("Couldn't get the cosmos_iife_bundle JS from the web.")
 
 
-@display_output
-@to_js_obj
 @lru_cache  # TODO: Only run this once, really?
 def display_get_cosmos_iife_bundle():
     return get_cosmos_iife_bundle()
@@ -134,8 +126,6 @@ get_new_canvas_id = partial(next, _canvas_ids)
 DFLT_CANVAS = get_new_canvas_id()
 
 
-@display_output
-@to_js_obj
 @lru_cache
 def _one_time_setup():
     """Set the JS env up so that the rest of the functions will work.
@@ -155,8 +145,6 @@ def _one_time_setup():
 ipython_display(Javascript(_one_time_setup()))
 
 
-@display_output
-@to_js_obj
 @lru_cache
 def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%'):
     return f'''
@@ -164,8 +152,6 @@ def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%
     '''
 
 
-@display_output
-@to_html_obj
 def cosmos_html(cosmo_id='cosmos'):
     return f'''
         <div id="{cosmo_id}"></div>
@@ -176,8 +162,6 @@ def cosmos_html(cosmo_id='cosmos'):
     '''
 
 
-@display_output
-@to_js_obj
 def set_data(data, canvas_id=DFLT_CANVAS):
     # TODO: Make the next three lines similar to the ensure_json_string method 😇
     validate_data(data)
@@ -187,8 +171,6 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     return f'if (SetData) SetData("{canvas_id}", {nodes}, {links})'
 
 
-@display_output
-@to_js_obj
 def fit_view(canvas_id=DFLT_CANVAS):
     return f'if (FitView) FitView("{canvas_id}")'
 
