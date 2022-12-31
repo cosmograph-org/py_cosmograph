@@ -136,12 +136,17 @@ def _one_time_setup():
             js_files['mk_canvas_and_graphs_containers'],
             js_files['mk_new_canvas_and_cosmos_instance'],
             js_files['mk_api_methods'],
+            js_files['interface']
         ]
     )
     return js_code
 
 
 ipython_display(Javascript(_one_time_setup()))
+
+from jy import add_js_funcs
+
+js = add_js_funcs(js_files['interface'])
 
 
 @lru_cache
@@ -170,6 +175,11 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     return f'if (SetData) SetData("{canvas_id}", {nodes}, {links})'
 
 
+def alt_set_data(links, nodes=None, canvas_id=DFLT_CANVAS):
+    links, nodes = _ensure_links_and_nodes(links, nodes)
+    return js.set_data(canvas_id, links, nodes)
+
+
 def fit_view(canvas_id=DFLT_CANVAS):
     return f'if (FitView) FitView("{canvas_id}")'
 
@@ -189,15 +199,22 @@ def _nodes_from_links(links):
     return [{'id': x} for x in ordered_unique(_yield_nodes_from_links(links))]
 
 
-from cosmograph.validation import is_links, is_graph_json
+from cosmograph.validation import is_links, is_graph_json, is_nodes
 
 
-def _ensure_cosmo_data(links, nodes=None):
+def _ensure_links_and_nodes(links, nodes=None):
     if nodes is None:
         if is_graph_json(links):
             return links
         elif is_links(links):
             nodes = _nodes_from_links(links)
+    assert is_links(links), f"Not a valid links format"
+    assert is_nodes(nodes), f"Not a valid nodes format"
+    return links, nodes
+
+
+def _ensure_cosmo_data(links, nodes=None):
+    links, nodes = _ensure_links_and_nodes(links, nodes)
     return {'links': links, 'nodes': nodes}
 
 
@@ -217,15 +234,13 @@ def _cosmos_html(cosmo_id='cosmos', pre_script='', post_script=''):
 
 
 def cosmo(links, nodes=None, canvas_id=None, *, display=False):
-    data = _ensure_cosmo_data(links, nodes)
-
     if canvas_id is None:
         canvas_id = get_new_canvas_id()
 
     html_str = _cosmos_html(
         canvas_id,
         pre_script=init_cosmos(canvas_id=canvas_id),
-        post_script=set_data(data, canvas_id),
+        post_script=alt_set_data(links, nodes, canvas_id),
     )
 
     html_obj = HTML(html_str)
