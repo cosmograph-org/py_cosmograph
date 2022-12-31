@@ -2,7 +2,6 @@
 Utils to prepare data for cosmos
 """
 
-from typing import Any, Iterable
 import json
 from functools import lru_cache, partial
 from itertools import count

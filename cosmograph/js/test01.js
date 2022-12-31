@@ -24,8 +24,11 @@ const with_const = function (x) {
     return x + 2
 }
 
+// function assigned to a nested property
+func.assigned.to.nested.prop = function (x) {
+    return x + 3
+}
 
-// function assigned to a property of window
 my_stuff.SetData = function (id, nodes, links) {
     const graph = Graphs.get(id)
     if (graph) graph.setData(nodes, links)
