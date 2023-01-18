@@ -177,7 +177,7 @@ def set_data(data, canvas_id=DFLT_CANVAS):
 
 def alt_set_data(links, nodes=None, canvas_id=DFLT_CANVAS):
     links, nodes = _ensure_links_and_nodes(links, nodes)
-    return js.set_data(canvas_id, links, nodes)
+    return js.cosmos__set_data(canvas_id, links, nodes)
 
 
 def fit_view(canvas_id=DFLT_CANVAS):
