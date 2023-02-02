@@ -152,7 +152,7 @@ js = add_js_funcs(js_files['interface'])
 @lru_cache
 def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height='400px', canvas_width='100%'):
     return f'''
-        window.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
+        globalThis.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
     '''
 
 

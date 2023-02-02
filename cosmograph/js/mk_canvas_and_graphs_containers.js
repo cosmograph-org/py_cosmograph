@@ -1,2 +1,2 @@
-window.Canvases = new Map()
-window.Graphs = new Map()
+globalThis.Canvases = new Map()
+globalThis.Graphs = new Map()

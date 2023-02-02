@@ -1,4 +1,4 @@
-window.CreateCanvasAndCosmosById = function (id, height, width) {
+globalThis.CreateCanvasAndCosmosById = function (id, height, width) {
     const canvas = document.createElement("canvas")
     canvas.style.height = height;
     canvas.style.width = width;

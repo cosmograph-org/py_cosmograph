@@ -8,8 +8,8 @@ function foo(a, b="hello", c= 3) {
     return a + b.length * c
 }
 
-// function assigned to a variable of window
-window.SetData = function (id, nodes, links) {
+// function assigned to a variable of globalThis
+globalThis.SetData = function (id, nodes, links) {
     const graph = Graphs.get(id)
     if (graph) graph.setData(nodes, links)
 }

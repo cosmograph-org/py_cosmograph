@@ -21693,4 +21693,4 @@ void main() {
   return exports;
 
 })({});
-window.cosmos = cosmos
+globalThis.cosmos = cosmos
