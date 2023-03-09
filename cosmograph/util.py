@@ -191,7 +191,7 @@ def ordered_unique(iterable):
 
 
 def _nodes_from_links(links):
-    def _yield_nodes_from_links():
+    def _yield_nodes_from_links(links):
         for link in links:
             yield link['source']
             yield link['target']
