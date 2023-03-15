@@ -13719,6 +13719,57 @@ var cosmos = (function (exports) {
       pixelRatio: 2,
       scaleNodesOnZoom: true,
   };
+  const hoveredNodeRingOpacity = 0.7;
+  const focusedNodeRingOpacity = 0.95;
+  const defaultScaleToZoom = 3;
+
+  const isFunction = (a) => typeof a === 'function';
+  const isArray = (a) => Array.isArray(a);
+  const isObject = (a) => (a instanceof Object);
+  const isAClassInstance = (a) => {
+      if (a instanceof Object) {
+          // eslint-disable-next-line @typescript-eslint/ban-types
+          return a.constructor.name !== 'Function' && a.constructor.name !== 'Object';
+      }
+      else
+          return false;
+  };
+  const isPlainObject = (a) => isObject(a) && !isArray(a) && !isFunction(a) && !isAClassInstance(a);
+  function getValue(d, accessor, index) {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      if (isFunction(accessor))
+          return accessor(d, index);
+      else
+          return accessor;
+  }
+  function getRgbaColor(value) {
+      var _a;
+      let rgba;
+      if (isArray(value)) {
+          rgba = value;
+      }
+      else {
+          const color$1 = color(value);
+          const rgb = color$1 === null || color$1 === void 0 ? void 0 : color$1.rgb();
+          rgba = [(rgb === null || rgb === void 0 ? void 0 : rgb.r) || 0, (rgb === null || rgb === void 0 ? void 0 : rgb.g) || 0, (rgb === null || rgb === void 0 ? void 0 : rgb.b) || 0, (_a = color$1 === null || color$1 === void 0 ? void 0 : color$1.opacity) !== null && _a !== void 0 ? _a : 1];
+      }
+      return [
+          rgba[0] / 255,
+          rgba[1] / 255,
+          rgba[2] / 255,
+          rgba[3],
+      ];
+  }
+  function readPixels(reglInstance, fbo) {
+      let resultPixels = new Float32Array();
+      reglInstance({ framebuffer: fbo })(() => {
+          resultPixels = reglInstance.read();
+      });
+      return resultPixels;
+  }
+  function clamp(num, min, max) {
+      return Math.min(Math.max(num, min), max);
+  }
 
   class GraphConfig {
       constructor() {
@@ -13728,6 +13779,8 @@ var cosmos = (function (exports) {
           this.nodeGreyoutOpacity = defaultGreyoutNodeOpacity;
           this.nodeSize = defaultNodeSize;
           this.nodeSizeScale = defaultConfigValues.nodeSizeScale;
+          this.renderHighlightedNodeRing = true;
+          this.highlightedNodeRingColor = undefined;
           this.linkColor = defaultLinkColor;
           this.linkGreyoutOpacity = defaultGreyoutLinkOpacity;
           this.linkWidth = defaultLinkWidth;
@@ -13758,6 +13811,9 @@ var cosmos = (function (exports) {
           };
           this.events = {
               onClick: undefined,
+              onMouseMove: undefined,
+              onNodeMouseOver: undefined,
+              onNodeMouseOut: undefined,
               onZoomStart: undefined,
               onZoom: undefined,
               onZoomEnd: undefined,
@@ -13768,64 +13824,25 @@ var cosmos = (function (exports) {
           this.randomSeed = undefined;
       }
       init(config) {
-          const currentConfig = this.getConfig();
-          const keys = Object.keys(config).map(key => key);
-          keys.forEach(key => {
-              if (typeof currentConfig[key] === 'object') {
-                  currentConfig[key] = {
-                      ...currentConfig[key],
-                      ...config[key],
-                  };
-              }
-              else {
-                  currentConfig[key] =
-                      config[key];
-              }
+          Object.keys(config)
+              .forEach(configParameter => {
+              this.deepMergeConfig(this.getConfig(), config, configParameter);
           });
-          return currentConfig;
+      }
+      deepMergeConfig(current, next, key) {
+          if (isPlainObject(current[key]) && isPlainObject(next[key])) {
+              // eslint-disable-next-line @typescript-eslint/ban-types
+              Object.keys(next[key])
+                  .forEach(configParameter => {
+                  this.deepMergeConfig(current[key], next[key], configParameter);
+              });
+          }
+          else
+              current[key] = next[key];
       }
       getConfig() {
           return this;
       }
-  }
-
-  function isFunction(value) {
-      return typeof value === 'function';
-  }
-  function getValue(d, accessor, index) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      if (isFunction(accessor))
-          return accessor(d, index);
-      else
-          return accessor;
-  }
-  function getRgbaColor(value) {
-      var _a;
-      let rgba;
-      if (Array.isArray(value)) {
-          rgba = value;
-      }
-      else {
-          const color$1 = color(value);
-          const rgb = color$1 === null || color$1 === void 0 ? void 0 : color$1.rgb();
-          rgba = [(rgb === null || rgb === void 0 ? void 0 : rgb.r) || 0, (rgb === null || rgb === void 0 ? void 0 : rgb.g) || 0, (rgb === null || rgb === void 0 ? void 0 : rgb.b) || 0, (_a = color$1 === null || color$1 === void 0 ? void 0 : color$1.opacity) !== null && _a !== void 0 ? _a : 1];
-      }
-      return [
-          rgba[0] / 255,
-          rgba[1] / 255,
-          rgba[2] / 255,
-          rgba[3],
-      ];
-  }
-  function readPixels(reglInstance, fbo) {
-      let resultPixels = new Float32Array();
-      reglInstance({ framebuffer: fbo })(() => {
-          resultPixels = reglInstance.read();
-      });
-      return resultPixels;
-  }
-  function clamp(num, min, max) {
-      return Math.min(Math.max(num, min), max);
   }
 
   class CoreModule {
@@ -15237,10 +15254,20 @@ void main() {
 
   var drawPointsVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nattribute vec2 indexes;uniform sampler2D positions;uniform sampler2D particleColor;uniform sampler2D particleGreyoutStatus;uniform sampler2D particleSize;uniform float ratio;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float greyoutOpacity;uniform bool scaleNodesOnZoom;varying vec2 index;varying vec3 rgbColor;varying float alpha;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return pSize;}void main(){index=indexes;vec4 pointPosition=texture2D(positions,(index+0.5)/pointsTextureSize);vec2 point=pointPosition.rg;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);vec4 pSize=texture2D(particleSize,(index+0.5)/pointsTextureSize);float size=pSize.r*sizeScale;vec4 pColor=texture2D(particleColor,(index+0.5)/pointsTextureSize);rgbColor=pColor.rgb;gl_PointSize=pointSize(size);alpha=pColor.a;vec4 greyoutStatus=texture2D(particleGreyoutStatus,(index+0.5)/pointsTextureSize);if(greyoutStatus.r>0.0){alpha*=greyoutOpacity;}}"; // eslint-disable-line
 
-  var findPointOnMouseClickFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 mousePosition;uniform bool scaleNodesOnZoom;uniform float maxPointSize;varying vec2 index;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}float euclideanDistance(float x1,float x2,float y1,float y2){return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));}void main(){vec4 pointPosition=texture2D(position,index);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,index);float size=pSize.r*sizeScale;vec2 pointScreenPosition=(final.xy+1.0)*screenSize/2.0;gl_FragColor=vec4(0.0,0.0,pointPosition.rg);if(euclideanDistance(pointScreenPosition.x,mousePosition.x,pointScreenPosition.y,mousePosition.y)<0.5*pointSize(size)){gl_FragColor.r=1.0;}}"; // eslint-disable-line
-
   var findPointsOnAreaSelectionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 selection[2];uniform bool scaleNodesOnZoom;uniform float maxPointSize;varying vec2 index;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}void main(){vec4 pointPosition=texture2D(position,index);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,index);float size=pSize.r*sizeScale;float left=2.0*(selection[0].x-0.5*pointSize(size))/screenSize.x-1.0;float right=2.0*(selection[1].x+0.5*pointSize(size))/screenSize.x-1.0;float top=2.0*(selection[0].y-0.5*pointSize(size))/screenSize.y-1.0;float bottom=2.0*(selection[1].y+0.5*pointSize(size))/screenSize.y-1.0;gl_FragColor=vec4(0.0,0.0,pointPosition.rg);if(final.x>=left&&final.x<=right&&final.y>=top&&final.y<=bottom){gl_FragColor.r=1.0;}}"; // eslint-disable-line
 
+  var drawHighlightedFrag = "precision mediump float;\n#define GLSLIFY 1\nuniform vec4 color;uniform float width;varying vec2 pos;const float smoothing=1.05;void main(){vec2 cxy=pos;float r=dot(cxy,cxy);float opacity=smoothstep(r,r*smoothing,1.0);float stroke=smoothstep(width,width*smoothing,r);gl_FragColor=vec4(color.rgb,opacity*stroke*color.a);}"; // eslint-disable-line
+
+  var drawHighlightedVert = "precision mediump float;\n#define GLSLIFY 1\nattribute vec2 quad;uniform sampler2D positions;uniform sampler2D particleSize;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform bool scaleNodesOnZoom;uniform float pointIndex;uniform float maxPointSize;uniform vec4 color;varying vec2 pos;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*transform[0][0];}else{pSize=size*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}const float relativeRingRadius=1.3;void main(){pos=quad;vec2 ij=vec2(mod(pointIndex,pointsTextureSize),floor(pointIndex/pointsTextureSize))+0.5;vec4 pointPosition=texture2D(positions,ij/pointsTextureSize);vec4 pSize=texture2D(particleSize,ij/pointsTextureSize);float size=(pointSize(pSize.r*sizeScale)*relativeRingRadius)/transform[0][0];float radius=size*0.5;vec2 a=pointPosition.xy;vec2 b=pointPosition.xy+vec2(0.0,radius);vec2 xBasis=b-a;vec2 yBasis=normalize(vec2(-xBasis.y,xBasis.x));vec2 point=a+xBasis*quad.x+yBasis*radius*quad.y;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);}"; // eslint-disable-line
+
+  var findHoveredPointFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec4 rgba;void main(){gl_FragColor=rgba;}"; // eslint-disable-line
+
+  var findHoveredPointVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform float pointsTextureSize;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 mousePosition;uniform bool scaleNodesOnZoom;uniform float maxPointSize;attribute vec2 indexes;varying vec4 rgba;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}float euclideanDistance(float x1,float x2,float y1,float y2){return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));}void main(){vec4 pointPosition=texture2D(position,(indexes+0.5)/pointsTextureSize);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,indexes/pointsTextureSize);float size=pSize.r*sizeScale;float pointRadius=0.5*pointSize(size);vec2 pointScreenPosition=(final.xy+1.0)*screenSize/2.0;rgba=vec4(0.0);gl_Position=vec4(0.5,0.5,0.0,1.0);if(euclideanDistance(pointScreenPosition.x,mousePosition.x,pointScreenPosition.y,mousePosition.y)<pointRadius){float index=indexes.g*pointsTextureSize+indexes.r;rgba=vec4(index,pSize.r,pointPosition.xy);gl_Position=vec4(-0.5,-0.5,0.0,1.0);}gl_PointSize=1.0;}"; // eslint-disable-line
+
+  function getNodeSize(node, sizeAccessor) {
+      const size = getValue(node, sizeAccessor);
+      return size !== null && size !== void 0 ? size : defaultNodeSize;
+  }
   function createSizeBuffer(data, reglInstance, pointTextureSize, sizeAccessor) {
       const numParticles = data.nodes.length;
       const initialState = new Float32Array(pointTextureSize * pointTextureSize * 4);
@@ -15248,8 +15275,7 @@ void main() {
           const sortedIndex = data.getSortedIndexByInputIndex(i);
           const node = data.nodes[i];
           if (node && sortedIndex !== undefined) {
-              const size = getValue(node, sizeAccessor);
-              initialState[sortedIndex * 4] = size !== null && size !== void 0 ? size : defaultNodeSize;
+              initialState[sortedIndex * 4] = getNodeSize(node, sizeAccessor);
           }
       }
       const initialTexture = reglInstance.texture({
@@ -15267,7 +15293,46 @@ void main() {
 
   var updatePositionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D velocity;uniform float friction;uniform float spaceSize;varying vec2 index;void main(){vec4 pointPosition=texture2D(position,index);vec4 pointVelocity=texture2D(velocity,index);pointVelocity.rg*=friction;pointPosition.rg+=pointVelocity.rg;pointPosition.r=clamp(pointPosition.r,0.0,spaceSize);pointPosition.g=clamp(pointPosition.g,0.0,spaceSize);gl_FragColor=pointPosition;}"; // eslint-disable-line
 
+  function createTrackedPositionsBuffer(indices, reglInstance) {
+      const size = Math.ceil(Math.sqrt(indices.length));
+      return reglInstance.framebuffer({
+          shape: [size, size],
+          depth: false,
+          stencil: false,
+          colorType: 'float',
+      });
+  }
+  function createTrackedIndicesBuffer(indices, pointsTextureSize, reglInstance) {
+      const size = Math.ceil(Math.sqrt(indices.length));
+      const initialState = new Float32Array(size * size * 4).fill(-1);
+      for (const [i, sortedIndex] of indices.entries()) {
+          if (sortedIndex !== undefined) {
+              initialState[i * 4] = sortedIndex % pointsTextureSize;
+              initialState[i * 4 + 1] = Math.floor(sortedIndex / pointsTextureSize);
+              initialState[i * 4 + 2] = 0;
+              initialState[i * 4 + 3] = 0;
+          }
+      }
+      const initialTexture = reglInstance.texture({
+          data: initialState,
+          width: size,
+          height: size,
+          type: 'float',
+      });
+      return reglInstance.framebuffer({
+          color: initialTexture,
+          depth: false,
+          stencil: false,
+      });
+  }
+
+  var trackPositionsFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D trackedIndices;uniform float pointsTextureSize;varying vec2 index;void main(){vec4 trackedPointIndicies=texture2D(trackedIndices,index);if(trackedPointIndicies.r<0.0)discard;vec4 pointPosition=texture2D(position,(trackedPointIndicies.rg+0.5)/pointsTextureSize);gl_FragColor=vec4(pointPosition.rg,1.0,1.0);}"; // eslint-disable-line
+
   class Points extends CoreModule {
+      constructor() {
+          super(...arguments);
+          this.trackedPositionsById = new Map();
+      }
       create() {
           var _a, _b;
           const { reglInstance, config, store, data } = this;
@@ -15279,8 +15344,9 @@ void main() {
               const sortedIndex = this.data.getSortedIndexByInputIndex(i);
               const node = data.nodes[i];
               if (node && sortedIndex !== undefined) {
-                  initialState[sortedIndex * 4 + 0] = (_a = node.x) !== null && _a !== void 0 ? _a : (spaceSize !== null && spaceSize !== void 0 ? spaceSize : defaultConfigValues.spaceSize) * (store.getRandomFloat(0, 1) * (0.505 - 0.495) + 0.495);
-                  initialState[sortedIndex * 4 + 1] = (_b = node.y) !== null && _b !== void 0 ? _b : (spaceSize !== null && spaceSize !== void 0 ? spaceSize : defaultConfigValues.spaceSize) * (store.getRandomFloat(0, 1) * (0.505 - 0.495) + 0.495);
+                  const space = spaceSize !== null && spaceSize !== void 0 ? spaceSize : defaultConfigValues.spaceSize;
+                  initialState[sortedIndex * 4 + 0] = (_a = node.x) !== null && _a !== void 0 ? _a : space * store.getRandomFloat(0.495, 0.505);
+                  initialState[sortedIndex * 4 + 1] = (_b = node.y) !== null && _b !== void 0 ? _b : space * store.getRandomFloat(0.495, 0.505);
               }
           }
           // Create position buffer
@@ -15319,6 +15385,12 @@ void main() {
                   shape: [pointsTextureSize, pointsTextureSize, 4],
                   type: 'float',
               }),
+              depth: false,
+              stencil: false,
+          });
+          this.hoveredFbo = reglInstance.framebuffer({
+              shape: [2, 2],
+              colorType: 'float',
               depth: false,
               stencil: false,
           });
@@ -15380,26 +15452,6 @@ void main() {
                   mask: false,
               },
           });
-          this.findPointOnMouseClickCommand = reglInstance({
-              frag: findPointOnMouseClickFrag,
-              vert: updateVert,
-              framebuffer: () => this.selectedFbo,
-              primitive: 'triangle strip',
-              count: 4,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-              uniforms: {
-                  position: () => this.currentPositionFbo,
-                  particleSize: () => this.sizeFbo,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  sizeScale: () => config.nodeSizeScale,
-                  transform: () => store.transform,
-                  ratio: () => config.pixelRatio,
-                  mousePosition: () => store.screenMousePosition,
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-                  maxPointSize: () => store.maxPointSize,
-              },
-          });
           this.findPointsOnAreaSelectionCommand = reglInstance({
               frag: findPointsOnAreaSelectionFrag,
               vert: updateVert,
@@ -15421,6 +15473,90 @@ void main() {
                   maxPointSize: () => store.maxPointSize,
               },
           });
+          this.clearHoveredFboCommand = reglInstance({
+              frag: clearFrag,
+              vert: updateVert,
+              framebuffer: this.hoveredFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+          });
+          this.findHoveredPointCommand = reglInstance({
+              frag: findHoveredPointFrag,
+              vert: findHoveredPointVert,
+              primitive: 'points',
+              count: () => data.nodes.length,
+              framebuffer: () => this.hoveredFbo,
+              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  particleSize: () => this.sizeFbo,
+                  ratio: () => config.pixelRatio,
+                  sizeScale: () => config.nodeSizeScale,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => config.spaceSize,
+                  screenSize: () => store.screenSize,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  mousePosition: () => store.screenMousePosition,
+                  maxPointSize: () => store.maxPointSize,
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.drawHighlightedCommand = reglInstance({
+              frag: drawHighlightedFrag,
+              vert: drawHighlightedVert,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+              primitive: 'triangle strip',
+              count: 4,
+              uniforms: {
+                  color: reglInstance.prop('color'),
+                  width: reglInstance.prop('width'),
+                  pointIndex: reglInstance.prop('pointIndex'),
+                  positions: () => this.currentPositionFbo,
+                  particleSize: () => this.sizeFbo,
+                  sizeScale: () => config.nodeSizeScale,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => config.spaceSize,
+                  screenSize: () => store.screenSize,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  maxPointSize: () => store.maxPointSize,
+              },
+              blend: {
+                  enable: true,
+                  func: {
+                      dstRGB: 'one minus src alpha',
+                      srcRGB: 'src alpha',
+                      dstAlpha: 'one minus src alpha',
+                      srcAlpha: 'one',
+                  },
+                  equation: {
+                      rgb: 'add',
+                      alpha: 'add',
+                  },
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.trackPointsCommand = reglInstance({
+              frag: trackPositionsFrag,
+              vert: updateVert,
+              framebuffer: () => this.trackedPositionsFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  trackedIndices: () => this.trackedIndicesFbo,
+                  pointsTextureSize: () => store.pointsTextureSize,
+              },
+          });
       }
       updateColor() {
           const { reglInstance, config, store, data } = this;
@@ -15434,9 +15570,31 @@ void main() {
           const { reglInstance, config, store, data } = this;
           this.sizeFbo = createSizeBuffer(data, reglInstance, store.pointsTextureSize, config.nodeSize);
       }
-      draw() {
+      trackPoints() {
           var _a;
+          if (!this.trackedIndicesFbo || !this.trackedPositionsFbo)
+              return;
+          (_a = this.trackPointsCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+      }
+      draw() {
+          var _a, _b, _c;
           (_a = this.drawCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          if (this.config.renderHighlightedNodeRing) {
+              if (this.store.hoveredNode) {
+                  (_b = this.drawHighlightedCommand) === null || _b === void 0 ? void 0 : _b.call(this, {
+                      width: 0.85,
+                      color: this.store.hoveredNodeRingColor,
+                      pointIndex: this.store.hoveredNode.index,
+                  });
+              }
+              if (this.store.focusedNode) {
+                  (_c = this.drawHighlightedCommand) === null || _c === void 0 ? void 0 : _c.call(this, {
+                      width: 0.75,
+                      color: this.store.focusedNodeRingColor,
+                      pointIndex: this.store.focusedNode.index,
+                  });
+              }
+          }
       }
       updatePosition() {
           var _a;
@@ -15447,12 +15605,47 @@ void main() {
           var _a;
           (_a = this.findPointsOnAreaSelectionCommand) === null || _a === void 0 ? void 0 : _a.call(this);
       }
-      findPointsOnMouseClick() {
-          var _a;
-          (_a = this.findPointOnMouseClickCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+      findHoveredPoint() {
+          var _a, _b;
+          (_a = this.clearHoveredFboCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          (_b = this.findHoveredPointCommand) === null || _b === void 0 ? void 0 : _b.call(this);
+      }
+      getNodeRadius(node) {
+          const { nodeSize } = this.config;
+          return getNodeSize(node, nodeSize) / 2;
+      }
+      trackNodesByIds(ids) {
+          this.trackedIds = ids.length ? ids : undefined;
+          this.trackedPositionsById.clear();
+          const indices = ids.map(id => this.data.getSortedIndexById(id)).filter((d) => d !== undefined);
+          if (this.trackedIndicesFbo) {
+              this.trackedIndicesFbo.destroy();
+              this.trackedIndicesFbo = undefined;
+          }
+          if (this.trackedPositionsFbo) {
+              this.trackedPositionsFbo.destroy();
+              this.trackedPositionsFbo = undefined;
+          }
+          if (indices.length) {
+              this.trackedIndicesFbo = createTrackedIndicesBuffer(indices, this.store.pointsTextureSize, this.reglInstance);
+              this.trackedPositionsFbo = createTrackedPositionsBuffer(indices, this.reglInstance);
+          }
+          this.trackPoints();
+      }
+      getTrackedPositions() {
+          if (!this.trackedIds)
+              return this.trackedPositionsById;
+          const pixels = readPixels(this.reglInstance, this.trackedPositionsFbo);
+          this.trackedIds.forEach((id, i) => {
+              const x = pixels[i * 4];
+              const y = pixels[i * 4 + 1];
+              if (x !== undefined && y !== undefined)
+                  this.trackedPositionsById.set(id, [x, y]);
+          });
+          return this.trackedPositionsById;
       }
       destroy() {
-          var _a, _b, _c, _d, _e, _f, _g;
+          var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
           (_a = this.currentPositionFbo) === null || _a === void 0 ? void 0 : _a.destroy();
           (_b = this.previousPositionFbo) === null || _b === void 0 ? void 0 : _b.destroy();
           (_c = this.velocityFbo) === null || _c === void 0 ? void 0 : _c.destroy();
@@ -15460,6 +15653,9 @@ void main() {
           (_e = this.colorFbo) === null || _e === void 0 ? void 0 : _e.destroy();
           (_f = this.sizeFbo) === null || _f === void 0 ? void 0 : _f.destroy();
           (_g = this.greyoutStatusFbo) === null || _g === void 0 ? void 0 : _g.destroy();
+          (_h = this.hoveredFbo) === null || _h === void 0 ? void 0 : _h.destroy();
+          (_j = this.trackedIndicesFbo) === null || _j === void 0 ? void 0 : _j.destroy();
+          (_k = this.trackedPositionsFbo) === null || _k === void 0 ? void 0 : _k.destroy();
       }
       swapFbo() {
           const temp = this.previousPositionFbo;
@@ -19510,6 +19706,10 @@ void main() {
           this.simulationProgress = 0;
           this.selectedIndices = null;
           this.maxPointSize = MAX_POINT_SIZE;
+          this.hoveredNode = undefined;
+          this.focusedNode = undefined;
+          this.hoveredNodeRingColor = [1, 1, 1, hoveredNodeRingOpacity];
+          this.focusedNodeRingColor = [1, 1, 1, focusedNodeRingOpacity];
           this.alphaTarget = 0;
           this.scaleNodeX = linear();
           this.scaleNodeY = linear();
@@ -19536,6 +19736,22 @@ void main() {
       }
       scaleY(y) {
           return this.scaleNodeY(y);
+      }
+      setHighlightedNodeRingColor(color) {
+          const convertedRgba = getRgbaColor(color);
+          this.hoveredNodeRingColor[0] = convertedRgba[0];
+          this.hoveredNodeRingColor[1] = convertedRgba[1];
+          this.hoveredNodeRingColor[2] = convertedRgba[2];
+          this.focusedNodeRingColor[0] = convertedRgba[0];
+          this.focusedNodeRingColor[1] = convertedRgba[1];
+          this.focusedNodeRingColor[2] = convertedRgba[2];
+      }
+      setFocusedNode(node, index) {
+          if (node && index !== undefined) {
+              this.focusedNode = { node, index };
+          }
+          else
+              this.focusedNode = undefined;
       }
       addAlpha(decay) {
           return (this.alphaTarget - this.alpha) * this.alphaDecay(decay);
@@ -21009,6 +21225,7 @@ void main() {
       constructor(store, config) {
           this.eventTransform = identity;
           this.behavior = zoom()
+              .scaleExtent([0.001, Infinity])
               .on('start', (e) => {
               var _a, _b, _c;
               this.isRunning = true;
@@ -21088,6 +21305,22 @@ void main() {
               .translate(translateX, translateY)
               .scale(scale);
       }
+      convertSpaceToScreenPosition(spacePosition) {
+          const screenPointX = this.eventTransform.applyX(this.store.scaleX(spacePosition[0]));
+          const screenPointY = this.eventTransform.applyY(this.store.scaleY(spacePosition[1]));
+          return [screenPointX, screenPointY];
+      }
+      convertSpaceToScreenRadius(spaceRadius) {
+          const { config: { scaleNodesOnZoom }, store: { maxPointSize }, eventTransform: { k } } = this;
+          let size = spaceRadius * 2;
+          if (scaleNodesOnZoom) {
+              size *= k;
+          }
+          else {
+              size *= Math.min(5.0, Math.max(1.0, k * 0.01));
+          }
+          return Math.min(size, maxPointSize) / 2;
+      }
   }
 
   class Graph {
@@ -21117,6 +21350,15 @@ void main() {
           }
           this.canvas = canvas;
           this.canvasD3Selection = select$1(canvas);
+          this.zoomInstance.behavior
+              .on('start.detect', (e) => { this.currentEvent = e; })
+              .on('zoom.detect', (e) => {
+              const userDriven = !!e.sourceEvent;
+              if (userDriven)
+                  this.updateMousePosition(e.sourceEvent);
+              this.currentEvent = e;
+          })
+              .on('end.detect', (e) => { this.currentEvent = e; });
           this.canvasD3Selection
               .call(this.zoomInstance.behavior)
               .on('click', this.onClick.bind(this))
@@ -21144,6 +21386,8 @@ void main() {
           this.forceLinkOutgoing = new ForceLink(this.reglInstance, this.config, this.store, this.graph, this.points);
           this.forceMouse = new ForceMouse(this.reglInstance, this.config, this.store, this.graph, this.points);
           this.store.backgroundColor = getRgbaColor(this.config.backgroundColor);
+          if (this.config.highlightedNodeRingColor)
+              this.store.setHighlightedNodeRingColor(this.config.highlightedNodeRingColor);
           if (this.config.showFPSMonitor)
               this.fpsMonitor = new FPSMonitor(this.canvas);
           if (this.config.randomSeed !== undefined)
@@ -21183,6 +21427,9 @@ void main() {
               this.lines.updateWidth();
           if (prevConfig.backgroundColor !== this.config.backgroundColor)
               this.store.backgroundColor = getRgbaColor(this.config.backgroundColor);
+          if (prevConfig.highlightedNodeRingColor !== this.config.highlightedNodeRingColor) {
+              this.store.setHighlightedNodeRingColor(this.config.highlightedNodeRingColor);
+          }
           if (prevConfig.spaceSize !== this.config.spaceSize ||
               prevConfig.simulation.repulsionQuadtreeLevels !== this.config.simulation.repulsionQuadtreeLevels)
               this.update(this.store.isSimulationRunning);
@@ -21222,23 +21469,27 @@ void main() {
        * Center the view on a node and zoom in, by node id.
        * @param id Id of the node.
        * @param duration Duration of the animation transition in milliseconds (`700` by default).
+       * @param scale Scale value to zoom in or out (`3` by default).
+       * @param canZoomOut Set to `false` to prevent zooming out from the node (`true` by default).
        */
-      zoomToNodeById(id, duration = 700) {
+      zoomToNodeById(id, duration = 700, scale = defaultScaleToZoom, canZoomOut = true) {
           const node = this.graph.getNodeById(id);
           if (!node)
               return;
-          this.zoomToNode(node, duration);
+          this.zoomToNode(node, duration, scale, canZoomOut);
       }
       /**
        * Center the view on a node and zoom in, by node index.
        * @param index The index of the node in the array of nodes.
        * @param duration Duration of the animation transition in milliseconds (`700` by default).
+       * @param scale Scale value to zoom in or out (`3` by default).
+       * @param canZoomOut Set to `false` to prevent zooming out from the node (`true` by default).
        */
-      zoomToNodeByIndex(index, duration = 700) {
+      zoomToNodeByIndex(index, duration = 700, scale = defaultScaleToZoom, canZoomOut = true) {
           const node = this.graph.getNodeByIndex(index);
           if (!node)
               return;
-          this.zoomToNode(node, duration);
+          this.zoomToNode(node, duration, scale, canZoomOut);
       }
       /**
        * Zoom the view in or out to the specified zoom level.
@@ -21289,7 +21540,7 @@ void main() {
       }
       /**
        * Get current X and Y coordinates of the nodes.
-       * @returns Map where keys are the ids of the nodes and values are corresponding `[number, number]` with X and Y coordinates of the node.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
        */
       getNodePositionsMap() {
           const positionMap = new Map();
@@ -21364,6 +21615,7 @@ void main() {
           else {
               this.store.selectedIndices = null;
           }
+          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21379,6 +21631,7 @@ void main() {
           }
           else
               this.selectNodesByIds([id]);
+          this.store.setFocusedNode(this.graph.getNodeById(id), this.graph.getSortedIndexById(id));
       }
       /**
        * Select a node by index. If you want the adjacent nodes to get selected too, provide `true` as the second argument.
@@ -21411,6 +21664,7 @@ void main() {
           else {
               this.store.selectedIndices = new Float32Array(indices.filter((d) => d !== undefined));
           }
+          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21418,6 +21672,7 @@ void main() {
        */
       unselectNodes() {
           this.store.selectedIndices = null;
+          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21445,6 +21700,63 @@ void main() {
        */
       getAdjacentNodes(id) {
           return this.graph.getAdjacentNodes(id);
+      }
+      /**
+       * Converts the X and Y node coordinates from the space coordinate system to the screen coordinate system.
+       * @param spacePosition Array of x and y coordinates in the space coordinate system.
+       * @returns Array of x and y coordinates in the screen coordinate system.
+       */
+      spaceToScreenPosition(spacePosition) {
+          return this.zoomInstance.convertSpaceToScreenPosition(spacePosition);
+      }
+      /**
+       * Converts the node radius value from the space coordinate system to the screen coordinate system.
+       * @param spaceRadius Radius of Node in the space coordinate system.
+       * @returns Radius of Node in the screen coordinate system.
+       */
+      spaceToScreenRadius(spaceRadius) {
+          return this.zoomInstance.convertSpaceToScreenRadius(spaceRadius);
+      }
+      /**
+       * Get node radius by its index.
+       * @param index Index of the node.
+       * @returns Radius of the node.
+       */
+      getNodeRadiusByIndex(index) {
+          const node = this.graph.getNodeByIndex(index);
+          return node && this.points.getNodeRadius(node);
+      }
+      /**
+       * Get node radius by its id.
+       * @param id Id of the node.
+       * @returns Radius of the node.
+       */
+      getNodeRadiusById(id) {
+          const node = this.graph.getNodeById(id);
+          return node && this.points.getNodeRadius(node);
+      }
+      /**
+       * Track multiple node positions by their ids.
+       * @param ids Array of nodes ids.
+       */
+      trackNodesByIds(ids) {
+          this.points.trackNodesByIds(ids);
+      }
+      /**
+       * Track multiple node positions by their indices.
+       * @param ids Array of nodes indices.
+       */
+      trackNodesByIndices(indices) {
+          this.points.trackNodesByIds(indices.map(index => this.graph.getNodeByIndex(index))
+              .filter((d) => d !== undefined)
+              .map(d => d.id));
+      }
+      /**
+       * Get current X and Y coordinates of the tracked nodes.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
+       */
+      getTrackedNodePositionsMap() {
+          return this.points.getTrackedPositions();
       }
       /**
        * Start the simulation.
@@ -21548,6 +21860,7 @@ void main() {
               var _a, _b, _c, _d, _e, _f;
               (_a = this.fpsMonitor) === null || _a === void 0 ? void 0 : _a.begin();
               this.resizeCanvas();
+              this.findHoveredPoint();
               if (this.isRightClickMouse) {
                   if (!isSimulationRunning)
                       this.start(0.1);
@@ -21575,6 +21888,7 @@ void main() {
                   this.store.simulationProgress = Math.sqrt(Math.min(1, ALPHA_MIN / this.store.alpha));
                   (_e = (_d = this.config.simulation).onTick) === null || _e === void 0 ? void 0 : _e.call(_d, this.store.alpha);
               }
+              this.points.trackPoints();
               // Clear canvas
               this.reglInstance.clear({
                   color: this.store.backgroundColor,
@@ -21586,6 +21900,7 @@ void main() {
               }
               this.points.draw();
               (_f = this.fpsMonitor) === null || _f === void 0 ? void 0 : _f.end(now);
+              this.currentEvent = undefined;
               this.frame();
           });
       }
@@ -21600,25 +21915,13 @@ void main() {
           (_b = (_a = this.config.simulation).onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
       }
       onClick(event) {
-          var _a, _b;
-          this.points.findPointsOnMouseClick();
-          const pixels = readPixels(this.reglInstance, this.points.selectedFbo);
-          let position;
-          const pixelsInSelectedArea = pixels
-              .map((pixel, i) => {
-              if (i % 4 === 0 && pixel !== 0) {
-                  position = [pixels[i + 2], this.config.spaceSize - pixels[i + 3]];
-                  return i / 4;
-              }
-              else
-                  return -1;
-          })
-              .filter(d => d !== -1);
-          const clickedIndex = this.graph.getInputIndexBySortedIndex(pixelsInSelectedArea[pixelsInSelectedArea.length - 1]);
-          const clickedParticle = (pixelsInSelectedArea.length && clickedIndex !== undefined) ? this.graph.nodes[clickedIndex] : undefined;
-          (_b = (_a = this.config.events).onClick) === null || _b === void 0 ? void 0 : _b.call(_a, clickedParticle, clickedIndex, position, event);
+          var _a, _b, _c, _d, _e, _f;
+          this.store.setFocusedNode((_a = this.store.hoveredNode) === null || _a === void 0 ? void 0 : _a.node, (_b = this.store.hoveredNode) === null || _b === void 0 ? void 0 : _b.index);
+          (_d = (_c = this.config.events).onClick) === null || _d === void 0 ? void 0 : _d.call(_c, (_e = this.store.hoveredNode) === null || _e === void 0 ? void 0 : _e.node, this.store.hoveredNode ? this.graph.getInputIndexBySortedIndex(this.store.hoveredNode.index) : undefined, (_f = this.store.hoveredNode) === null || _f === void 0 ? void 0 : _f.position, event);
       }
-      onMouseMove(event) {
+      updateMousePosition(event) {
+          if (!event || event.offsetX === undefined || event.offsetY === undefined)
+              return;
           const { x, y, k } = this.zoomInstance.eventTransform;
           const h = this.canvas.clientHeight;
           const mouseX = event.offsetX;
@@ -21629,7 +21932,13 @@ void main() {
           this.store.mousePosition[0] -= (this.store.screenSize[0] - this.config.spaceSize) / 2;
           this.store.mousePosition[1] -= (this.store.screenSize[1] - this.config.spaceSize) / 2;
           this.store.screenMousePosition = [mouseX, (this.store.screenSize[1] - mouseY)];
+      }
+      onMouseMove(event) {
+          var _a, _b, _c, _d;
+          this.currentEvent = event;
+          this.updateMousePosition(event);
           this.isRightClickMouse = event.which === 3;
+          (_b = (_a = this.config.events).onMouseMove) === null || _b === void 0 ? void 0 : _b.call(_a, (_c = this.store.hoveredNode) === null || _c === void 0 ? void 0 : _c.node, this.store.hoveredNode ? this.graph.getInputIndexBySortedIndex(this.store.hoveredNode.index) : undefined, (_d = this.store.hoveredNode) === null || _d === void 0 ? void 0 : _d.position, this.currentEvent);
       }
       onRightClickMouse(event) {
           event.preventDefault();
@@ -21656,7 +21965,7 @@ void main() {
               .duration(duration)
               .call(this.zoomInstance.behavior.transform, transform);
       }
-      zoomToNode(node, duration) {
+      zoomToNode(node, duration, scale, canZoomOut) {
           const { graph, store: { screenSize } } = this;
           const positionPixels = readPixels(this.reglInstance, this.points.currentPositionFbo);
           const nodeIndex = graph.getSortedIndexById(node.id);
@@ -21667,11 +21976,12 @@ void main() {
           if (posX === undefined || posY === undefined)
               return;
           const distance = this.zoomInstance.getDistanceToPoint([posX, posY]);
+          const zoomLevel = canZoomOut ? scale : Math.max(this.getZoomLevel(), scale);
           if (distance < Math.min(screenSize[0], screenSize[1])) {
-              this.setZoomTransformByNodePositions([[posX, posY]], duration, 3);
+              this.setZoomTransformByNodePositions([[posX, posY]], duration, zoomLevel);
           }
           else {
-              const transform = this.zoomInstance.getTransform([[posX, posY]], 3);
+              const transform = this.zoomInstance.getTransform([[posX, posY]], zoomLevel);
               const middle = this.zoomInstance.getMiddlePointTransform([posX, posY]);
               this.canvasD3Selection
                   .transition()
@@ -21683,6 +21993,38 @@ void main() {
                   .duration(duration / 2)
                   .call(this.zoomInstance.behavior.transform, transform);
           }
+      }
+      findHoveredPoint() {
+          var _a, _b, _c, _d, _e;
+          this.points.findHoveredPoint();
+          let isMouseover = false;
+          let isMouseout = false;
+          const pixels = readPixels(this.reglInstance, this.points.hoveredFbo);
+          const nodeSize = pixels[1];
+          if (nodeSize) {
+              const index = pixels[0];
+              const inputIndex = this.graph.getInputIndexBySortedIndex(index);
+              const hovered = inputIndex !== undefined ? this.graph.getNodeByIndex(inputIndex) : undefined;
+              if (((_a = this.store.hoveredNode) === null || _a === void 0 ? void 0 : _a.node) !== hovered)
+                  isMouseover = true;
+              const pointX = pixels[2];
+              const pointY = pixels[3];
+              this.store.hoveredNode = hovered && {
+                  node: hovered,
+                  index,
+                  position: [pointX, pointY],
+              };
+          }
+          else {
+              if (this.store.hoveredNode)
+                  isMouseout = true;
+              this.store.hoveredNode = undefined;
+          }
+          if (isMouseover && this.store.hoveredNode) {
+              (_c = (_b = this.config.events).onNodeMouseOver) === null || _c === void 0 ? void 0 : _c.call(_b, this.store.hoveredNode.node, this.graph.getInputIndexBySortedIndex(this.graph.getSortedIndexById(this.store.hoveredNode.node.id)), this.store.hoveredNode.position, this.currentEvent);
+          }
+          if (isMouseout)
+              (_e = (_d = this.config.events).onNodeMouseOut) === null || _e === void 0 ? void 0 : _e.call(_d, this.currentEvent);
       }
   }
 
