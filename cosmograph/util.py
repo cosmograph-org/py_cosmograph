@@ -176,9 +176,9 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     return f'if (SetData) SetData("{canvas_id}", {nodes}, {links})'
 
 
-def alt_set_data(links, nodes=None, canvas_id=DFLT_CANVAS):
+def alt_set_data(links, config, nodes=None, canvas_id=DFLT_CANVAS):
     links, nodes = _ensure_links_and_nodes(links, nodes)
-    return js.cosmos__set_data(canvas_id, links, nodes)
+    return js.cosmos__set_data(canvas_id, links, nodes, config)
 
 
 def fit_view(canvas_id=DFLT_CANVAS):
@@ -233,15 +233,21 @@ def _cosmos_html(cosmo_id="cosmos", pre_script="", post_script=""):
         </script>
     """
 
-
-def cosmo(links, nodes=None, canvas_id=None, *, display=False):
+# TODO: Make signature for config parameters
+def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     if canvas_id is None:
         canvas_id = get_new_canvas_id()
+
+    if any(argname not in _prop_of_py_name for argname in config):
+        raise TypeError(
+            f"Invalid argument names: {config.keys() - _prop_of_py_name.keys()}"
+        )
+    config = {_prop_of_py_name[argname]: value for argname, value in config.items()}
 
     html_str = _cosmos_html(
         canvas_id,
         pre_script=init_cosmos(canvas_id=canvas_id),
-        post_script=alt_set_data(links, nodes, canvas_id),
+        post_script=alt_set_data(links, config, nodes, canvas_id),
     )
 
     html_obj = HTML(html_str)
@@ -394,8 +400,10 @@ def cosmos_config_info():
     _assert_camel_and_snake_sanity(table["Property"], table["py_name"])
     return table.to_dict(orient="records")
 
+# _cosmos_config_info = cosmos_config_info()
+from cosmograph.cosmos_config import cosmos_config
 
-_cosmos_config_info = cosmos_config_info()
+_cosmos_config_info = cosmos_config
 _default_of_py_name = {d["py_name"]: d["Default"] for d in _cosmos_config_info}
 _prop_of_py_name = {d["py_name"]: d["Property"] for d in _cosmos_config_info}
 _description_of_py_name = {d["py_name"]: d["Description"] for d in _cosmos_config_info}

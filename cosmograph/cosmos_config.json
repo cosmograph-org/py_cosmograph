@@ -1,0 +1,318 @@
+{
+  "config": [
+    {
+      "Property": "backgroundColor",
+      "Description": "Canvas background color",
+      "Default": "#222222",
+      "py_name": "background_color",
+      "type": "string"
+    },
+    {
+      "Property": "spaceSize",
+      "Description": "Simulation space size (max 8192)",
+      "Default": 4096,
+      "py_name": "space_size",
+      "type": "number"
+    },
+    {
+      "Property": "nodeColor",
+      "Description": "Node color accessor function or hex value",
+      "Default": "#b3b3b3",
+      "py_name": "node_color",
+      "type": "ColorAccessor<N>"
+    },
+    {
+      "Property": "nodeGreyoutOpacity",
+      "Description": "Greyed out node opacity value when the selection is active",
+      "Default": 0.1,
+      "py_name": "node_greyout_opacity",
+      "type": "number"
+    },
+    {
+      "Property": "nodeSize",
+      "Description": "Node size accessor function or value in pixels",
+      "Default": 4,
+      "py_name": "node_size",
+      "type": "NumericAccessor<N>"
+    },
+    {
+      "Property": "nodeSizeScale",
+      "Description": "Scale factor for the node size",
+      "Default": 1,
+      "py_name": "node_size_scale",
+      "type": "number"
+    },
+    {
+      "Property": "renderHighlightedNodeRing",
+      "Description": "Turns the node highlight on hover on / off",
+      "Default": true,
+      "py_name": "render_highlighted_node_ring",
+      "type": "boolean"
+    },
+    {
+      "Property": "highlightedNodeRingColor",
+      "Description": "Highlighted node ring color",
+      "Default": null,
+      "py_name": "highlighted_node_ring_color",
+      "type": "string"
+    },
+    {
+      "Property": "renderLinks",
+      "Description": "Turns link rendering on / off",
+      "Default": true,
+      "py_name": "render_links",
+      "type": "boolean"
+    },
+    {
+      "Property": "linkColor",
+      "Description": "Link color accessor function or hex value",
+      "Default": "#666666",
+      "py_name": "link_color",
+      "type": "ColorAccessor<L>"
+    },
+    {
+      "Property": "linkGreyoutOpacity",
+      "Description": "Greyed out link opacity value when the selection is active",
+      "Default": 0.1,
+      "py_name": "link_greyout_opacity",
+      "type": "number"
+    },
+    {
+      "Property": "linkWidth",
+      "Description": "Link width accessor function or value in pixels",
+      "Default": 1,
+      "py_name": "link_width",
+      "type": "NumericAccessor<N>"
+    },
+    {
+      "Property": "linkWidthScale",
+      "Description": "Scale factor for the link width",
+      "Default": 1,
+      "py_name": "link_width_scale",
+      "type": "number"
+    },
+    {
+      "Property": "linkArrows",
+      "Description": "Turns link arrow rendering on / off",
+      "Default": true,
+      "py_name": "link_arrows",
+      "type": "boolean"
+    },
+    {
+      "Property": "linkArrowsSizeScale",
+      "Description": "Scale factor for the link arrows size",
+      "Default": 1,
+      "py_name": "link_arrows_size_scale",
+      "type": "number"
+    },
+    {
+      "Property": "linkVisibilityDistanceRange",
+      "Description": "The range defines the minimum and maximum link visibility distance in pixels. The link will be fully opaque when its length is less than the first number in the array, and will have linkVisibilityMinTransparency transparency when its length is greater than the second number in the array. This distance is defined in screen space coordinates and will change as you zoom in and out (e.g. links become longer when you zoom in, and shorter when you zoom out).",
+      "Default": [
+        50,
+        150
+      ],
+      "py_name": "link_visibility_distance_range",
+      "type": "number[]"
+    },
+    {
+      "Property": "linkVisibilityMinTransparency",
+      "Description": "The transparency value that the link will have when its length reaches the maximum link distance value from linkVisibilityDistanceRange.",
+      "Default": 0.25,
+      "py_name": "link_visibility_min_transparency",
+      "type": "number"
+    },
+    {
+      "Property": "useQuadtree",
+      "Description": "Use the classic quadtree algorithm for the Many-Body force. This property will be applied only on component initialization and it can't be changed using the setConfig method. ⚠ The algorithm might not work on some GPUs (e.g. Nvidia) and on Windows (unless you disable ANGLE in the browser settings).",
+      "Default": false,
+      "py_name": "use_quadtree",
+      "type": "boolean"
+    },
+    {
+      "Property": "simulation.decay",
+      "Description": "Decay coefficient. Use smaller values if you want the simulation to \"cool down\" slower.",
+      "Default": 1000,
+      "py_name": "simulation_decay",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.gravity",
+      "Description": "Gravity force coefficient.",
+      "Default": 0,
+      "py_name": "simulation_gravity",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.center",
+      "Description": "Centering to center mass force coefficient.",
+      "Default": 0,
+      "py_name": "simulation_center",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.repulsion",
+      "Description": "Repulsion force coefficient.",
+      "Default": 0.1,
+      "py_name": "simulation_repulsion",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.repulsionTheta",
+      "Description": "Decreases / increases the detalization of the Many-Body force calculations. When `useQuadtree` is set to `true`, this property corresponds to the Barnes–Hut approximation criterion.",
+      "Default": 1.7,
+      "py_name": "simulation_repulsion_theta",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.repulsionQuadtreeLevels",
+      "Description": "Barnes–Hut approximation depth. Can only be used when `useQuadtree` is set `true`.",
+      "Default": 12,
+      "py_name": "simulation_repulsion_quadtree_levels",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.linkSpring",
+      "Description": "Link spring force coefficient.",
+      "Default": 1,
+      "py_name": "simulation_link_spring",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.linkDistRandomVariationRange",
+      "Description": "Range of random link distance values.",
+      "Default": [
+        1,
+        1.2
+      ],
+      "py_name": "simulation_link_dist_random_variation_range",
+      "type": "number[]"
+    },
+    {
+      "Property": "simulation.repulsionFromMouse",
+      "Description": "Repulsion coefficient from mouse position. The repulsion force is activated by pressing the right mouse button.",
+      "Default": 2,
+      "py_name": "simulation_repulsion_from_mouse",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.friction",
+      "Description": "Friction coefficient.",
+      "Default": 0.85,
+      "py_name": "simulation_friction",
+      "type": "number"
+    },
+    {
+      "Property": "simulation.onStart",
+      "Description": "Callback function that will be called when the simulation starts.",
+      "Default": null,
+      "py_name": "simulation_on_start",
+      "type": "() => void"
+    },
+    {
+      "Property": "simulation.onTick",
+      "Description": "Callback function that will be called on every simulation tick. The value of the argument `alpha` will decrease over time as the simulation \"cools down\".",
+      "Default": null,
+      "py_name": "simulation_on_tick",
+      "type": "(alpha?: number) => void"
+    },
+    {
+      "Property": "simulation.onEnd",
+      "Description": "Callback function that will be called when the simulation stops.",
+      "Default": null,
+      "py_name": "simulation_on_end",
+      "type": "() => void"
+    },
+    {
+      "Property": "simulation.onPause",
+      "Description": "Callback function that will be called when the simulation gets paused.",
+      "Default": null,
+      "py_name": "simulation_on_pause",
+      "type": "() => void"
+    },
+    {
+      "Property": "simulation.onRestart",
+      "Description": "Callback function that will be called when the simulation is restarted.",
+      "Default": null,
+      "py_name": "simulation_on_restart",
+      "type": "() => void"
+    },
+    {
+      "Property": "events.onClick",
+      "Description": "Callback function that will be called on every canvas click. If clicked on a node, its data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event as the forth argument: (node: Node | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void",
+      "Default": null,
+      "py_name": "events_on_click",
+      "type": "(clickedNode: N | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void"
+    },
+    {
+      "Property": "events.onMouseMove",
+      "Description": "Callback function that will be called when mouse movement happens. If the mouse moves over a node, its data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event as the forth argument: (node: Node | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void",
+      "Default": null,
+      "py_name": "events_on_mouse_move",
+      "type": "(hoveredNode: N | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void"
+    },
+    {
+      "Property": "events.onNodeMouseOver",
+      "Description": "Callback function that will be called when a node appears under the mouse as a result of a mouse event, zooming and panning, or movement of nodes. The node data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event or D3's zoom event as the forth argument: (node: Node, index: number, nodePosition: [number, number], event: MouseEvent | D3ZoomEvent | undefined) => void",
+      "Default": null,
+      "py_name": "events_on_node_mouse_over",
+      "type": "(hoveredNode: N, index: number, nodePosition: [number, number], event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | undefined) => void"
+    },
+    {
+      "Property": "events.onNodeMouseOut",
+      "Description": "Callback function that will be called when node is no longer underneath the mouse pointer because of a mouse event, zoom/pan event, or movement of nodes. The corresponding mouse event or D3's zoom event will be passed as the first argument: (event: MouseEvent | D3ZoomEvent | undefined) => void",
+      "Default": null,
+      "py_name": "events_on_node_mouse_out",
+      "type": "(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | undefined) => void"
+    },
+    {
+      "Property": "events.onZoomStart",
+      "Description": "Callback function that will be called when zooming or panning starts. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
+      "Default": null,
+      "py_name": "events_on_zoom_start",
+      "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
+    },
+    {
+      "Property": "events.onZoom",
+      "Description": "Callback function that will be called continuously during zooming or panning. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
+      "Default": null,
+      "py_name": "events_on_zoom",
+      "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
+    },
+    {
+      "Property": "events.onZoomEnd",
+      "Description": "Callback function that will be called when zooming or panning ends. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
+      "Default": null,
+      "py_name": "events_on_zoom_end",
+      "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
+    },
+    {
+      "Property": "showFPSMonitor",
+      "Description": "Show WebGL performance monitor",
+      "Default": false,
+      "py_name": "show_fpsmonitor",
+      "type": "boolean"
+    },
+    {
+      "Property": "pixelRatio",
+      "Description": "Canvas pixel ratio",
+      "Default": 2,
+      "py_name": "pixel_ratio",
+      "type": "number"
+    },
+    {
+      "Property": "scaleNodesOnZoom",
+      "Description": "Scale the nodes when zooming in or out",
+      "Default": true,
+      "py_name": "scale_nodes_on_zoom",
+      "type": "boolean"
+    },
+    {
+      "Property": "randomSeed",
+      "Description": "Providing a randomSeed value allows you to control the randomness of the layout across different simulation runs. It is useful when you want the graph to always look the same on same datasets. This property will be applied only on component initialization and it can't be changed using the setConfig method.",
+      "Default": null,
+      "py_name": "random_seed",
+      "type": "number | string"
+    }
+  ]
+}
