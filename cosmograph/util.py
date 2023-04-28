@@ -233,7 +233,8 @@ def _cosmos_html(cosmo_id="cosmos", pre_script="", post_script=""):
         </script>
     """
 
-# TODO: Make signature for config parameters
+# TODO: Use jy!!! (makes the next todo mute.)
+# TODO: Make signature for config parameters.
 def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     if canvas_id is None:
         canvas_id = get_new_canvas_id()
@@ -244,11 +245,22 @@ def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
         )
     config = {_prop_of_py_name[argname]: value for argname, value in config.items()}
 
+    # TODO: Remove the following -- just a hack to diagnose a problem with booleans
+    # from jy.js_parse import dflt_py_to_js_value_trans
+    # print(f"Before: {config=}")
+    # config = {k: dflt_py_to_js_value_trans(v) for k, v in config.items()}
+    # print(f"After: {config=}")
+
     html_str = _cosmos_html(
         canvas_id,
         pre_script=init_cosmos(canvas_id=canvas_id),
         post_script=alt_set_data(links, config, nodes, canvas_id),
     )
+
+    # Olya: This repairs it -- so alt_set_data is the problem. Doesn't handle
+    # configs correctly
+    # html_str = html_str.replace("{'linkArrows': False}", '{"linkArrows": false}')
+    print(html_str)  # Olya: Diagnose link_arrow=False issue with this
 
     html_obj = HTML(html_str)
     html_obj.canvas_id = canvas_id
@@ -471,7 +483,7 @@ def _tmp_test_of_py_costmos_call():
         ", node_greyout_opacity='0.1', node_size='4', node_size_scale='1', "
         "render_highlighted_node_ring='true', highlighted_node_ring_color='undefined', "
         "render_links='true', link_color='#666666', link_greyout_opacity='0.1', "
-        "link_width='1', link_width_scale='1', link_arrows='true', "
+        "link_width='1', link_width_scale='1', link_arrows=true, "
         "link_arrows_size_scale='1', link_visibility_distance_range='[50, 150]', "
         "link_visibility_min_transparency='0.25', use_quadtree='false', "
         "simulation='See Simulation configuration table for more details', "
