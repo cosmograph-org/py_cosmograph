@@ -260,7 +260,7 @@ def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     # Olya: This repairs it -- so alt_set_data is the problem. Doesn't handle
     # configs correctly
     # html_str = html_str.replace("{'linkArrows': False}", '{"linkArrows": false}')
-    print(html_str)  # Olya: Diagnose link_arrow=False issue with this
+    # print(html_str)  # Olya: Diagnose link_arrow=False issue with this
 
     html_obj = HTML(html_str)
     html_obj.canvas_id = canvas_id
@@ -392,14 +392,15 @@ def _assert_camel_and_snake_sanity(camel_cases, snake_cases):
 
 @lru_cache
 def cosmos_config_info():
-    # TODO: Do we really want to source our config info from the README?
+    # TODO: Do we really want to source our config info from the wiki?
     #   Maybe we should just have a separate file for it?
-    #   But then the README should source itself from there, or else we'll have
+    #   But then the wiki should source itself from there, or else we'll have
     #   to keep them in sync manually.
+    #   --> Better have one source of truth.
     from tabled.html import get_tables_from_url  # pip install tabled
 
     tables = get_tables_from_url(
-        "https://github.com/cosmograph-org/cosmos/blob/master/README.md"
+        "https://github.com/cosmograph-org/cosmos/wiki/Cosmos-configuration"
     )
     is_cosmos_config_table = lambda table: "backgroundColor" in set(
         table.get("Property", [])
@@ -418,6 +419,7 @@ from cosmograph.cosmos_config import cosmos_config
 _cosmos_config_info = cosmos_config
 _default_of_py_name = {d["py_name"]: d["Default"] for d in _cosmos_config_info}
 _prop_of_py_name = {d["py_name"]: d["Property"] for d in _cosmos_config_info}
+# _py_name_of_prop = {d["Property"]: d["py_name"] for d in _cosmos_config_info}
 _description_of_py_name = {d["py_name"]: d["Description"] for d in _cosmos_config_info}
 
 
@@ -517,3 +519,46 @@ def _tmp_test_of_py_costmos_call():
     # """
 
 
+# ------------------------------------------------------------------------------
+# Putting a signature on cosmo
+
+
+def convert_js_to_py_val(x):
+    if isinstance(x, str):
+        if x == 'undefined':
+            return None
+        if x == 'true':
+            return True
+        elif x == 'false':
+            return False
+        # TODO: Add list handling ('link_visibility_distance_range': '[50, 150]',)
+        # elif x.startswith('[') and x.endswith(']'):
+    try:
+        return int(x)
+    except Exception:
+        try:
+            return float(x)
+        except Exception:
+            return x
+
+
+# # TODO: Take out of try/catch once we have a stable source of config info
+# try:
+#     info = cosmos_config_info()
+#     config_dflts = [
+#         {
+#             'name': d['py_name'],
+#             'default': convert_js_to_py_val(d['Default'])
+#         } for d in info
+#     ]
+#
+#     _cosmo_sig = Sig(cosmo) - 'display'
+#     _cosmo_sig = _cosmo_sig - 'config'
+#     _cosmo_sig = _cosmo_sig + Sig.from_params(
+#         [{'name': 'display', 'default': True, 'kind': Sig.KEYWORD_ONLY}]
+#     )
+#     _cosmo_sig = _cosmo_sig + Sig.from_params(config_dflts)
+#     cosmo = _cosmo_sig(cosmo)
+# except Exception as e:
+#     raise e
+#     print(f"Couldn't get config info: {e}")
