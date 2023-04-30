@@ -10,6 +10,7 @@ import re
 from IPython.display import HTML, Javascript, display as ipython_display
 from dol import (
     TextFiles,
+    Files,
     wrap_kvs,
     filt_iter,
     invertible_maps,
@@ -34,6 +35,8 @@ data_dir = files / "data"
 data_dir_path = str(data_dir)
 js_dir = files / "js"
 js_dir_path = str(js_dir)
+
+data_files = Files(data_dir_path)
 
 
 def _postprocess(func, egress):
@@ -389,30 +392,6 @@ def _assert_camel_and_snake_sanity(camel_cases, snake_cases):
 #             f"{list(camel_cases)[i]} and {list(snake_cases)[i]} do not agree"
 #         )
 
-
-@lru_cache
-def cosmos_config_info():
-    # TODO: Do we really want to source our config info from the wiki?
-    #   Maybe we should just have a separate file for it?
-    #   But then the wiki should source itself from there, or else we'll have
-    #   to keep them in sync manually.
-    #   --> Better have one source of truth.
-    from tabled.html import get_tables_from_url  # pip install tabled
-
-    tables = get_tables_from_url(
-        "https://github.com/cosmograph-org/cosmos/wiki/Cosmos-configuration"
-    )
-    is_cosmos_config_table = lambda table: "backgroundColor" in set(
-        table.get("Property", [])
-    )
-    table = next(filter(is_cosmos_config_table, tables), None)
-    if table is None:
-        raise ValueError("Couldn't find a cosmos configuration table")
-
-    table["py_name"] = list(map(camel_to_snake_case, table["Property"]))
-    _assert_camel_and_snake_sanity(table["Property"], table["py_name"])
-    return table.to_dict(orient="records")
-
 # _cosmos_config_info = cosmos_config_info()
 from cosmograph.cosmos_config import cosmos_config
 
@@ -542,23 +521,59 @@ def convert_js_to_py_val(x):
             return x
 
 
+
+@lru_cache
+def cosmos_config_info():
+    # TODO: Do we really want to source our config info from the wiki?
+    #   Maybe we should just have a separate file for it?
+    #   But then the wiki should source itself from there, or else we'll have
+    #   to keep them in sync manually.
+    #   --> Better have one source of truth.
+    from tabled.html import get_tables_from_url  # pip install tabled
+
+    tables = get_tables_from_url(
+        "https://github.com/cosmograph-org/cosmos/wiki/Cosmos-configuration"
+    )
+    is_cosmos_config_table = lambda table: "backgroundColor" in set(
+        table.get("Property", [])
+    )
+    table = next(filter(is_cosmos_config_table, tables), None)
+    if table is None:
+        raise ValueError("Couldn't find a cosmos configuration table")
+
+    table["py_name"] = list(map(camel_to_snake_case, table["Property"]))
+    _assert_camel_and_snake_sanity(table["Property"], table["py_name"])
+    return table.to_dict(orient="records")
+
+
+def _download_and_save_config_info():
+    import json
+    config_info = cosmos_config_info()
+    data_files['config_info.json'] = json.dumps(config_info).encode()
+
+
 # # TODO: Take out of try/catch once we have a stable source of config info
-# try:
-#     info = cosmos_config_info()
-#     config_dflts = [
-#         {
-#             'name': d['py_name'],
-#             'default': convert_js_to_py_val(d['Default'])
-#         } for d in info
-#     ]
-#
-#     _cosmo_sig = Sig(cosmo) - 'display'
-#     _cosmo_sig = _cosmo_sig - 'config'
-#     _cosmo_sig = _cosmo_sig + Sig.from_params(
-#         [{'name': 'display', 'default': True, 'kind': Sig.KEYWORD_ONLY}]
-#     )
-#     _cosmo_sig = _cosmo_sig + Sig.from_params(config_dflts)
-#     cosmo = _cosmo_sig(cosmo)
-# except Exception as e:
-#     raise e
-#     print(f"Couldn't get config info: {e}")
+try:
+    import json
+    config_info = json.loads(data_files['config_info.json'])
+    _config_dflts = [
+        {
+            'name': d['py_name'],
+            'kind': Sig.KEYWORD_ONLY,
+            'default': convert_js_to_py_val(d['Default'])
+        } for d in config_info
+    ]
+
+    _original_cosmo_sig = Sig(cosmo)
+    _cosmo_sig = _original_cosmo_sig - 'display'
+    _cosmo_sig = _cosmo_sig - 'config'
+    _cosmo_sig = _cosmo_sig + Sig.from_params(
+        [{'name': 'display', 'default': True, 'kind': Sig.KEYWORD_ONLY}]
+    )
+    _cosmo_sig = _cosmo_sig + Sig.from_params(_config_dflts)
+    _ko_names_kinds = {k: Sig.KEYWORD_ONLY for k in _cosmo_sig.names[3:]}
+    _cosmo_sig = _cosmo_sig.ch_kinds(_allow_reordering=False, **_ko_names_kinds)
+    # cosmo = _cosmo_sig(cosmo)  # TODO: See why this doesn't work
+    cosmo.__signature__ = _cosmo_sig
+except Exception as e:
+    print(f"There was a problem making a nice signature for cosmo: {e}")
