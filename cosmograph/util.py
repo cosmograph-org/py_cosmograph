@@ -393,7 +393,8 @@ def _assert_camel_and_snake_sanity(camel_cases, snake_cases):
 #         )
 
 # _cosmos_config_info = cosmos_config_info()
-from cosmograph.cosmos_config import cosmos_config
+
+cosmos_config = json.loads(data_files['cosmos_config.json'])['config']
 
 _cosmos_config_info = cosmos_config
 _default_of_py_name = {d["py_name"]: d["Default"] for d in _cosmos_config_info}

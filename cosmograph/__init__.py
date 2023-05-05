@@ -1,6 +1,5 @@
 """Python binders to cosmograph functionality"""
 
-from cosmograph.util import cosmo
+from cosmograph.util import cosmo, cosmos_config
 from linked.datasrc import mini_dot_to_graph_jdict
-from cosmograph.cosmos_config import cosmos_config
 
