@@ -33,3 +33,21 @@ class TestData:
         4 -> 5
         5 -> 6
     """)
+
+class MkTestData:
+    def path(self, n):
+        return mini_dot_to_graph_jdict(
+            "\n".join(f"{i} -> {i+1}" for i in range(1, n))
+        )
+    
+    def cycle(self, n):
+        return mini_dot_to_graph_jdict(
+            "\n".join(f"{i} -> {i+1}" for i in range(1, n))
+            + f"\n{n} -> 1"
+        )   
+    
+    def bipartite(self, n, m):
+        return mini_dot_to_graph_jdict(
+            "\n".join(f"{i} -> {j}" for i in range(1, n+1) for j in range(n+1, n+m+1))
+        )
+    
