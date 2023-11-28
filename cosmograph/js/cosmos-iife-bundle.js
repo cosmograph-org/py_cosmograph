@@ -1,3 +1,4 @@
+// v1.4.1
 var cosmos = (function (exports) {
   'use strict';
 
@@ -13693,14 +13694,21 @@ var cosmos = (function (exports) {
   const defaultLinkWidth = 1;
   const defaultBackgroundColor = '#222222';
   const defaultConfigValues = {
+      disableSimulation: false,
       spaceSize: 4096,
       nodeSizeScale: 1,
       linkWidthScale: 1,
       arrowSizeScale: 1,
       renderLinks: true,
+      curvedLinks: false,
+      curvedLinkSegments: 19,
+      curvedLinkWeight: 0.8,
+      curvedLinkControlPointDistance: 0.5,
       arrowLinks: true,
       linkVisibilityDistanceRange: [50, 150],
       linkVisibilityMinTransparency: 0.25,
+      hoveredNodeRingColor: 'white',
+      focusedNodeRingColor: 'white',
       useQuadtree: false,
       simulation: {
           decay: 1000,
@@ -13718,6 +13726,9 @@ var cosmos = (function (exports) {
       showFPSMonitor: false,
       pixelRatio: 2,
       scaleNodesOnZoom: true,
+      initialZoomLevel: 1,
+      disableZoom: false,
+      nodeSamplingDistance: 150,
   };
   const hoveredNodeRingOpacity = 0.7;
   const focusedNodeRingOpacity = 0.95;
@@ -13773,6 +13784,7 @@ var cosmos = (function (exports) {
 
   class GraphConfig {
       constructor() {
+          this.disableSimulation = defaultConfigValues.disableSimulation;
           this.backgroundColor = defaultBackgroundColor;
           this.spaceSize = defaultConfigValues.spaceSize;
           this.nodeColor = defaultNodeColor;
@@ -13781,11 +13793,18 @@ var cosmos = (function (exports) {
           this.nodeSizeScale = defaultConfigValues.nodeSizeScale;
           this.renderHighlightedNodeRing = true;
           this.highlightedNodeRingColor = undefined;
+          this.renderHoveredNodeRing = true;
+          this.hoveredNodeRingColor = defaultConfigValues.hoveredNodeRingColor;
+          this.focusedNodeRingColor = defaultConfigValues.focusedNodeRingColor;
           this.linkColor = defaultLinkColor;
           this.linkGreyoutOpacity = defaultGreyoutLinkOpacity;
           this.linkWidth = defaultLinkWidth;
           this.linkWidthScale = defaultConfigValues.linkWidthScale;
           this.renderLinks = defaultConfigValues.renderLinks;
+          this.curvedLinks = defaultConfigValues.curvedLinks;
+          this.curvedLinkSegments = defaultConfigValues.curvedLinkSegments;
+          this.curvedLinkWeight = defaultConfigValues.curvedLinkWeight;
+          this.curvedLinkControlPointDistance = defaultConfigValues.curvedLinkControlPointDistance;
           this.linkArrows = defaultConfigValues.arrowLinks;
           this.linkArrowsSizeScale = defaultConfigValues.arrowSizeScale;
           this.linkVisibilityDistanceRange = defaultConfigValues.linkVisibilityDistanceRange;
@@ -13821,7 +13840,10 @@ var cosmos = (function (exports) {
           this.showFPSMonitor = defaultConfigValues.showFPSMonitor;
           this.pixelRatio = defaultConfigValues.pixelRatio;
           this.scaleNodesOnZoom = defaultConfigValues.scaleNodesOnZoom;
+          this.initialZoomLevel = defaultConfigValues.initialZoomLevel;
+          this.disableZoom = defaultConfigValues.disableZoom;
           this.randomSeed = undefined;
+          this.nodeSamplingDistance = defaultConfigValues.nodeSamplingDistance;
       }
       init(config) {
           Object.keys(config)
@@ -13883,6 +13905,24 @@ var cosmos = (function (exports) {
           buffer: indexBuffer,
           size: 2,
       };
+  }
+  function destroyFramebuffer(fbo) {
+      var _a;
+      if (!fbo)
+          return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((_a = fbo === null || fbo === void 0 ? void 0 : fbo._framebuffer) === null || _a === void 0 ? void 0 : _a.framebuffer) {
+          fbo.destroy();
+      }
+  }
+  function destroyBuffer(fbo) {
+      var _a;
+      if (!fbo)
+          return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((_a = fbo === null || fbo === void 0 ? void 0 : fbo._buffer) === null || _a === void 0 ? void 0 : _a.buffer) {
+          fbo.destroy();
+      }
   }
 
   var clearFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec2 index;void main(){gl_FragColor=vec4(0.0);}"; // eslint-disable-line
@@ -13959,8 +13999,7 @@ var cosmos = (function (exports) {
           (_c = this.runCommand) === null || _c === void 0 ? void 0 : _c.call(this);
       }
       destroy() {
-          var _a;
-          (_a = this.centermassFbo) === null || _a === void 0 ? void 0 : _a.destroy();
+          destroyFramebuffer(this.centermassFbo);
       }
   }
 
@@ -13979,7 +14018,7 @@ var cosmos = (function (exports) {
               uniforms: {
                   position: () => points === null || points === void 0 ? void 0 : points.previousPositionFbo,
                   gravity: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.gravity; },
-                  spaceSize: () => config.spaceSize,
+                  spaceSize: () => store.adjustedSpaceSize,
                   alpha: () => store.alpha,
               },
           });
@@ -14076,6 +14115,8 @@ void main() {
       }
       create(direction) {
           const { reglInstance, store: { pointsTextureSize, linksTextureSize }, data } = this;
+          if (!pointsTextureSize || !linksTextureSize)
+              return;
           this.linkFirstIndicesAndAmount = new Float32Array(pointsTextureSize * pointsTextureSize * 4);
           this.indices = new Float32Array(linksTextureSize * linksTextureSize * 4);
           const linkBiasAndStrengthState = new Float32Array(linksTextureSize * linksTextureSize * 4);
@@ -14169,11 +14210,10 @@ void main() {
           (_a = this.runCommand) === null || _a === void 0 ? void 0 : _a.call(this);
       }
       destroy() {
-          var _a, _b, _c, _d;
-          (_a = this.linkFirstIndicesAndAmountFbo) === null || _a === void 0 ? void 0 : _a.destroy();
-          (_b = this.indicesFbo) === null || _b === void 0 ? void 0 : _b.destroy();
-          (_c = this.biasAndStrengthFbo) === null || _c === void 0 ? void 0 : _c.destroy();
-          (_d = this.randomDistanceFbo) === null || _d === void 0 ? void 0 : _d.destroy();
+          destroyFramebuffer(this.linkFirstIndicesAndAmountFbo);
+          destroyFramebuffer(this.indicesFbo);
+          destroyFramebuffer(this.biasAndStrengthFbo);
+          destroyFramebuffer(this.randomDistanceFbo);
       }
   }
 
@@ -14192,9 +14232,10 @@ void main() {
           this.quadtreeLevels = 0;
       }
       create() {
-          var _a;
-          const { reglInstance, config, store } = this;
-          this.quadtreeLevels = Math.log2((_a = config.spaceSize) !== null && _a !== void 0 ? _a : defaultConfigValues.spaceSize);
+          const { reglInstance, store } = this;
+          if (!store.pointsTextureSize)
+              return;
+          this.quadtreeLevels = Math.log2(store.adjustedSpaceSize);
           for (let i = 0; i < this.quadtreeLevels; i += 1) {
               const levelTextureSize = Math.pow(2, i + 1);
               this.levelsFbos.set(`level[${i}]`, reglInstance.framebuffer({
@@ -14272,7 +14313,7 @@ void main() {
                   levelTextureSize: (_, props) => props.levelTextureSize,
                   alpha: () => store.alpha,
                   repulsion: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.repulsion; },
-                  spaceSize: () => config.spaceSize,
+                  spaceSize: () => store.adjustedSpaceSize,
                   theta: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.repulsionTheta; },
               },
               blend: {
@@ -14303,7 +14344,7 @@ void main() {
                   levelTextureSize: (_, props) => props.levelTextureSize,
                   alpha: () => store.alpha,
                   repulsion: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.repulsion; },
-                  spaceSize: () => config.spaceSize,
+                  spaceSize: () => store.adjustedSpaceSize,
               },
               blend: {
                   enable: true,
@@ -14329,28 +14370,28 @@ void main() {
           });
       }
       run() {
-          var _a, _b, _c, _d, _e, _f;
-          const { config } = this;
+          var _a, _b, _c, _d, _e;
+          const { store } = this;
           for (let i = 0; i < this.quadtreeLevels; i += 1) {
               (_a = this.clearLevelsCommand) === null || _a === void 0 ? void 0 : _a.call(this, { levelFbo: this.levelsFbos.get(`level[${i}]`) });
               const levelTextureSize = Math.pow(2, i + 1);
-              const cellSize = ((_b = config.spaceSize) !== null && _b !== void 0 ? _b : defaultConfigValues.spaceSize) / levelTextureSize;
-              (_c = this.calculateLevelsCommand) === null || _c === void 0 ? void 0 : _c.call(this, {
+              const cellSize = store.adjustedSpaceSize / levelTextureSize;
+              (_b = this.calculateLevelsCommand) === null || _b === void 0 ? void 0 : _b.call(this, {
                   levelFbo: this.levelsFbos.get(`level[${i}]`),
                   levelTextureSize,
                   cellSize,
               });
           }
-          (_d = this.clearVelocityCommand) === null || _d === void 0 ? void 0 : _d.call(this);
+          (_c = this.clearVelocityCommand) === null || _c === void 0 ? void 0 : _c.call(this);
           for (let i = 0; i < this.quadtreeLevels; i += 1) {
               const levelTextureSize = Math.pow(2, i + 1);
-              (_e = this.forceCommand) === null || _e === void 0 ? void 0 : _e.call(this, {
+              (_d = this.forceCommand) === null || _d === void 0 ? void 0 : _d.call(this, {
                   levelFbo: this.levelsFbos.get(`level[${i}]`),
                   levelTextureSize,
                   level: i,
               });
               if (i === this.quadtreeLevels - 1) {
-                  (_f = this.forceFromItsOwnCentermassCommand) === null || _f === void 0 ? void 0 : _f.call(this, {
+                  (_e = this.forceFromItsOwnCentermassCommand) === null || _e === void 0 ? void 0 : _e.call(this, {
                       levelFbo: this.levelsFbos.get(`level[${i}]`),
                       levelTextureSize,
                       level: i,
@@ -14359,13 +14400,9 @@ void main() {
           }
       }
       destroy() {
-          var _a;
-          (_a = this.randomValuesFbo) === null || _a === void 0 ? void 0 : _a.destroy();
+          destroyFramebuffer(this.randomValuesFbo);
           this.levelsFbos.forEach(fbo => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              if (fbo === null || fbo === void 0 ? void 0 : fbo._framebuffer.framebuffer) {
-                  fbo.destroy();
-              }
+              destroyFramebuffer(fbo);
           });
           this.levelsFbos.clear();
       }
@@ -14468,9 +14505,10 @@ void main() {
           this.quadtreeLevels = 0;
       }
       create() {
-          var _a;
-          const { reglInstance, config, store } = this;
-          this.quadtreeLevels = Math.log2((_a = config.spaceSize) !== null && _a !== void 0 ? _a : defaultConfigValues.spaceSize);
+          const { reglInstance, store } = this;
+          if (!store.pointsTextureSize)
+              return;
+          this.quadtreeLevels = Math.log2(store.adjustedSpaceSize);
           for (let i = 0; i < this.quadtreeLevels; i += 1) {
               const levelTextureSize = Math.pow(2, i + 1);
               this.levelsFbos.set(`level[${i}]`, reglInstance.framebuffer({
@@ -14547,7 +14585,7 @@ void main() {
               uniforms: {
                   position: () => points === null || points === void 0 ? void 0 : points.previousPositionFbo,
                   randomValues: () => this.randomValuesFbo,
-                  spaceSize: () => config.spaceSize,
+                  spaceSize: () => store.adjustedSpaceSize,
                   repulsion: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.repulsion; },
                   theta: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.repulsionTheta; },
                   alpha: () => store.alpha,
@@ -14556,28 +14594,24 @@ void main() {
           });
       }
       run() {
-          var _a, _b, _c, _d;
-          const { config } = this;
+          var _a, _b, _c;
+          const { store } = this;
           for (let i = 0; i < this.quadtreeLevels; i += 1) {
               (_a = this.clearLevelsCommand) === null || _a === void 0 ? void 0 : _a.call(this, { levelFbo: this.levelsFbos.get(`level[${i}]`) });
               const levelTextureSize = Math.pow(2, i + 1);
-              const cellSize = ((_b = config.spaceSize) !== null && _b !== void 0 ? _b : defaultConfigValues.spaceSize) / levelTextureSize;
-              (_c = this.calculateLevelsCommand) === null || _c === void 0 ? void 0 : _c.call(this, {
+              const cellSize = store.adjustedSpaceSize / levelTextureSize;
+              (_b = this.calculateLevelsCommand) === null || _b === void 0 ? void 0 : _b.call(this, {
                   levelFbo: this.levelsFbos.get(`level[${i}]`),
                   levelTextureSize,
                   cellSize,
               });
           }
-          (_d = this.quadtreeCommand) === null || _d === void 0 ? void 0 : _d.call(this);
+          (_c = this.quadtreeCommand) === null || _c === void 0 ? void 0 : _c.call(this);
       }
       destroy() {
-          var _a;
-          (_a = this.randomValuesFbo) === null || _a === void 0 ? void 0 : _a.destroy();
+          destroyFramebuffer(this.randomValuesFbo);
           this.levelsFbos.forEach(fbo => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              if (fbo === null || fbo === void 0 ? void 0 : fbo._framebuffer.framebuffer) {
-                  fbo.destroy();
-              }
+              destroyFramebuffer(fbo);
           });
           this.levelsFbos.clear();
       }
@@ -15048,6 +15082,14 @@ void main() {
       getSortedIndexById(id) {
           return id !== undefined ? this.idToSortedIndexMap.get(id) : undefined;
       }
+      getInputIndexById(id) {
+          if (id === undefined)
+              return undefined;
+          const sortedIndex = this.getSortedIndexById(id);
+          if (sortedIndex === undefined)
+              return undefined;
+          return this.getInputIndexBySortedIndex(sortedIndex);
+      }
       getAdjacentNodes(id) {
           var _a, _b;
           const index = this.getSortedIndexById(id);
@@ -15060,609 +15102,9 @@ void main() {
       }
   }
 
-  var drawStraightFrag = "precision highp float;\n#define GLSLIFY 1\nuniform bool useArrow;varying vec4 rgbaColor;varying vec2 pos;varying float arrowLength;varying float linkWidthArrowWidthRatio;varying float smoothWidthRatio;varying float targetPointSize;float map(float value,float min1,float max1,float min2,float max2){return min2+(value-min1)*(max2-min2)/(max1-min1);}void main(){float opacity=1.0;vec3 color=rgbaColor.rgb;float smoothDelta=smoothWidthRatio/2.0;if(useArrow){float end_arrow=0.5+arrowLength/2.0;float start_arrow=end_arrow-arrowLength;float arrowWidthDelta=linkWidthArrowWidthRatio/2.0;float linkOpacity=rgbaColor.a*smoothstep(0.5-arrowWidthDelta,0.5-arrowWidthDelta-smoothDelta,abs(pos.y));float arrowOpacity=1.0;if(pos.x>start_arrow&&pos.x<start_arrow+arrowLength){float xmapped=map(pos.x,start_arrow,end_arrow,0.0,1.0);arrowOpacity=rgbaColor.a*smoothstep(xmapped-smoothDelta,xmapped,map(abs(pos.y),0.5,0.0,0.0,1.0));if(linkOpacity!=arrowOpacity){linkOpacity+=arrowOpacity;}}opacity=linkOpacity;}else opacity=rgbaColor.a*smoothstep(0.5,0.5-smoothDelta,abs(pos.y));gl_FragColor=vec4(color,opacity);}"; // eslint-disable-line
+  var drawLineFrag = "precision highp float;\n#define GLSLIFY 1\nuniform bool useArrow;varying vec4 rgbaColor;varying vec2 pos;varying float arrowLength;varying float linkWidthArrowWidthRatio;varying float smoothWidthRatio;float map(float value,float min1,float max1,float min2,float max2){return min2+(value-min1)*(max2-min2)/(max1-min1);}void main(){float opacity=1.0;vec3 color=rgbaColor.rgb;float smoothDelta=smoothWidthRatio/2.0;if(useArrow){float end_arrow=0.5+arrowLength/2.0;float start_arrow=end_arrow-arrowLength;float arrowWidthDelta=linkWidthArrowWidthRatio/2.0;float linkOpacity=rgbaColor.a*smoothstep(0.5-arrowWidthDelta,0.5-arrowWidthDelta-smoothDelta,abs(pos.y));float arrowOpacity=1.0;if(pos.x>start_arrow&&pos.x<start_arrow+arrowLength){float xmapped=map(pos.x,start_arrow,end_arrow,0.0,1.0);arrowOpacity=rgbaColor.a*smoothstep(xmapped-smoothDelta,xmapped,map(abs(pos.y),0.5,0.0,0.0,1.0));if(linkOpacity!=arrowOpacity){linkOpacity+=arrowOpacity;}}opacity=linkOpacity;}else opacity=rgbaColor.a*smoothstep(0.5,0.5-smoothDelta,abs(pos.y));gl_FragColor=vec4(color,opacity);}"; // eslint-disable-line
 
-  var drawStraightVert = "precision highp float;\n#define GLSLIFY 1\nattribute vec2 position,pointA,pointB;attribute vec4 color;attribute float width;uniform sampler2D positions;uniform sampler2D particleSize;uniform sampler2D particleGreyoutStatus;uniform mat3 transform;uniform float pointsTextureSize;uniform float widthScale;uniform float nodeSizeScale;uniform bool useArrow;uniform float arrowSizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform vec2 linkVisibilityDistanceRange;uniform float linkVisibilityMinTransparency;uniform float greyoutOpacity;uniform bool scaleNodesOnZoom;varying vec4 rgbaColor;varying vec2 pos;varying float arrowLength;varying float linkWidthArrowWidthRatio;varying float smoothWidthRatio;varying float targetPointSize;float map(float value,float min1,float max1,float min2,float max2){return min2+(value-min1)*(max2-min2)/(max1-min1);}float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return pSize;}void main(){pos=position;vec2 pointTexturePosA=(pointA+0.5)/pointsTextureSize;vec2 pointTexturePosB=(pointB+0.5)/pointsTextureSize;vec4 greyoutStatusA=texture2D(particleGreyoutStatus,pointTexturePosA);vec4 greyoutStatusB=texture2D(particleGreyoutStatus,pointTexturePosB);targetPointSize=pointSize(texture2D(particleSize,pointTexturePosB).r*nodeSizeScale);vec4 pointPositionA=texture2D(positions,pointTexturePosA);vec4 pointPositionB=texture2D(positions,pointTexturePosB);vec2 a=pointPositionA.xy;vec2 b=pointPositionB.xy;vec2 xBasis=b-a;vec2 yBasis=normalize(vec2(-xBasis.y,xBasis.x));vec2 distVector=a-b;float linkDist=sqrt(dot(distVector,distVector));float linkDistPx=linkDist*transform[0][0];targetPointSize=(targetPointSize/(2.0*ratio))/linkDistPx;float linkWidth=width*widthScale;float k=2.0;float arrowWidth=max(5.0,linkWidth*k);arrowWidth*=arrowSizeScale;float arrowWidthPx=arrowWidth/transform[0][0];arrowLength=min(0.3,(0.866*arrowWidthPx*2.0)/linkDist);float smoothWidth=2.0;float arrowExtraWidth=arrowWidth-linkWidth;linkWidth+=smoothWidth/2.0;if(useArrow){linkWidth+=arrowExtraWidth;}smoothWidthRatio=smoothWidth/linkWidth;linkWidthArrowWidthRatio=arrowExtraWidth/linkWidth;float linkWidthPx=linkWidth/transform[0][0];vec3 rgbColor=color.rgb;float opacity=color.a*max(linkVisibilityMinTransparency,map(linkDistPx,linkVisibilityDistanceRange.g,linkVisibilityDistanceRange.r,0.0,1.0));if(greyoutStatusA.r>0.0||greyoutStatusB.r>0.0){opacity*=greyoutOpacity;}rgbaColor=vec4(rgbColor,opacity);vec2 point=a+xBasis*position.x+yBasis*linkWidthPx*position.y;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);}"; // eslint-disable-line
-
-  class Lines extends CoreModule {
-      create() {
-          this.updateColor();
-          this.updateWidth();
-      }
-      initPrograms() {
-          const { reglInstance, config, store, data, points } = this;
-          const { pointsTextureSize } = store;
-          const geometryLinkBuffer = {
-              buffer: reglInstance.buffer([
-                  [0, -0.5],
-                  [1, -0.5],
-                  [1, 0.5],
-                  [0, -0.5],
-                  [1, 0.5],
-                  [0, 0.5],
-              ]),
-              divisor: 0,
-          };
-          const instancePoints = [];
-          data.completeLinks.forEach(l => {
-              const toIndex = data.getSortedIndexById(l.target);
-              const fromIndex = data.getSortedIndexById(l.source);
-              const fromX = fromIndex % pointsTextureSize;
-              const fromY = Math.floor(fromIndex / pointsTextureSize);
-              const toX = toIndex % pointsTextureSize;
-              const toY = Math.floor(toIndex / pointsTextureSize);
-              instancePoints.push([fromX, fromY]);
-              instancePoints.push([toX, toY]);
-          });
-          const pointsBuffer = reglInstance.buffer(instancePoints);
-          this.drawStraightCommand = reglInstance({
-              vert: drawStraightVert,
-              frag: drawStraightFrag,
-              attributes: {
-                  position: geometryLinkBuffer,
-                  pointA: {
-                      buffer: () => pointsBuffer,
-                      divisor: 1,
-                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
-                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
-                  },
-                  pointB: {
-                      buffer: () => pointsBuffer,
-                      divisor: 1,
-                      offset: Float32Array.BYTES_PER_ELEMENT * 2,
-                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
-                  },
-                  color: {
-                      buffer: () => this.colorBuffer,
-                      divisor: 1,
-                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
-                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
-                  },
-                  width: {
-                      buffer: () => this.widthBuffer,
-                      divisor: 1,
-                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
-                      stride: Float32Array.BYTES_PER_ELEMENT * 1,
-                  },
-              },
-              uniforms: {
-                  positions: () => points === null || points === void 0 ? void 0 : points.currentPositionFbo,
-                  particleSize: () => points === null || points === void 0 ? void 0 : points.sizeFbo,
-                  particleGreyoutStatus: () => points === null || points === void 0 ? void 0 : points.greyoutStatusFbo,
-                  transform: () => store.transform,
-                  pointsTextureSize: () => store.pointsTextureSize,
-                  nodeSizeScale: () => config.nodeSizeScale,
-                  widthScale: () => config.linkWidthScale,
-                  useArrow: () => config.linkArrows,
-                  arrowSizeScale: () => config.linkArrowsSizeScale,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  ratio: () => config.pixelRatio,
-                  linkVisibilityDistanceRange: () => config.linkVisibilityDistanceRange,
-                  linkVisibilityMinTransparency: () => config.linkVisibilityMinTransparency,
-                  greyoutOpacity: () => config.linkGreyoutOpacity,
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-              },
-              cull: {
-                  enable: true,
-                  face: 'back',
-              },
-              blend: {
-                  enable: true,
-                  func: {
-                      dstRGB: 'one minus src alpha',
-                      srcRGB: 'src alpha',
-                      dstAlpha: 'one minus src alpha',
-                      srcAlpha: 'one',
-                  },
-                  equation: {
-                      rgb: 'add',
-                      alpha: 'add',
-                  },
-              },
-              depth: {
-                  enable: false,
-                  mask: false,
-              },
-              count: 6,
-              instances: () => data.linksNumber,
-          });
-      }
-      draw() {
-          var _a;
-          if (!this.colorBuffer || !this.widthBuffer)
-              return;
-          (_a = this.drawStraightCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-      }
-      updateColor() {
-          const { reglInstance, config, data } = this;
-          const instancePoints = [];
-          data.completeLinks.forEach(l => {
-              var _a;
-              const c = (_a = getValue(l, config.linkColor)) !== null && _a !== void 0 ? _a : defaultLinkColor;
-              const rgba = getRgbaColor(c);
-              instancePoints.push(rgba);
-          });
-          this.colorBuffer = reglInstance.buffer(instancePoints);
-      }
-      updateWidth() {
-          const { reglInstance, config, data } = this;
-          const instancePoints = [];
-          data.completeLinks.forEach(l => {
-              const linkWidth = getValue(l, config.linkWidth);
-              instancePoints.push([linkWidth !== null && linkWidth !== void 0 ? linkWidth : defaultLinkWidth]);
-          });
-          this.widthBuffer = reglInstance.buffer(instancePoints);
-      }
-      destroy() {
-          var _a, _b;
-          (_a = this.colorBuffer) === null || _a === void 0 ? void 0 : _a.destroy();
-          (_b = this.widthBuffer) === null || _b === void 0 ? void 0 : _b.destroy();
-      }
-  }
-
-  function createColorBuffer(data, reglInstance, textureSize, colorAccessor) {
-      var _a;
-      const initialState = new Float32Array(textureSize * textureSize * 4);
-      for (let i = 0; i < data.nodes.length; ++i) {
-          const sortedIndex = data.getSortedIndexByInputIndex(i);
-          const node = data.nodes[i];
-          if (node && sortedIndex !== undefined) {
-              const c = (_a = getValue(node, colorAccessor)) !== null && _a !== void 0 ? _a : defaultNodeColor;
-              const rgba = getRgbaColor(c);
-              initialState[sortedIndex * 4 + 0] = rgba[0];
-              initialState[sortedIndex * 4 + 1] = rgba[1];
-              initialState[sortedIndex * 4 + 2] = rgba[2];
-              initialState[sortedIndex * 4 + 3] = rgba[3];
-          }
-      }
-      const initialTexture = reglInstance.texture({
-          data: initialState,
-          width: textureSize,
-          height: textureSize,
-          type: 'float',
-      });
-      return reglInstance.framebuffer({
-          color: initialTexture,
-          depth: false,
-          stencil: false,
-      });
-  }
-  function createGreyoutStatusBuffer(selectedIndices, reglInstance, textureSize) {
-      // Greyout status: 0 - false, highlighted or normal point; 1 - true, greyout point
-      const initialState = new Float32Array(textureSize * textureSize * 4)
-          .fill(selectedIndices ? 1 : 0);
-      if (selectedIndices) {
-          for (const selectedIndex of selectedIndices) {
-              initialState[selectedIndex * 4] = 0;
-          }
-      }
-      const initialTexture = reglInstance.texture({
-          data: initialState,
-          width: textureSize,
-          height: textureSize,
-          type: 'float',
-      });
-      return reglInstance.framebuffer({
-          color: initialTexture,
-          depth: false,
-          stencil: false,
-      });
-  }
-
-  var drawPointsFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec2 index;varying vec3 rgbColor;varying float alpha;const float smoothing=0.9;void main(){if(alpha==0.0){discard;}float r=0.0;float delta=0.0;vec2 cxy=2.0*gl_PointCoord-1.0;r=dot(cxy,cxy);float opacity=alpha*(1.0-smoothstep(smoothing,1.0,r));gl_FragColor=vec4(rgbColor,opacity);}"; // eslint-disable-line
-
-  var drawPointsVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nattribute vec2 indexes;uniform sampler2D positions;uniform sampler2D particleColor;uniform sampler2D particleGreyoutStatus;uniform sampler2D particleSize;uniform float ratio;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float greyoutOpacity;uniform bool scaleNodesOnZoom;varying vec2 index;varying vec3 rgbColor;varying float alpha;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return pSize;}void main(){index=indexes;vec4 pointPosition=texture2D(positions,(index+0.5)/pointsTextureSize);vec2 point=pointPosition.rg;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);vec4 pSize=texture2D(particleSize,(index+0.5)/pointsTextureSize);float size=pSize.r*sizeScale;vec4 pColor=texture2D(particleColor,(index+0.5)/pointsTextureSize);rgbColor=pColor.rgb;gl_PointSize=pointSize(size);alpha=pColor.a;vec4 greyoutStatus=texture2D(particleGreyoutStatus,(index+0.5)/pointsTextureSize);if(greyoutStatus.r>0.0){alpha*=greyoutOpacity;}}"; // eslint-disable-line
-
-  var findPointsOnAreaSelectionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 selection[2];uniform bool scaleNodesOnZoom;uniform float maxPointSize;varying vec2 index;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}void main(){vec4 pointPosition=texture2D(position,index);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,index);float size=pSize.r*sizeScale;float left=2.0*(selection[0].x-0.5*pointSize(size))/screenSize.x-1.0;float right=2.0*(selection[1].x+0.5*pointSize(size))/screenSize.x-1.0;float top=2.0*(selection[0].y-0.5*pointSize(size))/screenSize.y-1.0;float bottom=2.0*(selection[1].y+0.5*pointSize(size))/screenSize.y-1.0;gl_FragColor=vec4(0.0,0.0,pointPosition.rg);if(final.x>=left&&final.x<=right&&final.y>=top&&final.y<=bottom){gl_FragColor.r=1.0;}}"; // eslint-disable-line
-
-  var drawHighlightedFrag = "precision mediump float;\n#define GLSLIFY 1\nuniform vec4 color;uniform float width;varying vec2 pos;const float smoothing=1.05;void main(){vec2 cxy=pos;float r=dot(cxy,cxy);float opacity=smoothstep(r,r*smoothing,1.0);float stroke=smoothstep(width,width*smoothing,r);gl_FragColor=vec4(color.rgb,opacity*stroke*color.a);}"; // eslint-disable-line
-
-  var drawHighlightedVert = "precision mediump float;\n#define GLSLIFY 1\nattribute vec2 quad;uniform sampler2D positions;uniform sampler2D particleSize;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform bool scaleNodesOnZoom;uniform float pointIndex;uniform float maxPointSize;uniform vec4 color;varying vec2 pos;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*transform[0][0];}else{pSize=size*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}const float relativeRingRadius=1.3;void main(){pos=quad;vec2 ij=vec2(mod(pointIndex,pointsTextureSize),floor(pointIndex/pointsTextureSize))+0.5;vec4 pointPosition=texture2D(positions,ij/pointsTextureSize);vec4 pSize=texture2D(particleSize,ij/pointsTextureSize);float size=(pointSize(pSize.r*sizeScale)*relativeRingRadius)/transform[0][0];float radius=size*0.5;vec2 a=pointPosition.xy;vec2 b=pointPosition.xy+vec2(0.0,radius);vec2 xBasis=b-a;vec2 yBasis=normalize(vec2(-xBasis.y,xBasis.x));vec2 point=a+xBasis*quad.x+yBasis*radius*quad.y;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);}"; // eslint-disable-line
-
-  var findHoveredPointFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec4 rgba;void main(){gl_FragColor=rgba;}"; // eslint-disable-line
-
-  var findHoveredPointVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform float pointsTextureSize;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 mousePosition;uniform bool scaleNodesOnZoom;uniform float maxPointSize;attribute vec2 indexes;varying vec4 rgba;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}float euclideanDistance(float x1,float x2,float y1,float y2){return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));}void main(){vec4 pointPosition=texture2D(position,(indexes+0.5)/pointsTextureSize);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,indexes/pointsTextureSize);float size=pSize.r*sizeScale;float pointRadius=0.5*pointSize(size);vec2 pointScreenPosition=(final.xy+1.0)*screenSize/2.0;rgba=vec4(0.0);gl_Position=vec4(0.5,0.5,0.0,1.0);if(euclideanDistance(pointScreenPosition.x,mousePosition.x,pointScreenPosition.y,mousePosition.y)<pointRadius){float index=indexes.g*pointsTextureSize+indexes.r;rgba=vec4(index,pSize.r,pointPosition.xy);gl_Position=vec4(-0.5,-0.5,0.0,1.0);}gl_PointSize=1.0;}"; // eslint-disable-line
-
-  function getNodeSize(node, sizeAccessor) {
-      const size = getValue(node, sizeAccessor);
-      return size !== null && size !== void 0 ? size : defaultNodeSize;
-  }
-  function createSizeBuffer(data, reglInstance, pointTextureSize, sizeAccessor) {
-      const numParticles = data.nodes.length;
-      const initialState = new Float32Array(pointTextureSize * pointTextureSize * 4);
-      for (let i = 0; i < numParticles; ++i) {
-          const sortedIndex = data.getSortedIndexByInputIndex(i);
-          const node = data.nodes[i];
-          if (node && sortedIndex !== undefined) {
-              initialState[sortedIndex * 4] = getNodeSize(node, sizeAccessor);
-          }
-      }
-      const initialTexture = reglInstance.texture({
-          data: initialState,
-          width: pointTextureSize,
-          height: pointTextureSize,
-          type: 'float',
-      });
-      return reglInstance.framebuffer({
-          color: initialTexture,
-          depth: false,
-          stencil: false,
-      });
-  }
-
-  var updatePositionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D velocity;uniform float friction;uniform float spaceSize;varying vec2 index;void main(){vec4 pointPosition=texture2D(position,index);vec4 pointVelocity=texture2D(velocity,index);pointVelocity.rg*=friction;pointPosition.rg+=pointVelocity.rg;pointPosition.r=clamp(pointPosition.r,0.0,spaceSize);pointPosition.g=clamp(pointPosition.g,0.0,spaceSize);gl_FragColor=pointPosition;}"; // eslint-disable-line
-
-  function createTrackedPositionsBuffer(indices, reglInstance) {
-      const size = Math.ceil(Math.sqrt(indices.length));
-      return reglInstance.framebuffer({
-          shape: [size, size],
-          depth: false,
-          stencil: false,
-          colorType: 'float',
-      });
-  }
-  function createTrackedIndicesBuffer(indices, pointsTextureSize, reglInstance) {
-      const size = Math.ceil(Math.sqrt(indices.length));
-      const initialState = new Float32Array(size * size * 4).fill(-1);
-      for (const [i, sortedIndex] of indices.entries()) {
-          if (sortedIndex !== undefined) {
-              initialState[i * 4] = sortedIndex % pointsTextureSize;
-              initialState[i * 4 + 1] = Math.floor(sortedIndex / pointsTextureSize);
-              initialState[i * 4 + 2] = 0;
-              initialState[i * 4 + 3] = 0;
-          }
-      }
-      const initialTexture = reglInstance.texture({
-          data: initialState,
-          width: size,
-          height: size,
-          type: 'float',
-      });
-      return reglInstance.framebuffer({
-          color: initialTexture,
-          depth: false,
-          stencil: false,
-      });
-  }
-
-  var trackPositionsFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D trackedIndices;uniform float pointsTextureSize;varying vec2 index;void main(){vec4 trackedPointIndicies=texture2D(trackedIndices,index);if(trackedPointIndicies.r<0.0)discard;vec4 pointPosition=texture2D(position,(trackedPointIndicies.rg+0.5)/pointsTextureSize);gl_FragColor=vec4(pointPosition.rg,1.0,1.0);}"; // eslint-disable-line
-
-  class Points extends CoreModule {
-      constructor() {
-          super(...arguments);
-          this.trackedPositionsById = new Map();
-      }
-      create() {
-          var _a, _b;
-          const { reglInstance, config, store, data } = this;
-          const { spaceSize } = config;
-          const { pointsTextureSize } = store;
-          const numParticles = data.nodes.length;
-          const initialState = new Float32Array(pointsTextureSize * pointsTextureSize * 4);
-          for (let i = 0; i < numParticles; ++i) {
-              const sortedIndex = this.data.getSortedIndexByInputIndex(i);
-              const node = data.nodes[i];
-              if (node && sortedIndex !== undefined) {
-                  const space = spaceSize !== null && spaceSize !== void 0 ? spaceSize : defaultConfigValues.spaceSize;
-                  initialState[sortedIndex * 4 + 0] = (_a = node.x) !== null && _a !== void 0 ? _a : space * store.getRandomFloat(0.495, 0.505);
-                  initialState[sortedIndex * 4 + 1] = (_b = node.y) !== null && _b !== void 0 ? _b : space * store.getRandomFloat(0.495, 0.505);
-              }
-          }
-          // Create position buffer
-          this.currentPositionFbo = reglInstance.framebuffer({
-              color: reglInstance.texture({
-                  data: initialState,
-                  shape: [pointsTextureSize, pointsTextureSize, 4],
-                  type: 'float',
-              }),
-              depth: false,
-              stencil: false,
-          });
-          this.previousPositionFbo = reglInstance.framebuffer({
-              color: reglInstance.texture({
-                  data: initialState,
-                  shape: [pointsTextureSize, pointsTextureSize, 4],
-                  type: 'float',
-              }),
-              depth: false,
-              stencil: false,
-          });
-          // Create velocity buffer
-          this.velocityFbo = reglInstance.framebuffer({
-              color: reglInstance.texture({
-                  data: new Float32Array(pointsTextureSize * pointsTextureSize * 4).fill(0),
-                  shape: [pointsTextureSize, pointsTextureSize, 4],
-                  type: 'float',
-              }),
-              depth: false,
-              stencil: false,
-          });
-          // Create selected points buffer
-          this.selectedFbo = reglInstance.framebuffer({
-              color: reglInstance.texture({
-                  data: initialState,
-                  shape: [pointsTextureSize, pointsTextureSize, 4],
-                  type: 'float',
-              }),
-              depth: false,
-              stencil: false,
-          });
-          this.hoveredFbo = reglInstance.framebuffer({
-              shape: [2, 2],
-              colorType: 'float',
-              depth: false,
-              stencil: false,
-          });
-          this.updateSize();
-          this.updateColor();
-          this.updateGreyoutStatus();
-      }
-      initPrograms() {
-          const { reglInstance, config, store, data } = this;
-          this.updatePositionCommand = reglInstance({
-              frag: updatePositionFrag,
-              vert: updateVert,
-              framebuffer: () => this.currentPositionFbo,
-              primitive: 'triangle strip',
-              count: 4,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-              uniforms: {
-                  position: () => this.previousPositionFbo,
-                  velocity: () => this.velocityFbo,
-                  friction: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.friction; },
-                  spaceSize: () => config.spaceSize,
-              },
-          });
-          this.drawCommand = reglInstance({
-              frag: drawPointsFrag,
-              vert: drawPointsVert,
-              primitive: 'points',
-              count: () => data.nodes.length,
-              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
-              uniforms: {
-                  positions: () => this.currentPositionFbo,
-                  particleColor: () => this.colorFbo,
-                  particleGreyoutStatus: () => this.greyoutStatusFbo,
-                  particleSize: () => this.sizeFbo,
-                  ratio: () => config.pixelRatio,
-                  sizeScale: () => config.nodeSizeScale,
-                  pointsTextureSize: () => store.pointsTextureSize,
-                  transform: () => store.transform,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  greyoutOpacity: () => config.nodeGreyoutOpacity,
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-              },
-              blend: {
-                  enable: true,
-                  func: {
-                      dstRGB: 'one minus src alpha',
-                      srcRGB: 'src alpha',
-                      dstAlpha: 'one minus src alpha',
-                      srcAlpha: 'one',
-                  },
-                  equation: {
-                      rgb: 'add',
-                      alpha: 'add',
-                  },
-              },
-              depth: {
-                  enable: false,
-                  mask: false,
-              },
-          });
-          this.findPointsOnAreaSelectionCommand = reglInstance({
-              frag: findPointsOnAreaSelectionFrag,
-              vert: updateVert,
-              framebuffer: () => this.selectedFbo,
-              primitive: 'triangle strip',
-              count: 4,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-              uniforms: {
-                  position: () => this.currentPositionFbo,
-                  particleSize: () => this.sizeFbo,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  sizeScale: () => config.nodeSizeScale,
-                  transform: () => store.transform,
-                  ratio: () => config.pixelRatio,
-                  'selection[0]': () => store.selectedArea[0],
-                  'selection[1]': () => store.selectedArea[1],
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-                  maxPointSize: () => store.maxPointSize,
-              },
-          });
-          this.clearHoveredFboCommand = reglInstance({
-              frag: clearFrag,
-              vert: updateVert,
-              framebuffer: this.hoveredFbo,
-              primitive: 'triangle strip',
-              count: 4,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-          });
-          this.findHoveredPointCommand = reglInstance({
-              frag: findHoveredPointFrag,
-              vert: findHoveredPointVert,
-              primitive: 'points',
-              count: () => data.nodes.length,
-              framebuffer: () => this.hoveredFbo,
-              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
-              uniforms: {
-                  position: () => this.currentPositionFbo,
-                  particleSize: () => this.sizeFbo,
-                  ratio: () => config.pixelRatio,
-                  sizeScale: () => config.nodeSizeScale,
-                  pointsTextureSize: () => store.pointsTextureSize,
-                  transform: () => store.transform,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-                  mousePosition: () => store.screenMousePosition,
-                  maxPointSize: () => store.maxPointSize,
-              },
-              depth: {
-                  enable: false,
-                  mask: false,
-              },
-          });
-          this.drawHighlightedCommand = reglInstance({
-              frag: drawHighlightedFrag,
-              vert: drawHighlightedVert,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-              primitive: 'triangle strip',
-              count: 4,
-              uniforms: {
-                  color: reglInstance.prop('color'),
-                  width: reglInstance.prop('width'),
-                  pointIndex: reglInstance.prop('pointIndex'),
-                  positions: () => this.currentPositionFbo,
-                  particleSize: () => this.sizeFbo,
-                  sizeScale: () => config.nodeSizeScale,
-                  pointsTextureSize: () => store.pointsTextureSize,
-                  transform: () => store.transform,
-                  spaceSize: () => config.spaceSize,
-                  screenSize: () => store.screenSize,
-                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
-                  maxPointSize: () => store.maxPointSize,
-              },
-              blend: {
-                  enable: true,
-                  func: {
-                      dstRGB: 'one minus src alpha',
-                      srcRGB: 'src alpha',
-                      dstAlpha: 'one minus src alpha',
-                      srcAlpha: 'one',
-                  },
-                  equation: {
-                      rgb: 'add',
-                      alpha: 'add',
-                  },
-              },
-              depth: {
-                  enable: false,
-                  mask: false,
-              },
-          });
-          this.trackPointsCommand = reglInstance({
-              frag: trackPositionsFrag,
-              vert: updateVert,
-              framebuffer: () => this.trackedPositionsFbo,
-              primitive: 'triangle strip',
-              count: 4,
-              attributes: { quad: createQuadBuffer(reglInstance) },
-              uniforms: {
-                  position: () => this.currentPositionFbo,
-                  trackedIndices: () => this.trackedIndicesFbo,
-                  pointsTextureSize: () => store.pointsTextureSize,
-              },
-          });
-      }
-      updateColor() {
-          const { reglInstance, config, store, data } = this;
-          this.colorFbo = createColorBuffer(data, reglInstance, store.pointsTextureSize, config.nodeColor);
-      }
-      updateGreyoutStatus() {
-          const { reglInstance, store } = this;
-          this.greyoutStatusFbo = createGreyoutStatusBuffer(store.selectedIndices, reglInstance, store.pointsTextureSize);
-      }
-      updateSize() {
-          const { reglInstance, config, store, data } = this;
-          this.sizeFbo = createSizeBuffer(data, reglInstance, store.pointsTextureSize, config.nodeSize);
-      }
-      trackPoints() {
-          var _a;
-          if (!this.trackedIndicesFbo || !this.trackedPositionsFbo)
-              return;
-          (_a = this.trackPointsCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-      }
-      draw() {
-          var _a, _b, _c;
-          (_a = this.drawCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-          if (this.config.renderHighlightedNodeRing) {
-              if (this.store.hoveredNode) {
-                  (_b = this.drawHighlightedCommand) === null || _b === void 0 ? void 0 : _b.call(this, {
-                      width: 0.85,
-                      color: this.store.hoveredNodeRingColor,
-                      pointIndex: this.store.hoveredNode.index,
-                  });
-              }
-              if (this.store.focusedNode) {
-                  (_c = this.drawHighlightedCommand) === null || _c === void 0 ? void 0 : _c.call(this, {
-                      width: 0.75,
-                      color: this.store.focusedNodeRingColor,
-                      pointIndex: this.store.focusedNode.index,
-                  });
-              }
-          }
-      }
-      updatePosition() {
-          var _a;
-          (_a = this.updatePositionCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-          this.swapFbo();
-      }
-      findPointsOnAreaSelection() {
-          var _a;
-          (_a = this.findPointsOnAreaSelectionCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-      }
-      findHoveredPoint() {
-          var _a, _b;
-          (_a = this.clearHoveredFboCommand) === null || _a === void 0 ? void 0 : _a.call(this);
-          (_b = this.findHoveredPointCommand) === null || _b === void 0 ? void 0 : _b.call(this);
-      }
-      getNodeRadius(node) {
-          const { nodeSize } = this.config;
-          return getNodeSize(node, nodeSize) / 2;
-      }
-      trackNodesByIds(ids) {
-          this.trackedIds = ids.length ? ids : undefined;
-          this.trackedPositionsById.clear();
-          const indices = ids.map(id => this.data.getSortedIndexById(id)).filter((d) => d !== undefined);
-          if (this.trackedIndicesFbo) {
-              this.trackedIndicesFbo.destroy();
-              this.trackedIndicesFbo = undefined;
-          }
-          if (this.trackedPositionsFbo) {
-              this.trackedPositionsFbo.destroy();
-              this.trackedPositionsFbo = undefined;
-          }
-          if (indices.length) {
-              this.trackedIndicesFbo = createTrackedIndicesBuffer(indices, this.store.pointsTextureSize, this.reglInstance);
-              this.trackedPositionsFbo = createTrackedPositionsBuffer(indices, this.reglInstance);
-          }
-          this.trackPoints();
-      }
-      getTrackedPositions() {
-          if (!this.trackedIds)
-              return this.trackedPositionsById;
-          const pixels = readPixels(this.reglInstance, this.trackedPositionsFbo);
-          this.trackedIds.forEach((id, i) => {
-              const x = pixels[i * 4];
-              const y = pixels[i * 4 + 1];
-              if (x !== undefined && y !== undefined)
-                  this.trackedPositionsById.set(id, [x, y]);
-          });
-          return this.trackedPositionsById;
-      }
-      destroy() {
-          var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-          (_a = this.currentPositionFbo) === null || _a === void 0 ? void 0 : _a.destroy();
-          (_b = this.previousPositionFbo) === null || _b === void 0 ? void 0 : _b.destroy();
-          (_c = this.velocityFbo) === null || _c === void 0 ? void 0 : _c.destroy();
-          (_d = this.selectedFbo) === null || _d === void 0 ? void 0 : _d.destroy();
-          (_e = this.colorFbo) === null || _e === void 0 ? void 0 : _e.destroy();
-          (_f = this.sizeFbo) === null || _f === void 0 ? void 0 : _f.destroy();
-          (_g = this.greyoutStatusFbo) === null || _g === void 0 ? void 0 : _g.destroy();
-          (_h = this.hoveredFbo) === null || _h === void 0 ? void 0 : _h.destroy();
-          (_j = this.trackedIndicesFbo) === null || _j === void 0 ? void 0 : _j.destroy();
-          (_k = this.trackedPositionsFbo) === null || _k === void 0 ? void 0 : _k.destroy();
-      }
-      swapFbo() {
-          const temp = this.previousPositionFbo;
-          this.previousPositionFbo = this.currentPositionFbo;
-          this.currentPositionFbo = temp;
-      }
-  }
+  var drawLineVert = "precision highp float;\n#define GLSLIFY 1\nattribute vec2 position,pointA,pointB;attribute vec4 color;attribute float width;uniform sampler2D positions;uniform sampler2D particleGreyoutStatus;uniform mat3 transform;uniform float pointsTextureSize;uniform float widthScale;uniform float nodeSizeScale;uniform bool useArrow;uniform float arrowSizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform vec2 linkVisibilityDistanceRange;uniform float linkVisibilityMinTransparency;uniform float greyoutOpacity;uniform bool scaleNodesOnZoom;uniform float curvedWeight;uniform float curvedLinkControlPointDistance;uniform float curvedLinkSegments;varying vec4 rgbaColor;varying vec2 pos;varying float arrowLength;varying float linkWidthArrowWidthRatio;varying float smoothWidthRatio;float map(float value,float min1,float max1,float min2,float max2){return min2+(value-min1)*(max2-min2)/(max1-min1);}vec2 conicParametricCurve(vec2 A,vec2 B,vec2 ControlPoint,float t,float w){vec2 divident=(1.0-t)*(1.0-t)*A+2.0*(1.0-t)*t*w*ControlPoint+t*t*B;float divisor=(1.0-t)*(1.0-t)+2.0*(1.0-t)*t*w+t*t;return divident/divisor;}void main(){pos=position;vec2 pointTexturePosA=(pointA+0.5)/pointsTextureSize;vec2 pointTexturePosB=(pointB+0.5)/pointsTextureSize;vec4 greyoutStatusA=texture2D(particleGreyoutStatus,pointTexturePosA);vec4 greyoutStatusB=texture2D(particleGreyoutStatus,pointTexturePosB);vec4 pointPositionA=texture2D(positions,pointTexturePosA);vec4 pointPositionB=texture2D(positions,pointTexturePosB);vec2 a=pointPositionA.xy;vec2 b=pointPositionB.xy;vec2 xBasis=b-a;vec2 yBasis=normalize(vec2(-xBasis.y,xBasis.x));float linkDist=length(xBasis);float h=curvedLinkControlPointDistance;vec2 controlPoint=(a+b)/2.0+yBasis*linkDist*h;float linkDistPx=linkDist*transform[0][0];float linkWidth=width*widthScale;float k=2.0;float arrowWidth=max(5.0,linkWidth*k);arrowWidth*=arrowSizeScale;float arrowWidthPx=arrowWidth/transform[0][0];arrowLength=min(0.3,(0.866*arrowWidthPx*2.0)/linkDist);float smoothWidth=2.0;float arrowExtraWidth=arrowWidth-linkWidth;linkWidth+=smoothWidth/2.0;if(useArrow){linkWidth+=arrowExtraWidth;}smoothWidthRatio=smoothWidth/linkWidth;linkWidthArrowWidthRatio=arrowExtraWidth/linkWidth;float linkWidthPx=linkWidth/transform[0][0];vec3 rgbColor=color.rgb;float opacity=color.a*max(linkVisibilityMinTransparency,map(linkDistPx,linkVisibilityDistanceRange.g,linkVisibilityDistanceRange.r,0.0,1.0));if(greyoutStatusA.r>0.0||greyoutStatusB.r>0.0){opacity*=greyoutOpacity;}rgbaColor=vec4(rgbColor,opacity);float t=position.x;float w=curvedWeight;float tPrev=t-1.0/curvedLinkSegments;float tNext=t+1.0/curvedLinkSegments;vec2 pointCurr=conicParametricCurve(a,b,controlPoint,t,w);vec2 pointPrev=conicParametricCurve(a,b,controlPoint,max(0.0,tPrev),w);vec2 pointNext=conicParametricCurve(a,b,controlPoint,min(tNext,1.0),w);vec2 xBasisCurved=pointNext-pointPrev;vec2 yBasisCurved=normalize(vec2(-xBasisCurved.y,xBasisCurved.x));pointCurr+=yBasisCurved*linkWidthPx*position.y;vec2 p=2.0*pointCurr/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);}"; // eslint-disable-line
 
   function ascending$1(a, b) {
     return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
@@ -15821,6 +15263,20 @@ void main() {
     else if (error >= e5) step1 *= 5;
     else if (error >= e2) step1 *= 2;
     return stop < start ? -step1 : step1;
+  }
+
+  function range(start, stop, step) {
+    start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
+
+    var i = -1,
+        n = Math.max(0, Math.ceil((stop - start) / step)) | 0,
+        range = new Array(n);
+
+    while (++i < n) {
+      range[i] = start + i * step;
+    }
+
+    return range;
   }
 
   function initRange(domain, range) {
@@ -16381,6 +15837,49 @@ void main() {
     initRange.apply(scale, arguments);
 
     return linearish(scale);
+  }
+
+  function transformPow(exponent) {
+    return function(x) {
+      return x < 0 ? -Math.pow(-x, exponent) : Math.pow(x, exponent);
+    };
+  }
+
+  function transformSqrt(x) {
+    return x < 0 ? -Math.sqrt(-x) : Math.sqrt(x);
+  }
+
+  function transformSquare(x) {
+    return x < 0 ? -x * x : x * x;
+  }
+
+  function powish(transform) {
+    var scale = transform(identity$2, identity$2),
+        exponent = 1;
+
+    function rescale() {
+      return exponent === 1 ? transform(identity$2, identity$2)
+          : exponent === 0.5 ? transform(transformSqrt, transformSquare)
+          : transform(transformPow(exponent), transformPow(1 / exponent));
+    }
+
+    scale.exponent = function(_) {
+      return arguments.length ? (exponent = +_, rescale()) : exponent;
+    };
+
+    return linearish(scale);
+  }
+
+  function pow() {
+    var scale = powish(transformer());
+
+    scale.copy = function() {
+      return copy(scale, pow()).exponent(scale.exponent());
+    };
+
+    initRange.apply(scale, arguments);
+
+    return scale;
   }
 
   var t0 = new Date,
@@ -17408,6 +16907,704 @@ void main() {
   +new Date("2000-01-01T00:00:00.000Z")
       ? parseIsoNative
       : utcParse(isoSpecifier);
+
+  const getCurveLineGeometry = (segments) => {
+      const scale = pow()
+          .exponent(2)
+          .range([0, 1])
+          .domain([-1, 1]);
+      const hodographValues = range(0, segments).map(d => -0.5 + d / segments);
+      hodographValues.push(0.5);
+      const result = new Array(hodographValues.length * 2);
+      hodographValues.forEach((d, i) => {
+          result[i * 2] = [scale(d * 2), 0.5];
+          result[i * 2 + 1] = [scale(d * 2), -0.5];
+      });
+      return result;
+  };
+
+  class Lines extends CoreModule {
+      create() {
+          this.updateColor();
+          this.updateWidth();
+          this.updateCurveLineGeometry();
+      }
+      initPrograms() {
+          const { reglInstance, config, store, data, points } = this;
+          const { pointsTextureSize } = store;
+          const instancePoints = [];
+          data.completeLinks.forEach(l => {
+              const toIndex = data.getSortedIndexById(l.target);
+              const fromIndex = data.getSortedIndexById(l.source);
+              const fromX = fromIndex % pointsTextureSize;
+              const fromY = Math.floor(fromIndex / pointsTextureSize);
+              const toX = toIndex % pointsTextureSize;
+              const toY = Math.floor(toIndex / pointsTextureSize);
+              instancePoints.push([fromX, fromY]);
+              instancePoints.push([toX, toY]);
+          });
+          const pointsBuffer = reglInstance.buffer(instancePoints);
+          this.drawCurveCommand = reglInstance({
+              vert: drawLineVert,
+              frag: drawLineFrag,
+              attributes: {
+                  position: {
+                      buffer: () => this.curveLineBuffer,
+                      divisor: 0,
+                  },
+                  pointA: {
+                      buffer: () => pointsBuffer,
+                      divisor: 1,
+                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
+                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
+                  },
+                  pointB: {
+                      buffer: () => pointsBuffer,
+                      divisor: 1,
+                      offset: Float32Array.BYTES_PER_ELEMENT * 2,
+                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
+                  },
+                  color: {
+                      buffer: () => this.colorBuffer,
+                      divisor: 1,
+                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
+                      stride: Float32Array.BYTES_PER_ELEMENT * 4,
+                  },
+                  width: {
+                      buffer: () => this.widthBuffer,
+                      divisor: 1,
+                      offset: Float32Array.BYTES_PER_ELEMENT * 0,
+                      stride: Float32Array.BYTES_PER_ELEMENT * 1,
+                  },
+              },
+              uniforms: {
+                  positions: () => points === null || points === void 0 ? void 0 : points.currentPositionFbo,
+                  particleGreyoutStatus: () => points === null || points === void 0 ? void 0 : points.greyoutStatusFbo,
+                  transform: () => store.transform,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  nodeSizeScale: () => config.nodeSizeScale,
+                  widthScale: () => config.linkWidthScale,
+                  useArrow: () => config.linkArrows,
+                  arrowSizeScale: () => config.linkArrowsSizeScale,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+                  ratio: () => config.pixelRatio,
+                  linkVisibilityDistanceRange: () => config.linkVisibilityDistanceRange,
+                  linkVisibilityMinTransparency: () => config.linkVisibilityMinTransparency,
+                  greyoutOpacity: () => config.linkGreyoutOpacity,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  curvedWeight: () => config.curvedLinkWeight,
+                  curvedLinkControlPointDistance: () => config.curvedLinkControlPointDistance,
+                  curvedLinkSegments: () => { var _a; return config.curvedLinks ? (_a = config.curvedLinkSegments) !== null && _a !== void 0 ? _a : defaultConfigValues.curvedLinkSegments : 1; },
+              },
+              cull: {
+                  enable: true,
+                  face: 'back',
+              },
+              blend: {
+                  enable: true,
+                  func: {
+                      dstRGB: 'one minus src alpha',
+                      srcRGB: 'src alpha',
+                      dstAlpha: 'one minus src alpha',
+                      srcAlpha: 'one',
+                  },
+                  equation: {
+                      rgb: 'add',
+                      alpha: 'add',
+                  },
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+              count: () => { var _a, _b; return (_b = (_a = this.curveLineGeometry) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0; },
+              instances: () => data.linksNumber,
+              primitive: 'triangle strip',
+          });
+      }
+      draw() {
+          var _a;
+          if (!this.colorBuffer || !this.widthBuffer || !this.curveLineBuffer)
+              return;
+          (_a = this.drawCurveCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+      }
+      updateColor() {
+          const { reglInstance, config, data } = this;
+          const instancePoints = [];
+          data.completeLinks.forEach(l => {
+              var _a;
+              const c = (_a = getValue(l, config.linkColor)) !== null && _a !== void 0 ? _a : defaultLinkColor;
+              const rgba = getRgbaColor(c);
+              instancePoints.push(rgba);
+          });
+          this.colorBuffer = reglInstance.buffer(instancePoints);
+      }
+      updateWidth() {
+          const { reglInstance, config, data } = this;
+          const instancePoints = [];
+          data.completeLinks.forEach(l => {
+              const linkWidth = getValue(l, config.linkWidth);
+              instancePoints.push([linkWidth !== null && linkWidth !== void 0 ? linkWidth : defaultLinkWidth]);
+          });
+          this.widthBuffer = reglInstance.buffer(instancePoints);
+      }
+      updateCurveLineGeometry() {
+          const { reglInstance, config: { curvedLinks, curvedLinkSegments } } = this;
+          this.curveLineGeometry = getCurveLineGeometry(curvedLinks ? curvedLinkSegments !== null && curvedLinkSegments !== void 0 ? curvedLinkSegments : defaultConfigValues.curvedLinkSegments : 1);
+          this.curveLineBuffer = reglInstance.buffer(this.curveLineGeometry);
+      }
+      destroy() {
+          destroyBuffer(this.colorBuffer);
+          destroyBuffer(this.widthBuffer);
+          destroyBuffer(this.curveLineBuffer);
+      }
+  }
+
+  function createColorBuffer(data, reglInstance, textureSize, colorAccessor) {
+      var _a;
+      if (textureSize === 0)
+          return undefined;
+      const initialState = new Float32Array(textureSize * textureSize * 4);
+      for (let i = 0; i < data.nodes.length; ++i) {
+          const sortedIndex = data.getSortedIndexByInputIndex(i);
+          const node = data.nodes[i];
+          if (node && sortedIndex !== undefined) {
+              const c = (_a = getValue(node, colorAccessor, i)) !== null && _a !== void 0 ? _a : defaultNodeColor;
+              const rgba = getRgbaColor(c);
+              initialState[sortedIndex * 4 + 0] = rgba[0];
+              initialState[sortedIndex * 4 + 1] = rgba[1];
+              initialState[sortedIndex * 4 + 2] = rgba[2];
+              initialState[sortedIndex * 4 + 3] = rgba[3];
+          }
+      }
+      const initialTexture = reglInstance.texture({
+          data: initialState,
+          width: textureSize,
+          height: textureSize,
+          type: 'float',
+      });
+      return reglInstance.framebuffer({
+          color: initialTexture,
+          depth: false,
+          stencil: false,
+      });
+  }
+  function createGreyoutStatusBuffer(selectedIndices, reglInstance, textureSize) {
+      if (textureSize === 0)
+          return undefined;
+      // Greyout status: 0 - false, highlighted or normal point; 1 - true, greyout point
+      const initialState = new Float32Array(textureSize * textureSize * 4)
+          .fill(selectedIndices ? 1 : 0);
+      if (selectedIndices) {
+          for (const selectedIndex of selectedIndices) {
+              initialState[selectedIndex * 4] = 0;
+          }
+      }
+      const initialTexture = reglInstance.texture({
+          data: initialState,
+          width: textureSize,
+          height: textureSize,
+          type: 'float',
+      });
+      return reglInstance.framebuffer({
+          color: initialTexture,
+          depth: false,
+          stencil: false,
+      });
+  }
+
+  var drawPointsFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec2 index;varying vec3 rgbColor;varying float alpha;const float smoothing=0.9;void main(){if(alpha==0.0){discard;}float r=0.0;float delta=0.0;vec2 cxy=2.0*gl_PointCoord-1.0;r=dot(cxy,cxy);float opacity=alpha*(1.0-smoothstep(smoothing,1.0,r));gl_FragColor=vec4(rgbColor,opacity);}"; // eslint-disable-line
+
+  var drawPointsVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nattribute vec2 indexes;uniform sampler2D positions;uniform sampler2D particleColor;uniform sampler2D particleGreyoutStatus;uniform sampler2D particleSize;uniform float ratio;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float greyoutOpacity;uniform bool scaleNodesOnZoom;varying vec2 index;varying vec3 rgbColor;varying float alpha;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return pSize;}void main(){index=indexes;vec4 pointPosition=texture2D(positions,(index+0.5)/pointsTextureSize);vec2 point=pointPosition.rg;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);vec4 pSize=texture2D(particleSize,(index+0.5)/pointsTextureSize);float size=pSize.r*sizeScale;vec4 pColor=texture2D(particleColor,(index+0.5)/pointsTextureSize);rgbColor=pColor.rgb;gl_PointSize=pointSize(size);alpha=pColor.a;vec4 greyoutStatus=texture2D(particleGreyoutStatus,(index+0.5)/pointsTextureSize);if(greyoutStatus.r>0.0){alpha*=greyoutOpacity;}}"; // eslint-disable-line
+
+  var findPointsOnAreaSelectionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 selection[2];uniform bool scaleNodesOnZoom;uniform float maxPointSize;varying vec2 index;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}void main(){vec4 pointPosition=texture2D(position,index);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,index);float size=pSize.r*sizeScale;float left=2.0*(selection[0].x-0.5*pointSize(size))/screenSize.x-1.0;float right=2.0*(selection[1].x+0.5*pointSize(size))/screenSize.x-1.0;float top=2.0*(selection[0].y-0.5*pointSize(size))/screenSize.y-1.0;float bottom=2.0*(selection[1].y+0.5*pointSize(size))/screenSize.y-1.0;gl_FragColor=vec4(0.0,0.0,pointPosition.rg);if(final.x>=left&&final.x<=right&&final.y>=top&&final.y<=bottom){gl_FragColor.r=1.0;}}"; // eslint-disable-line
+
+  var drawHighlightedFrag = "precision mediump float;\n#define GLSLIFY 1\nuniform vec4 color;uniform float width;varying vec2 pos;varying float particleOpacity;const float smoothing=1.05;void main(){vec2 cxy=pos;float r=dot(cxy,cxy);float opacity=smoothstep(r,r*smoothing,1.0);float stroke=smoothstep(width,width*smoothing,r);gl_FragColor=vec4(color.rgb,opacity*stroke*color.a*particleOpacity);}"; // eslint-disable-line
+
+  var drawHighlightedVert = "precision mediump float;\n#define GLSLIFY 1\nattribute vec2 quad;uniform sampler2D positions;uniform sampler2D particleColor;uniform sampler2D particleGreyoutStatus;uniform sampler2D particleSize;uniform mat3 transform;uniform float pointsTextureSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform bool scaleNodesOnZoom;uniform float pointIndex;uniform float maxPointSize;uniform vec4 color;uniform float greyoutOpacity;varying vec2 pos;varying float particleOpacity;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*transform[0][0];}else{pSize=size*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}const float relativeRingRadius=1.3;void main(){pos=quad;vec2 ij=vec2(mod(pointIndex,pointsTextureSize),floor(pointIndex/pointsTextureSize))+0.5;vec4 pointPosition=texture2D(positions,ij/pointsTextureSize);vec4 pSize=texture2D(particleSize,ij/pointsTextureSize);vec4 pColor=texture2D(particleColor,ij/pointsTextureSize);particleOpacity=pColor.a;vec4 greyoutStatus=texture2D(particleGreyoutStatus,ij/pointsTextureSize);if(greyoutStatus.r>0.0){particleOpacity*=greyoutOpacity;}float size=(pointSize(pSize.r*sizeScale)*relativeRingRadius)/transform[0][0];float radius=size*0.5;vec2 a=pointPosition.xy;vec2 b=pointPosition.xy+vec2(0.0,radius);vec2 xBasis=b-a;vec2 yBasis=normalize(vec2(-xBasis.y,xBasis.x));vec2 point=a+xBasis*quad.x+yBasis*radius*quad.y;vec2 p=2.0*point/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);gl_Position=vec4(final.rg,0,1);}"; // eslint-disable-line
+
+  var findHoveredPointFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec4 rgba;void main(){gl_FragColor=rgba;}"; // eslint-disable-line
+
+  var findHoveredPointVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform float pointsTextureSize;uniform sampler2D particleSize;uniform float sizeScale;uniform float spaceSize;uniform vec2 screenSize;uniform float ratio;uniform mat3 transform;uniform vec2 mousePosition;uniform bool scaleNodesOnZoom;uniform float maxPointSize;attribute vec2 indexes;varying vec4 rgba;float pointSize(float size){float pSize;if(scaleNodesOnZoom){pSize=size*ratio*transform[0][0];}else{pSize=size*ratio*min(5.0,max(1.0,transform[0][0]*0.01));}return min(pSize,maxPointSize);}float euclideanDistance(float x1,float x2,float y1,float y2){return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));}void main(){vec4 pointPosition=texture2D(position,(indexes+0.5)/pointsTextureSize);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec4 pSize=texture2D(particleSize,indexes/pointsTextureSize);float size=pSize.r*sizeScale;float pointRadius=0.5*pointSize(size);vec2 pointScreenPosition=(final.xy+1.0)*screenSize/2.0;rgba=vec4(0.0);gl_Position=vec4(0.5,0.5,0.0,1.0);if(euclideanDistance(pointScreenPosition.x,mousePosition.x,pointScreenPosition.y,mousePosition.y)<pointRadius){float index=indexes.g*pointsTextureSize+indexes.r;rgba=vec4(index,pSize.r,pointPosition.xy);gl_Position=vec4(-0.5,-0.5,0.0,1.0);}gl_PointSize=1.0;}"; // eslint-disable-line
+
+  var fillGridWithSampledNodesFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nvarying vec4 rgba;void main(){gl_FragColor=rgba;}"; // eslint-disable-line
+
+  var fillGridWithSampledNodesVert = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform float pointsTextureSize;uniform float spaceSize;uniform vec2 screenSize;uniform mat3 transform;attribute vec2 indexes;varying vec4 rgba;void main(){vec4 pointPosition=texture2D(position,(indexes+0.5)/pointsTextureSize);vec2 p=2.0*pointPosition.rg/spaceSize-1.0;p*=spaceSize/screenSize;vec3 final=transform*vec3(p,1);vec2 pointScreenPosition=(final.xy+1.0)*screenSize/2.0;float index=indexes.g*pointsTextureSize+indexes.r;rgba=vec4(index,1.0,pointPosition.xy);float i=(pointScreenPosition.x+0.5)/screenSize.x;float j=(pointScreenPosition.y+0.5)/screenSize.y;gl_Position=vec4(2.0*vec2(i,j)-1.0,0.0,1.0);gl_PointSize=1.0;}"; // eslint-disable-line
+
+  function getNodeSize(node, sizeAccessor, index) {
+      const size = getValue(node, sizeAccessor, index);
+      return size !== null && size !== void 0 ? size : defaultNodeSize;
+  }
+  function createSizeBuffer(data, reglInstance, pointTextureSize, sizeAccessor) {
+      if (pointTextureSize === 0)
+          return undefined;
+      const numParticles = data.nodes.length;
+      const initialState = new Float32Array(pointTextureSize * pointTextureSize * 4);
+      for (let i = 0; i < numParticles; ++i) {
+          const sortedIndex = data.getSortedIndexByInputIndex(i);
+          const node = data.nodes[i];
+          if (node && sortedIndex !== undefined) {
+              initialState[sortedIndex * 4] = getNodeSize(node, sizeAccessor, i);
+          }
+      }
+      const initialTexture = reglInstance.texture({
+          data: initialState,
+          width: pointTextureSize,
+          height: pointTextureSize,
+          type: 'float',
+      });
+      return reglInstance.framebuffer({
+          color: initialTexture,
+          depth: false,
+          stencil: false,
+      });
+  }
+
+  var updatePositionFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D velocity;uniform float friction;uniform float spaceSize;varying vec2 index;void main(){vec4 pointPosition=texture2D(position,index);vec4 pointVelocity=texture2D(velocity,index);pointVelocity.rg*=friction;pointPosition.rg+=pointVelocity.rg;pointPosition.r=clamp(pointPosition.r,0.0,spaceSize);pointPosition.g=clamp(pointPosition.g,0.0,spaceSize);gl_FragColor=pointPosition;}"; // eslint-disable-line
+
+  function createTrackedPositionsBuffer(indices, reglInstance) {
+      const size = Math.ceil(Math.sqrt(indices.length));
+      return reglInstance.framebuffer({
+          shape: [size, size],
+          depth: false,
+          stencil: false,
+          colorType: 'float',
+      });
+  }
+  function createTrackedIndicesBuffer(indices, pointsTextureSize, reglInstance) {
+      const size = Math.ceil(Math.sqrt(indices.length));
+      if (size === 0)
+          return undefined;
+      const initialState = new Float32Array(size * size * 4).fill(-1);
+      for (const [i, sortedIndex] of indices.entries()) {
+          if (sortedIndex !== undefined) {
+              initialState[i * 4] = sortedIndex % pointsTextureSize;
+              initialState[i * 4 + 1] = Math.floor(sortedIndex / pointsTextureSize);
+              initialState[i * 4 + 2] = 0;
+              initialState[i * 4 + 3] = 0;
+          }
+      }
+      const initialTexture = reglInstance.texture({
+          data: initialState,
+          width: size,
+          height: size,
+          type: 'float',
+      });
+      return reglInstance.framebuffer({
+          color: initialTexture,
+          depth: false,
+          stencil: false,
+      });
+  }
+
+  var trackPositionsFrag = "#ifdef GL_ES\nprecision highp float;\n#define GLSLIFY 1\n#endif\nuniform sampler2D position;uniform sampler2D trackedIndices;uniform float pointsTextureSize;varying vec2 index;void main(){vec4 trackedPointIndicies=texture2D(trackedIndices,index);if(trackedPointIndicies.r<0.0)discard;vec4 pointPosition=texture2D(position,(trackedPointIndicies.rg+0.5)/pointsTextureSize);gl_FragColor=vec4(pointPosition.rg,1.0,1.0);}"; // eslint-disable-line
+
+  class Points extends CoreModule {
+      constructor() {
+          super(...arguments);
+          this.trackedPositionsById = new Map();
+      }
+      create() {
+          var _a, _b;
+          const { reglInstance, store, data } = this;
+          const { pointsTextureSize, adjustedSpaceSize } = store;
+          if (!pointsTextureSize)
+              return;
+          const numParticles = data.nodes.length;
+          const initialState = new Float32Array(pointsTextureSize * pointsTextureSize * 4);
+          for (let i = 0; i < numParticles; ++i) {
+              const sortedIndex = this.data.getSortedIndexByInputIndex(i);
+              const node = data.nodes[i];
+              if (node && sortedIndex !== undefined) {
+                  initialState[sortedIndex * 4 + 0] = (_a = node.x) !== null && _a !== void 0 ? _a : adjustedSpaceSize * store.getRandomFloat(0.495, 0.505);
+                  initialState[sortedIndex * 4 + 1] = (_b = node.y) !== null && _b !== void 0 ? _b : adjustedSpaceSize * store.getRandomFloat(0.495, 0.505);
+              }
+          }
+          // Create position buffer
+          this.currentPositionFbo = reglInstance.framebuffer({
+              color: reglInstance.texture({
+                  data: initialState,
+                  shape: [pointsTextureSize, pointsTextureSize, 4],
+                  type: 'float',
+              }),
+              depth: false,
+              stencil: false,
+          });
+          if (!this.config.disableSimulation) {
+              this.previousPositionFbo = reglInstance.framebuffer({
+                  color: reglInstance.texture({
+                      data: initialState,
+                      shape: [pointsTextureSize, pointsTextureSize, 4],
+                      type: 'float',
+                  }),
+                  depth: false,
+                  stencil: false,
+              });
+              // Create velocity buffer
+              this.velocityFbo = reglInstance.framebuffer({
+                  color: reglInstance.texture({
+                      data: new Float32Array(pointsTextureSize * pointsTextureSize * 4).fill(0),
+                      shape: [pointsTextureSize, pointsTextureSize, 4],
+                      type: 'float',
+                  }),
+                  depth: false,
+                  stencil: false,
+              });
+          }
+          // Create selected points buffer
+          this.selectedFbo = reglInstance.framebuffer({
+              color: reglInstance.texture({
+                  data: initialState,
+                  shape: [pointsTextureSize, pointsTextureSize, 4],
+                  type: 'float',
+              }),
+              depth: false,
+              stencil: false,
+          });
+          this.hoveredFbo = reglInstance.framebuffer({
+              shape: [2, 2],
+              colorType: 'float',
+              depth: false,
+              stencil: false,
+          });
+          this.updateSize();
+          this.updateColor();
+          this.updateGreyoutStatus();
+          this.updateSampledNodesGrid();
+      }
+      initPrograms() {
+          const { reglInstance, config, store, data } = this;
+          if (!config.disableSimulation) {
+              this.updatePositionCommand = reglInstance({
+                  frag: updatePositionFrag,
+                  vert: updateVert,
+                  framebuffer: () => this.currentPositionFbo,
+                  primitive: 'triangle strip',
+                  count: 4,
+                  attributes: { quad: createQuadBuffer(reglInstance) },
+                  uniforms: {
+                      position: () => this.previousPositionFbo,
+                      velocity: () => this.velocityFbo,
+                      friction: () => { var _a; return (_a = config.simulation) === null || _a === void 0 ? void 0 : _a.friction; },
+                      spaceSize: () => store.adjustedSpaceSize,
+                  },
+              });
+          }
+          this.drawCommand = reglInstance({
+              frag: drawPointsFrag,
+              vert: drawPointsVert,
+              primitive: 'points',
+              count: () => data.nodes.length,
+              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
+              uniforms: {
+                  positions: () => this.currentPositionFbo,
+                  particleColor: () => this.colorFbo,
+                  particleGreyoutStatus: () => this.greyoutStatusFbo,
+                  particleSize: () => this.sizeFbo,
+                  ratio: () => config.pixelRatio,
+                  sizeScale: () => config.nodeSizeScale,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+                  greyoutOpacity: () => config.nodeGreyoutOpacity,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+              },
+              blend: {
+                  enable: true,
+                  func: {
+                      dstRGB: 'one minus src alpha',
+                      srcRGB: 'src alpha',
+                      dstAlpha: 'one minus src alpha',
+                      srcAlpha: 'one',
+                  },
+                  equation: {
+                      rgb: 'add',
+                      alpha: 'add',
+                  },
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.findPointsOnAreaSelectionCommand = reglInstance({
+              frag: findPointsOnAreaSelectionFrag,
+              vert: updateVert,
+              framebuffer: () => this.selectedFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  particleSize: () => this.sizeFbo,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+                  sizeScale: () => config.nodeSizeScale,
+                  transform: () => store.transform,
+                  ratio: () => config.pixelRatio,
+                  'selection[0]': () => store.selectedArea[0],
+                  'selection[1]': () => store.selectedArea[1],
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  maxPointSize: () => store.maxPointSize,
+              },
+          });
+          this.clearHoveredFboCommand = reglInstance({
+              frag: clearFrag,
+              vert: updateVert,
+              framebuffer: this.hoveredFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+          });
+          this.findHoveredPointCommand = reglInstance({
+              frag: findHoveredPointFrag,
+              vert: findHoveredPointVert,
+              primitive: 'points',
+              count: () => data.nodes.length,
+              framebuffer: () => this.hoveredFbo,
+              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  particleSize: () => this.sizeFbo,
+                  ratio: () => config.pixelRatio,
+                  sizeScale: () => config.nodeSizeScale,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  mousePosition: () => store.screenMousePosition,
+                  maxPointSize: () => store.maxPointSize,
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.clearSampledNodesFboCommand = reglInstance({
+              frag: clearFrag,
+              vert: updateVert,
+              framebuffer: () => this.sampledNodesFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+          });
+          this.fillSampledNodesFboCommand = reglInstance({
+              frag: fillGridWithSampledNodesFrag,
+              vert: fillGridWithSampledNodesVert,
+              primitive: 'points',
+              count: () => data.nodes.length,
+              framebuffer: () => this.sampledNodesFbo,
+              attributes: { indexes: createIndexesBuffer(reglInstance, store.pointsTextureSize) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.drawHighlightedCommand = reglInstance({
+              frag: drawHighlightedFrag,
+              vert: drawHighlightedVert,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+              primitive: 'triangle strip',
+              count: 4,
+              uniforms: {
+                  color: reglInstance.prop('color'),
+                  width: reglInstance.prop('width'),
+                  pointIndex: reglInstance.prop('pointIndex'),
+                  positions: () => this.currentPositionFbo,
+                  particleColor: () => this.colorFbo,
+                  particleSize: () => this.sizeFbo,
+                  sizeScale: () => config.nodeSizeScale,
+                  pointsTextureSize: () => store.pointsTextureSize,
+                  transform: () => store.transform,
+                  spaceSize: () => store.adjustedSpaceSize,
+                  screenSize: () => store.screenSize,
+                  scaleNodesOnZoom: () => config.scaleNodesOnZoom,
+                  maxPointSize: () => store.maxPointSize,
+                  particleGreyoutStatus: () => this.greyoutStatusFbo,
+                  greyoutOpacity: () => config.nodeGreyoutOpacity,
+              },
+              blend: {
+                  enable: true,
+                  func: {
+                      dstRGB: 'one minus src alpha',
+                      srcRGB: 'src alpha',
+                      dstAlpha: 'one minus src alpha',
+                      srcAlpha: 'one',
+                  },
+                  equation: {
+                      rgb: 'add',
+                      alpha: 'add',
+                  },
+              },
+              depth: {
+                  enable: false,
+                  mask: false,
+              },
+          });
+          this.trackPointsCommand = reglInstance({
+              frag: trackPositionsFrag,
+              vert: updateVert,
+              framebuffer: () => this.trackedPositionsFbo,
+              primitive: 'triangle strip',
+              count: 4,
+              attributes: { quad: createQuadBuffer(reglInstance) },
+              uniforms: {
+                  position: () => this.currentPositionFbo,
+                  trackedIndices: () => this.trackedIndicesFbo,
+                  pointsTextureSize: () => store.pointsTextureSize,
+              },
+          });
+      }
+      updateColor() {
+          const { reglInstance, config, store: { pointsTextureSize }, data } = this;
+          if (!pointsTextureSize)
+              return;
+          this.colorFbo = createColorBuffer(data, reglInstance, pointsTextureSize, config.nodeColor);
+      }
+      updateGreyoutStatus() {
+          const { reglInstance, store } = this;
+          this.greyoutStatusFbo = createGreyoutStatusBuffer(store.selectedIndices, reglInstance, store.pointsTextureSize);
+      }
+      updateSize() {
+          const { reglInstance, config, store: { pointsTextureSize }, data } = this;
+          if (!pointsTextureSize)
+              return;
+          this.sizeFbo = createSizeBuffer(data, reglInstance, pointsTextureSize, config.nodeSize);
+      }
+      updateSampledNodesGrid() {
+          const { store: { screenSize }, config: { nodeSamplingDistance }, reglInstance } = this;
+          const dist = nodeSamplingDistance !== null && nodeSamplingDistance !== void 0 ? nodeSamplingDistance : Math.min(...screenSize) / 2;
+          const w = Math.ceil(screenSize[0] / dist);
+          const h = Math.ceil(screenSize[1] / dist);
+          destroyFramebuffer(this.sampledNodesFbo);
+          this.sampledNodesFbo = reglInstance.framebuffer({
+              shape: [w, h],
+              depth: false,
+              stencil: false,
+              colorType: 'float',
+          });
+      }
+      trackPoints() {
+          var _a;
+          if (!this.trackedIndicesFbo || !this.trackedPositionsFbo)
+              return;
+          (_a = this.trackPointsCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+      }
+      draw() {
+          var _a, _b, _c;
+          const { config: { renderHoveredNodeRing, renderHighlightedNodeRing }, store } = this;
+          (_a = this.drawCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          if ((renderHoveredNodeRing !== null && renderHoveredNodeRing !== void 0 ? renderHoveredNodeRing : renderHighlightedNodeRing) && store.hoveredNode) {
+              (_b = this.drawHighlightedCommand) === null || _b === void 0 ? void 0 : _b.call(this, {
+                  width: 0.85,
+                  color: store.hoveredNodeRingColor,
+                  pointIndex: store.hoveredNode.index,
+              });
+          }
+          if (store.focusedNode) {
+              (_c = this.drawHighlightedCommand) === null || _c === void 0 ? void 0 : _c.call(this, {
+                  width: 0.75,
+                  color: store.focusedNodeRingColor,
+                  pointIndex: store.focusedNode.index,
+              });
+          }
+      }
+      updatePosition() {
+          var _a;
+          (_a = this.updatePositionCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          this.swapFbo();
+      }
+      findPointsOnAreaSelection() {
+          var _a;
+          (_a = this.findPointsOnAreaSelectionCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+      }
+      findHoveredPoint() {
+          var _a, _b;
+          (_a = this.clearHoveredFboCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          (_b = this.findHoveredPointCommand) === null || _b === void 0 ? void 0 : _b.call(this);
+      }
+      getNodeRadius(node, index) {
+          const { nodeSize } = this.config;
+          return getNodeSize(node, nodeSize, index) / 2;
+      }
+      trackNodesByIds(ids) {
+          this.trackedIds = ids.length ? ids : undefined;
+          this.trackedPositionsById.clear();
+          const indices = ids.map(id => this.data.getSortedIndexById(id)).filter((d) => d !== undefined);
+          destroyFramebuffer(this.trackedIndicesFbo);
+          this.trackedIndicesFbo = undefined;
+          destroyFramebuffer(this.trackedPositionsFbo);
+          this.trackedPositionsFbo = undefined;
+          if (indices.length) {
+              this.trackedIndicesFbo = createTrackedIndicesBuffer(indices, this.store.pointsTextureSize, this.reglInstance);
+              this.trackedPositionsFbo = createTrackedPositionsBuffer(indices, this.reglInstance);
+          }
+          this.trackPoints();
+      }
+      getTrackedPositions() {
+          if (!this.trackedIds)
+              return this.trackedPositionsById;
+          const pixels = readPixels(this.reglInstance, this.trackedPositionsFbo);
+          this.trackedIds.forEach((id, i) => {
+              const x = pixels[i * 4];
+              const y = pixels[i * 4 + 1];
+              if (x !== undefined && y !== undefined)
+                  this.trackedPositionsById.set(id, [x, y]);
+          });
+          return this.trackedPositionsById;
+      }
+      getSampledNodePositionsMap() {
+          var _a, _b, _c;
+          const positions = new Map();
+          if (!this.sampledNodesFbo)
+              return positions;
+          (_a = this.clearSampledNodesFboCommand) === null || _a === void 0 ? void 0 : _a.call(this);
+          (_b = this.fillSampledNodesFboCommand) === null || _b === void 0 ? void 0 : _b.call(this);
+          const pixels = readPixels(this.reglInstance, this.sampledNodesFbo);
+          for (let i = 0; i < pixels.length / 4; i++) {
+              const index = pixels[i * 4];
+              const isNotEmpty = !!pixels[i * 4 + 1];
+              const x = pixels[i * 4 + 2];
+              const y = pixels[i * 4 + 3];
+              if (isNotEmpty && index !== undefined && x !== undefined && y !== undefined) {
+                  const inputIndex = this.data.getInputIndexBySortedIndex(index);
+                  if (inputIndex !== undefined) {
+                      const id = (_c = this.data.getNodeByIndex(inputIndex)) === null || _c === void 0 ? void 0 : _c.id;
+                      if (id !== undefined)
+                          positions.set(id, [x, y]);
+                  }
+              }
+          }
+          return positions;
+      }
+      destroy() {
+          destroyFramebuffer(this.currentPositionFbo);
+          destroyFramebuffer(this.previousPositionFbo);
+          destroyFramebuffer(this.velocityFbo);
+          destroyFramebuffer(this.selectedFbo);
+          destroyFramebuffer(this.colorFbo);
+          destroyFramebuffer(this.sizeFbo);
+          destroyFramebuffer(this.greyoutStatusFbo);
+          destroyFramebuffer(this.hoveredFbo);
+          destroyFramebuffer(this.trackedIndicesFbo);
+          destroyFramebuffer(this.trackedPositionsFbo);
+      }
+      swapFbo() {
+          const temp = this.previousPositionFbo;
+          this.previousPositionFbo = this.currentPositionFbo;
+          this.currentPositionFbo = temp;
+      }
+  }
 
   /**
    * Common utilities
@@ -19708,6 +19905,7 @@ void main() {
           this.maxPointSize = MAX_POINT_SIZE;
           this.hoveredNode = undefined;
           this.focusedNode = undefined;
+          this.adjustedSpaceSize = defaultConfigValues.spaceSize;
           this.hoveredNodeRingColor = [1, 1, 1, hoveredNodeRingOpacity];
           this.focusedNodeRingColor = [1, 1, 1, focusedNodeRingOpacity];
           this.alphaTarget = 0;
@@ -19722,14 +19920,27 @@ void main() {
       getRandomFloat(min, max) {
           return this.random.float(min, max);
       }
-      updateScreenSize(width, height, spaceSize) {
+      /**
+       * If the config parameter `spaceSize` exceeds the limits of WebGL,
+       * it reduces the space size without changing the config parameter.
+       */
+      adjustSpaceSize(configSpaceSize, webglMaxTextureSize) {
+          if (configSpaceSize >= webglMaxTextureSize) {
+              this.adjustedSpaceSize = webglMaxTextureSize / 2;
+              console.warn(`The \`spaceSize\` has been reduced to ${this.adjustedSpaceSize} due to WebGL limits`);
+          }
+          else
+              this.adjustedSpaceSize = configSpaceSize;
+      }
+      updateScreenSize(width, height) {
+          const { adjustedSpaceSize } = this;
           this.screenSize = [width, height];
           this.scaleNodeX
-              .domain([0, spaceSize])
-              .range([(width - spaceSize) / 2, (width + spaceSize) / 2]);
+              .domain([0, adjustedSpaceSize])
+              .range([(width - adjustedSpaceSize) / 2, (width + adjustedSpaceSize) / 2]);
           this.scaleNodeY
-              .domain([spaceSize, 0])
-              .range([(height - spaceSize) / 2, (height + spaceSize) / 2]);
+              .domain([adjustedSpaceSize, 0])
+              .range([(height - adjustedSpaceSize) / 2, (height + adjustedSpaceSize) / 2]);
       }
       scaleX(x) {
           return this.scaleNodeX(x);
@@ -19737,11 +19948,14 @@ void main() {
       scaleY(y) {
           return this.scaleNodeY(y);
       }
-      setHighlightedNodeRingColor(color) {
+      setHoveredNodeRingColor(color) {
           const convertedRgba = getRgbaColor(color);
           this.hoveredNodeRingColor[0] = convertedRgba[0];
           this.hoveredNodeRingColor[1] = convertedRgba[1];
           this.hoveredNodeRingColor[2] = convertedRgba[2];
+      }
+      setFocusedNodeRingColor(color) {
+          const convertedRgba = getRgbaColor(color);
           this.focusedNodeRingColor[0] = convertedRgba[0];
           this.focusedNodeRingColor[1] = convertedRgba[1];
           this.focusedNodeRingColor[2] = convertedRgba[2];
@@ -21327,17 +21541,25 @@ void main() {
       constructor(canvas, config) {
           var _a;
           this.config = new GraphConfig();
+          this.graph = new GraphData();
           this.requestAnimationFrameId = 0;
           this.isRightClickMouse = false;
-          this.graph = new GraphData();
           this.store = new Store();
           this.zoomInstance = new Zoom(this.store, this.config);
-          this.hasBeenRecentlyDestroyed = false;
+          this.hasParticleSystemDestroyed = false;
+          /**
+           * The value of `_findHoveredPointExecutionCount` is incremented by 1 on each animation frame.
+           * When the counter reaches 2 (or more), it is reset to 0 and the `findHoveredPoint` method is executed.
+           */
+          this._findHoveredPointExecutionCount = 0;
+          /**
+           * If the mouse is not on the Canvas, the `findHoveredPoint` method will not be executed.
+           */
+          this._isMouseOnCanvas = false;
           if (config)
               this.config.init(config);
           const w = canvas.clientWidth;
           const h = canvas.clientHeight;
-          this.store.updateScreenSize(w, h, this.config.spaceSize);
           canvas.width = w * this.config.pixelRatio;
           canvas.height = h * this.config.pixelRatio;
           // If the canvas element has no CSS width and height style, the clientWidth and the clientHeight will always
@@ -21350,6 +21572,9 @@ void main() {
           }
           this.canvas = canvas;
           this.canvasD3Selection = select$1(canvas);
+          this.canvasD3Selection
+              .on('mouseenter.cosmos', () => { this._isMouseOnCanvas = true; })
+              .on('mouseleave.cosmos', () => { this._isMouseOnCanvas = false; });
           this.zoomInstance.behavior
               .on('start.detect', (e) => { this.currentEvent = e; })
               .on('zoom.detect', (e) => {
@@ -21364,6 +21589,9 @@ void main() {
               .on('click', this.onClick.bind(this))
               .on('mousemove', this.onMouseMove.bind(this))
               .on('contextmenu', this.onRightClickMouse.bind(this));
+          if (this.config.disableZoom)
+              this.disableZoom();
+          this.setZoomLevel(this.config.initialZoomLevel);
           this.reglInstance = regl({
               canvas: this.canvas,
               attributes: {
@@ -21375,19 +21603,33 @@ void main() {
               extensions: ['OES_texture_float', 'ANGLE_instanced_arrays'],
           });
           this.store.maxPointSize = ((_a = this.reglInstance.limits.pointSizeDims[1]) !== null && _a !== void 0 ? _a : MAX_POINT_SIZE) / this.config.pixelRatio;
+          this.store.adjustSpaceSize(this.config.spaceSize, this.reglInstance.limits.maxTextureSize);
+          this.store.updateScreenSize(w, h);
           this.points = new Points(this.reglInstance, this.config, this.store, this.graph);
           this.lines = new Lines(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceGravity = new ForceGravity(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceCenter = new ForceCenter(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceManyBody = this.config.useQuadtree
-              ? new ForceManyBodyQuadtree(this.reglInstance, this.config, this.store, this.graph, this.points)
-              : new ForceManyBody(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceLinkIncoming = new ForceLink(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceLinkOutgoing = new ForceLink(this.reglInstance, this.config, this.store, this.graph, this.points);
-          this.forceMouse = new ForceMouse(this.reglInstance, this.config, this.store, this.graph, this.points);
+          if (!this.config.disableSimulation) {
+              this.forceGravity = new ForceGravity(this.reglInstance, this.config, this.store, this.graph, this.points);
+              this.forceCenter = new ForceCenter(this.reglInstance, this.config, this.store, this.graph, this.points);
+              this.forceManyBody = this.config.useQuadtree
+                  ? new ForceManyBodyQuadtree(this.reglInstance, this.config, this.store, this.graph, this.points)
+                  : new ForceManyBody(this.reglInstance, this.config, this.store, this.graph, this.points);
+              this.forceLinkIncoming = new ForceLink(this.reglInstance, this.config, this.store, this.graph, this.points);
+              this.forceLinkOutgoing = new ForceLink(this.reglInstance, this.config, this.store, this.graph, this.points);
+              this.forceMouse = new ForceMouse(this.reglInstance, this.config, this.store, this.graph, this.points);
+          }
           this.store.backgroundColor = getRgbaColor(this.config.backgroundColor);
-          if (this.config.highlightedNodeRingColor)
-              this.store.setHighlightedNodeRingColor(this.config.highlightedNodeRingColor);
+          if (this.config.highlightedNodeRingColor) {
+              this.store.setHoveredNodeRingColor(this.config.highlightedNodeRingColor);
+              this.store.setFocusedNodeRingColor(this.config.highlightedNodeRingColor);
+          }
+          else {
+              if (this.config.hoveredNodeRingColor) {
+                  this.store.setHoveredNodeRingColor(this.config.hoveredNodeRingColor);
+              }
+              if (this.config.focusedNodeRingColor) {
+                  this.store.setFocusedNodeRingColor(this.config.focusedNodeRingColor);
+              }
+          }
           if (this.config.showFPSMonitor)
               this.fpsMonitor = new FPSMonitor(this.canvas);
           if (this.config.randomSeed !== undefined)
@@ -21425,14 +21667,28 @@ void main() {
               this.points.updateSize();
           if (prevConfig.linkWidth !== this.config.linkWidth)
               this.lines.updateWidth();
+          if (prevConfig.curvedLinkSegments !== this.config.curvedLinkSegments ||
+              prevConfig.curvedLinks !== this.config.curvedLinks) {
+              this.lines.updateCurveLineGeometry();
+          }
           if (prevConfig.backgroundColor !== this.config.backgroundColor)
               this.store.backgroundColor = getRgbaColor(this.config.backgroundColor);
           if (prevConfig.highlightedNodeRingColor !== this.config.highlightedNodeRingColor) {
-              this.store.setHighlightedNodeRingColor(this.config.highlightedNodeRingColor);
+              this.store.setHoveredNodeRingColor(this.config.highlightedNodeRingColor);
+              this.store.setFocusedNodeRingColor(this.config.highlightedNodeRingColor);
+          }
+          if (prevConfig.hoveredNodeRingColor !== this.config.hoveredNodeRingColor) {
+              this.store.setHoveredNodeRingColor(this.config.hoveredNodeRingColor);
+          }
+          if (prevConfig.focusedNodeRingColor !== this.config.focusedNodeRingColor) {
+              this.store.setFocusedNodeRingColor(this.config.focusedNodeRingColor);
           }
           if (prevConfig.spaceSize !== this.config.spaceSize ||
-              prevConfig.simulation.repulsionQuadtreeLevels !== this.config.simulation.repulsionQuadtreeLevels)
+              prevConfig.simulation.repulsionQuadtreeLevels !== this.config.simulation.repulsionQuadtreeLevels) {
+              this.store.adjustSpaceSize(this.config.spaceSize, this.reglInstance.limits.maxTextureSize);
+              this.resizeCanvas(true);
               this.update(this.store.isSimulationRunning);
+          }
           if (prevConfig.showFPSMonitor !== this.config.showFPSMonitor) {
               if (this.config.showFPSMonitor) {
                   this.fpsMonitor = new FPSMonitor(this.canvas);
@@ -21445,6 +21701,12 @@ void main() {
           if (prevConfig.pixelRatio !== this.config.pixelRatio) {
               this.store.maxPointSize = ((_b = this.reglInstance.limits.pointSizeDims[1]) !== null && _b !== void 0 ? _b : MAX_POINT_SIZE) / this.config.pixelRatio;
           }
+          if (prevConfig.disableZoom !== this.config.disableZoom) {
+              if (this.config.disableZoom)
+                  this.disableZoom();
+              else
+                  this.enableZoom();
+          }
       }
       /**
        * Pass data to Cosmos.
@@ -21454,7 +21716,7 @@ void main() {
        */
       setData(nodes, links, runSimulation = true) {
           if (!nodes.length && !links.length) {
-              this.destroy();
+              this.destroyParticleSystem();
               this.reglInstance.clear({
                   color: this.store.backgroundColor,
                   depth: 1,
@@ -21522,7 +21784,7 @@ void main() {
        * @returns Object where keys are the ids of the nodes and values are corresponding `{ x: number; y: number }` objects.
        */
       getNodePositions() {
-          if (this.hasBeenRecentlyDestroyed)
+          if (this.hasParticleSystemDestroyed)
               return {};
           const particlePositionPixels = readPixels(this.reglInstance, this.points.currentPositionFbo);
           return this.graph.nodes.reduce((acc, curr) => {
@@ -21544,7 +21806,7 @@ void main() {
        */
       getNodePositionsMap() {
           const positionMap = new Map();
-          if (this.hasBeenRecentlyDestroyed)
+          if (this.hasParticleSystemDestroyed)
               return positionMap;
           const particlePositionPixels = readPixels(this.reglInstance, this.points.currentPositionFbo);
           return this.graph.nodes.reduce((acc, curr) => {
@@ -21563,7 +21825,7 @@ void main() {
        */
       getNodePositionsArray() {
           const positions = [];
-          if (this.hasBeenRecentlyDestroyed)
+          if (this.hasParticleSystemDestroyed)
               return [];
           const particlePositionPixels = readPixels(this.reglInstance, this.points.currentPositionFbo);
           positions.length = this.graph.nodes.length;
@@ -21615,7 +21877,6 @@ void main() {
           else {
               this.store.selectedIndices = null;
           }
-          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21631,7 +21892,6 @@ void main() {
           }
           else
               this.selectNodesByIds([id]);
-          this.store.setFocusedNode(this.graph.getNodeById(id), this.graph.getSortedIndexById(id));
       }
       /**
        * Select a node by index. If you want the adjacent nodes to get selected too, provide `true` as the second argument.
@@ -21664,7 +21924,6 @@ void main() {
           else {
               this.store.selectedIndices = new Float32Array(indices.filter((d) => d !== undefined));
           }
-          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21672,7 +21931,6 @@ void main() {
        */
       unselectNodes() {
           this.store.selectedIndices = null;
-          this.store.setFocusedNode();
           this.points.updateGreyoutStatus();
       }
       /**
@@ -21702,6 +21960,32 @@ void main() {
           return this.graph.getAdjacentNodes(id);
       }
       /**
+       * Set focus on a node by id. A ring will be highlighted around the focused node.
+       * If no id is specified, the focus will be reset.
+       * @param id Id of the node.
+       */
+      setFocusedNodeById(id) {
+          if (id === undefined) {
+              this.store.setFocusedNode();
+          }
+          else {
+              this.store.setFocusedNode(this.graph.getNodeById(id), this.graph.getSortedIndexById(id));
+          }
+      }
+      /**
+       * Set focus on a node by index. A ring will be highlighted around the focused node.
+       * If no index is specified, the focus will be reset.
+       * @param index The index of the node in the array of nodes.
+       */
+      setFocusedNodeByIndex(index) {
+          if (index === undefined) {
+              this.store.setFocusedNode();
+          }
+          else {
+              this.store.setFocusedNode(this.graph.getNodeByIndex(index), index);
+          }
+      }
+      /**
        * Converts the X and Y node coordinates from the space coordinate system to the screen coordinate system.
        * @param spacePosition Array of x and y coordinates in the space coordinate system.
        * @returns Array of x and y coordinates in the screen coordinate system.
@@ -21724,7 +22008,7 @@ void main() {
        */
       getNodeRadiusByIndex(index) {
           const node = this.graph.getNodeByIndex(index);
-          return node && this.points.getNodeRadius(node);
+          return node && this.points.getNodeRadius(node, index);
       }
       /**
        * Get node radius by its id.
@@ -21733,20 +22017,20 @@ void main() {
        */
       getNodeRadiusById(id) {
           const node = this.graph.getNodeById(id);
-          return node && this.points.getNodeRadius(node);
+          return node && this.points.getNodeRadius(node, this.graph.getInputIndexById(id));
       }
       /**
-       * Track multiple node positions by their ids.
+       * Track multiple node positions by their ids on each Cosmos tick.
        * @param ids Array of nodes ids.
        */
-      trackNodesByIds(ids) {
+      trackNodePositionsByIds(ids) {
           this.points.trackNodesByIds(ids);
       }
       /**
-       * Track multiple node positions by their indices.
+       * Track multiple node positions by their indices on each Cosmos tick.
        * @param ids Array of nodes indices.
        */
-      trackNodesByIndices(indices) {
+      trackNodePositionsByIndices(indices) {
           this.points.trackNodesByIds(indices.map(index => this.graph.getNodeByIndex(index))
               .filter((d) => d !== undefined)
               .map(d => d.id));
@@ -21757,6 +22041,15 @@ void main() {
        */
       getTrackedNodePositionsMap() {
           return this.points.getTrackedPositions();
+      }
+      /**
+       * For the nodes that are currently visible on the screen, get a sample of node ids with their coordinates.
+       * The resulting number of nodes will depend on the `nodeSamplingDistance` configuration property,
+       * and the sampled nodes will be evenly distributed.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
+       */
+      getSampledNodePositionsMap() {
+          return this.points.getSampledNodePositionsMap();
       }
       /**
        * Start the simulation.
@@ -21801,39 +22094,47 @@ void main() {
        * Destroy this Cosmos instance.
        */
       destroy() {
-          var _a;
+          var _a, _b;
           this.stopFrames();
-          if (this.hasBeenRecentlyDestroyed)
-              return;
-          this.points.destroy();
-          this.lines.destroy();
-          this.forceCenter.destroy();
-          this.forceLinkIncoming.destroy();
-          this.forceLinkOutgoing.destroy();
-          (_a = this.forceManyBody) === null || _a === void 0 ? void 0 : _a.destroy();
-          this.reglInstance.destroy();
-          this.hasBeenRecentlyDestroyed = true;
+          this.destroyParticleSystem();
+          (_a = this.fpsMonitor) === null || _a === void 0 ? void 0 : _a.destroy();
+          (_b = document.getElementById('gl-bench-style')) === null || _b === void 0 ? void 0 : _b.remove();
       }
       /**
        * Create new Cosmos instance.
        */
       create() {
-          var _a;
+          var _a, _b, _c, _d;
           this.points.create();
           this.lines.create();
           (_a = this.forceManyBody) === null || _a === void 0 ? void 0 : _a.create();
-          this.forceLinkIncoming.create(LinkDirection.INCOMING);
-          this.forceLinkOutgoing.create(LinkDirection.OUTGOING);
-          this.forceCenter.create();
-          this.hasBeenRecentlyDestroyed = false;
+          (_b = this.forceLinkIncoming) === null || _b === void 0 ? void 0 : _b.create(LinkDirection.INCOMING);
+          (_c = this.forceLinkOutgoing) === null || _c === void 0 ? void 0 : _c.create(LinkDirection.OUTGOING);
+          (_d = this.forceCenter) === null || _d === void 0 ? void 0 : _d.create();
+          this.hasParticleSystemDestroyed = false;
+      }
+      destroyParticleSystem() {
+          var _a, _b, _c, _d;
+          if (this.hasParticleSystemDestroyed)
+              return;
+          this.points.destroy();
+          this.lines.destroy();
+          (_a = this.forceCenter) === null || _a === void 0 ? void 0 : _a.destroy();
+          (_b = this.forceLinkIncoming) === null || _b === void 0 ? void 0 : _b.destroy();
+          (_c = this.forceLinkOutgoing) === null || _c === void 0 ? void 0 : _c.destroy();
+          (_d = this.forceManyBody) === null || _d === void 0 ? void 0 : _d.destroy();
+          this.reglInstance.destroy();
+          this.hasParticleSystemDestroyed = true;
       }
       update(runSimulation) {
           const { graph } = this;
           this.store.pointsTextureSize = Math.ceil(Math.sqrt(graph.nodes.length));
           this.store.linksTextureSize = Math.ceil(Math.sqrt(graph.linksNumber * 2));
-          this.destroy();
+          this.destroyParticleSystem();
           this.create();
           this.initPrograms();
+          this.setFocusedNodeById();
+          this.store.hoveredNode = undefined;
           if (runSimulation) {
               this.start();
           }
@@ -21842,64 +22143,70 @@ void main() {
           }
       }
       initPrograms() {
-          var _a;
+          var _a, _b, _c, _d, _e, _f;
           this.points.initPrograms();
           this.lines.initPrograms();
-          this.forceGravity.initPrograms();
-          this.forceLinkIncoming.initPrograms();
-          this.forceLinkOutgoing.initPrograms();
-          this.forceMouse.initPrograms();
-          (_a = this.forceManyBody) === null || _a === void 0 ? void 0 : _a.initPrograms();
-          this.forceCenter.initPrograms();
+          (_a = this.forceGravity) === null || _a === void 0 ? void 0 : _a.initPrograms();
+          (_b = this.forceLinkIncoming) === null || _b === void 0 ? void 0 : _b.initPrograms();
+          (_c = this.forceLinkOutgoing) === null || _c === void 0 ? void 0 : _c.initPrograms();
+          (_d = this.forceMouse) === null || _d === void 0 ? void 0 : _d.initPrograms();
+          (_e = this.forceManyBody) === null || _e === void 0 ? void 0 : _e.initPrograms();
+          (_f = this.forceCenter) === null || _f === void 0 ? void 0 : _f.initPrograms();
       }
       frame() {
-          const { config: { simulation, renderLinks }, store: { alpha, isSimulationRunning } } = this;
+          const { config: { simulation, renderLinks, disableSimulation }, store: { alpha, isSimulationRunning } } = this;
           if (alpha < ALPHA_MIN && isSimulationRunning)
               this.end();
+          if (!this.store.pointsTextureSize)
+              return;
           this.requestAnimationFrameId = window.requestAnimationFrame((now) => {
-              var _a, _b, _c, _d, _e, _f;
+              var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
               (_a = this.fpsMonitor) === null || _a === void 0 ? void 0 : _a.begin();
               this.resizeCanvas();
               this.findHoveredPoint();
-              if (this.isRightClickMouse) {
-                  if (!isSimulationRunning)
-                      this.start(0.1);
-                  this.forceMouse.run();
-                  this.points.updatePosition();
-              }
-              if ((isSimulationRunning && !this.zoomInstance.isRunning)) {
-                  if (simulation.gravity) {
-                      this.forceGravity.run();
+              if (!disableSimulation) {
+                  if (this.isRightClickMouse) {
+                      if (!isSimulationRunning)
+                          this.start(0.1);
+                      (_b = this.forceMouse) === null || _b === void 0 ? void 0 : _b.run();
                       this.points.updatePosition();
                   }
-                  if (simulation.center) {
-                      this.forceCenter.run();
+                  if ((isSimulationRunning && !this.zoomInstance.isRunning)) {
+                      if (simulation.gravity) {
+                          (_c = this.forceGravity) === null || _c === void 0 ? void 0 : _c.run();
+                          this.points.updatePosition();
+                      }
+                      if (simulation.center) {
+                          (_d = this.forceCenter) === null || _d === void 0 ? void 0 : _d.run();
+                          this.points.updatePosition();
+                      }
+                      (_e = this.forceManyBody) === null || _e === void 0 ? void 0 : _e.run();
                       this.points.updatePosition();
+                      if (this.store.linksTextureSize) {
+                          (_f = this.forceLinkIncoming) === null || _f === void 0 ? void 0 : _f.run();
+                          this.points.updatePosition();
+                          (_g = this.forceLinkOutgoing) === null || _g === void 0 ? void 0 : _g.run();
+                          this.points.updatePosition();
+                      }
+                      this.store.alpha += this.store.addAlpha((_h = this.config.simulation.decay) !== null && _h !== void 0 ? _h : defaultConfigValues.simulation.decay);
+                      if (this.isRightClickMouse)
+                          this.store.alpha = Math.max(this.store.alpha, 0.1);
+                      this.store.simulationProgress = Math.sqrt(Math.min(1, ALPHA_MIN / this.store.alpha));
+                      (_k = (_j = this.config.simulation).onTick) === null || _k === void 0 ? void 0 : _k.call(_j, this.store.alpha, (_l = this.store.hoveredNode) === null || _l === void 0 ? void 0 : _l.node, this.store.hoveredNode ? this.graph.getInputIndexBySortedIndex(this.store.hoveredNode.index) : undefined, (_m = this.store.hoveredNode) === null || _m === void 0 ? void 0 : _m.position);
                   }
-                  (_b = this.forceManyBody) === null || _b === void 0 ? void 0 : _b.run();
-                  this.points.updatePosition();
-                  this.forceLinkIncoming.run();
-                  this.points.updatePosition();
-                  this.forceLinkOutgoing.run();
-                  this.points.updatePosition();
-                  this.store.alpha += this.store.addAlpha((_c = this.config.simulation.decay) !== null && _c !== void 0 ? _c : defaultConfigValues.simulation.decay);
-                  if (this.isRightClickMouse)
-                      this.store.alpha = Math.max(this.store.alpha, 0.1);
-                  this.store.simulationProgress = Math.sqrt(Math.min(1, ALPHA_MIN / this.store.alpha));
-                  (_e = (_d = this.config.simulation).onTick) === null || _e === void 0 ? void 0 : _e.call(_d, this.store.alpha);
+                  this.points.trackPoints();
               }
-              this.points.trackPoints();
               // Clear canvas
               this.reglInstance.clear({
                   color: this.store.backgroundColor,
                   depth: 1,
                   stencil: 0,
               });
-              if (renderLinks) {
+              if (renderLinks && this.store.linksTextureSize) {
                   this.lines.draw();
               }
               this.points.draw();
-              (_f = this.fpsMonitor) === null || _f === void 0 ? void 0 : _f.end(now);
+              (_o = this.fpsMonitor) === null || _o === void 0 ? void 0 : _o.end(now);
               this.currentEvent = undefined;
               this.frame();
           });
@@ -21915,9 +22222,8 @@ void main() {
           (_b = (_a = this.config.simulation).onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
       }
       onClick(event) {
-          var _a, _b, _c, _d, _e, _f;
-          this.store.setFocusedNode((_a = this.store.hoveredNode) === null || _a === void 0 ? void 0 : _a.node, (_b = this.store.hoveredNode) === null || _b === void 0 ? void 0 : _b.index);
-          (_d = (_c = this.config.events).onClick) === null || _d === void 0 ? void 0 : _d.call(_c, (_e = this.store.hoveredNode) === null || _e === void 0 ? void 0 : _e.node, this.store.hoveredNode ? this.graph.getInputIndexBySortedIndex(this.store.hoveredNode.index) : undefined, (_f = this.store.hoveredNode) === null || _f === void 0 ? void 0 : _f.position, event);
+          var _a, _b, _c, _d;
+          (_b = (_a = this.config.events).onClick) === null || _b === void 0 ? void 0 : _b.call(_a, (_c = this.store.hoveredNode) === null || _c === void 0 ? void 0 : _c.node, this.store.hoveredNode ? this.graph.getInputIndexBySortedIndex(this.store.hoveredNode.index) : undefined, (_d = this.store.hoveredNode) === null || _d === void 0 ? void 0 : _d.position, event);
       }
       updateMousePosition(event) {
           if (!event || event.offsetX === undefined || event.offsetY === undefined)
@@ -21929,8 +22235,8 @@ void main() {
           const invertedX = (mouseX - x) / k;
           const invertedY = (mouseY - y) / k;
           this.store.mousePosition = [invertedX, (h - invertedY)];
-          this.store.mousePosition[0] -= (this.store.screenSize[0] - this.config.spaceSize) / 2;
-          this.store.mousePosition[1] -= (this.store.screenSize[1] - this.config.spaceSize) / 2;
+          this.store.mousePosition[0] -= (this.store.screenSize[0] - this.store.adjustedSpaceSize) / 2;
+          this.store.mousePosition[1] -= (this.store.screenSize[1] - this.store.adjustedSpaceSize) / 2;
           this.store.screenMousePosition = [mouseX, (this.store.screenSize[1] - mouseY)];
       }
       onMouseMove(event) {
@@ -21943,21 +22249,23 @@ void main() {
       onRightClickMouse(event) {
           event.preventDefault();
       }
-      resizeCanvas() {
+      resizeCanvas(forceResize = false) {
           const prevWidth = this.canvas.width;
           const prevHeight = this.canvas.height;
           const w = this.canvas.clientWidth;
           const h = this.canvas.clientHeight;
-          if (prevWidth !== w * this.config.pixelRatio || prevHeight !== h * this.config.pixelRatio) {
-              this.store.updateScreenSize(w, h, this.config.spaceSize);
+          if (forceResize || prevWidth !== w * this.config.pixelRatio || prevHeight !== h * this.config.pixelRatio) {
+              this.store.updateScreenSize(w, h);
               this.canvas.width = w * this.config.pixelRatio;
               this.canvas.height = h * this.config.pixelRatio;
               this.reglInstance.poll();
               this.canvasD3Selection
                   .call(this.zoomInstance.behavior.transform, this.zoomInstance.eventTransform);
+              this.points.updateSampledNodesGrid();
           }
       }
       setZoomTransformByNodePositions(positions, duration = 250, scale) {
+          this.resizeCanvas();
           const transform = this.zoomInstance.getTransform(positions, scale);
           this.canvasD3Selection
               .transition()
@@ -21994,8 +22302,23 @@ void main() {
                   .call(this.zoomInstance.behavior.transform, transform);
           }
       }
+      disableZoom() {
+          this.canvasD3Selection
+              .call(this.zoomInstance.behavior)
+              .on('wheel.zoom', null);
+      }
+      enableZoom() {
+          this.canvasD3Selection.call(this.zoomInstance.behavior);
+      }
       findHoveredPoint() {
           var _a, _b, _c, _d, _e;
+          if (!this._isMouseOnCanvas)
+              return;
+          if (this._findHoveredPointExecutionCount < 2) {
+              this._findHoveredPointExecutionCount += 1;
+              return;
+          }
+          this._findHoveredPointExecutionCount = 0;
           this.points.findHoveredPoint();
           let isMouseover = false;
           let isMouseout = false;

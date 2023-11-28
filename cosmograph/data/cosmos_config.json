@@ -1,6 +1,14 @@
 {
   "config": [
     {
+      "Property": "disableSimulation",
+      "Description": "Do not run the simulation, just render the graph. Cosmos uses the x and y values of the nodes’ data to determine their position in the graph. If x and y values are not specified, the position of the nodes will be assigned randomly. This property will be applied only on component initialization and it can't be changed using the `setConfig` method.",
+      "Default": false,
+      "py_name": "disable_simulation",
+      "type": "boolean"
+
+    },
+    {
       "Property": "backgroundColor",
       "Description": "Canvas background color",
       "Default": "#222222",
@@ -57,6 +65,20 @@
       "type": "string"
     },
     {
+      "Property": "hoveredNodeRingColor",
+      "Description": "Hovered node ring color hex value.",
+      "Default": "white",
+      "py_name": "hovered_node_ring_color",
+      "type": "string"
+    },
+    {
+      "Property": "focusedNodeRingColor",
+      "Description": "Focused node ring color hex value.",
+      "Default": "white",
+      "py_name": "focused_node_ring_color",
+      "type": "string"
+    },
+    {
       "Property": "renderLinks",
       "Description": "Turns link rendering on / off",
       "Default": true,
@@ -89,6 +111,34 @@
       "Description": "Scale factor for the link width",
       "Default": 1,
       "py_name": "link_width_scale",
+      "type": "number"
+    },
+    {
+      "Property": "curvedLinks",
+      "Description": "If set to true, links are rendered as curved lines. Otherwise as straight lines.",
+      "Default": false,
+      "py_name": "curved_links",
+      "type": "boolean"
+    },
+    {
+      "Property": "curvedLinkSegments",
+      "Description": "Number of segments in a curved line.",
+      "Default": 19,
+      "py_name": "curved_link_segments",
+      "type": "number"
+    },
+    {
+      "Property": "curvedLinkWeight",
+      "Description": "Weight affects the shape of the curve.",
+      "Default": 0.8,
+      "py_name": "curved_link_weight",
+      "type": "number"
+    },
+    {
+      "Property": "curvedLinkControlPointDistance",
+      "Description": "Defines the position of the control point of the curve on the normal from the centre of the line. If set to 1 then the control point is at a distance equal to the length of the line.",
+      "Default": 0.5,
+      "py_name": "curved_link_control_point_distance",
       "type": "number"
     },
     {
@@ -308,11 +358,32 @@
       "type": "boolean"
     },
     {
+      "Property": "initialZoomLevel",
+      "Description": "Initial zoom level. Can be set once during graph initialization.",
+      "Default": 1,
+      "py_name": "initial_zoom_level",
+      "type": "number"
+    },
+    {
+      "Property": "disableZoom",
+      "Description": "Disables zooming in and out.",
+      "Default": false,
+      "py_name": "disable_zoom",
+      "type": "boolean"
+    },
+    {
       "Property": "randomSeed",
       "Description": "Providing a randomSeed value allows you to control the randomness of the layout across different simulation runs. It is useful when you want the graph to always look the same on same datasets. This property will be applied only on component initialization and it can't be changed using the setConfig method.",
       "Default": null,
       "py_name": "random_seed",
       "type": "number | string"
+    },
+    {
+      "Property": "nodeSamplingDistance",
+      "Description": "Node sampling distance in pixels between neighboring nodes when calling the `getSampledNodePositionsMap` method. This parameter determines how many nodes will be included in the sample.",
+      "Default": 150,
+      "py_name": "node_sampling_distance",
+      "type": "number"
     }
   ]
 }
