@@ -85,7 +85,7 @@ js_files = mk_js_files(str(js_dir_path))
 # TODO: How to keep 'cosmos-iife-bundle.js' contents in sink with most recent?
 @lru_cache
 def get_cosmos_iife_bundle():
-    return (js_dir / "cosmos-iife-bundle.js").read_text()
+    return (js_dir / "cosmograph-iife-bundle.js").read_text()
     # import requests
     # root_url = "https://github.com/cosmograph-org/cosmos-integrations/"
     # cosmos_iife_bundle_url=(
@@ -114,8 +114,8 @@ def data_to_html_obj(data):
     return html_obj
 
 
-_js_mk_canvas_and_graphs_containers = js_files["mk_canvas_and_graphs_containers"]
-_js_mk_new_canvas_and_cosmos_instance = js_files["mk_new_canvas_and_cosmos_instance"]
+_js_mk_containers_and_graphs = js_files["mk_containers_and_graphs"]
+_js_mk_new_container_and_graph = js_files["mk_new_container_and_graph"]
 _js_mk_api_methods = js_files["mk_api_methods"]
 
 
@@ -137,8 +137,8 @@ def _one_time_setup():
     js_code = "\n\n".join(
         [
             get_cosmos_iife_bundle(),
-            js_files["mk_canvas_and_graphs_containers"],
-            js_files["mk_new_canvas_and_cosmos_instance"],
+            js_files["mk_containers_and_graphs"],
+            js_files["mk_new_container_and_graph"],
             js_files["mk_api_methods"],
             js_files["interface"],
         ]
@@ -156,7 +156,7 @@ js = add_js_funcs(js_files["interface"])
 @lru_cache
 def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%"):
     return f"""
-        globalThis.CreateCanvasAndCosmosById("{canvas_id}", "{canvas_height}", "{canvas_width}")
+        globalThis.CreateContainerAndCosmographById("{canvas_id}", "{canvas_height}", "{canvas_width}")
     """
 
 
@@ -165,7 +165,7 @@ def cosmos_html(cosmo_id="cosmos"):
         <div id="{cosmo_id}"></div>
 
         <script>
-            AddCanvasToDivById("{cosmo_id}")
+            AddGraphContainerToDivById("{cosmo_id}")
         </script>
     """
 
@@ -231,7 +231,7 @@ def _cosmos_html(cosmo_id="cosmos", pre_script="", post_script=""):
 
         <script>
             {pre_script}
-            AddCanvasToDivById("{cosmo_id}")
+            AddGraphContainerToDivById("{cosmo_id}")
             {post_script}
         </script>
     """
@@ -281,7 +281,7 @@ def __cosmos_html(cosmo_id="cosmos"):
         <div id="{cosmo_id}"></div>
 
         <script>
-            AddCanvasToDivById("{cosmo_id}")
+            AddGraphContainerToDivById("{cosmo_id}")
         </script>
     """
 

@@ -6,10 +6,10 @@ globalThis.FitView = function (id) {
     const graph = Graphs.get(id)
     if (graph) graph.fitView()
 }
-globalThis.AddCanvasToDivById = function (id) {
-    const canvas = Canvases.get(id)
+globalThis.AddGraphContainerToDivById = function (id) {
+    const container = GraphContainers.get(id)
     const divElement = document.querySelector(`#${id}`)
-    if (divElement && canvas) {
-        divElement.appendChild(canvas)
+    if (divElement && container) {
+        divElement.appendChild(container)
     }
 }

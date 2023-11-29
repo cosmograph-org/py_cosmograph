@@ -180,56 +180,63 @@
       "type": "boolean"
     },
     {
-      "Property": "simulation.decay",
+      "Property": "simulationDecay",
       "Description": "Decay coefficient. Use smaller values if you want the simulation to \"cool down\" slower.",
       "Default": 1000,
       "py_name": "simulation_decay",
       "type": "number"
     },
     {
-      "Property": "simulation.gravity",
+      "Property": "simulationGravity",
       "Description": "Gravity force coefficient.",
       "Default": 0,
       "py_name": "simulation_gravity",
       "type": "number"
     },
     {
-      "Property": "simulation.center",
+      "Property": "simulationCenter",
       "Description": "Centering to center mass force coefficient.",
       "Default": 0,
       "py_name": "simulation_center",
       "type": "number"
     },
     {
-      "Property": "simulation.repulsion",
+      "Property": "simulationRepulsion",
       "Description": "Repulsion force coefficient.",
       "Default": 0.1,
       "py_name": "simulation_repulsion",
       "type": "number"
     },
     {
-      "Property": "simulation.repulsionTheta",
+      "Property": "simulationRepulsionTheta",
       "Description": "Decreases / increases the detalization of the Many-Body force calculations. When `useQuadtree` is set to `true`, this property corresponds to the Barnes–Hut approximation criterion.",
       "Default": 1.7,
       "py_name": "simulation_repulsion_theta",
       "type": "number"
     },
     {
-      "Property": "simulation.repulsionQuadtreeLevels",
+      "Property": "simulationRepulsionQuadtreeLevels",
       "Description": "Barnes–Hut approximation depth. Can only be used when `useQuadtree` is set `true`.",
       "Default": 12,
       "py_name": "simulation_repulsion_quadtree_levels",
       "type": "number"
     },
     {
-      "Property": "simulation.linkSpring",
+      "Property": "simulationLinkSpring",
       "Description": "Link spring force coefficient.",
       "Default": 1,
       "py_name": "simulation_link_spring",
       "type": "number"
     },
     {
-      "Property": "simulation.linkDistRandomVariationRange",
+      "Property": "simulationLinkDistance",
+      "Description": "Minimum link distance.",
+      "Default": 2,
+      "py_name": "simulation_link_distance",
+      "type": "number"
+    },
+    {
+      "Property": "simulationLinkDistRandomVariationRange",
       "Description": "Range of random link distance values.",
       "Default": [
         1,
@@ -239,101 +246,101 @@
       "type": "number[]"
     },
     {
-      "Property": "simulation.repulsionFromMouse",
+      "Property": "simulationRepulsionFromMouse",
       "Description": "Repulsion coefficient from mouse position. The repulsion force is activated by pressing the right mouse button.",
       "Default": 2,
       "py_name": "simulation_repulsion_from_mouse",
       "type": "number"
     },
     {
-      "Property": "simulation.friction",
+      "Property": "simulationFriction",
       "Description": "Friction coefficient.",
       "Default": 0.85,
       "py_name": "simulation_friction",
       "type": "number"
     },
     {
-      "Property": "simulation.onStart",
+      "Property": "onSimulationStart",
       "Description": "Callback function that will be called when the simulation starts.",
       "Default": null,
-      "py_name": "simulation_on_start",
+      "py_name": "on_simulation_start",
       "type": "() => void"
     },
     {
-      "Property": "simulation.onTick",
+      "Property": "onSimulationTick",
       "Description": "Callback function that will be called on every simulation tick. The value of the argument `alpha` will decrease over time as the simulation \"cools down\".",
       "Default": null,
-      "py_name": "simulation_on_tick",
+      "py_name": "on_simulation_tick",
       "type": "(alpha?: number) => void"
     },
     {
-      "Property": "simulation.onEnd",
+      "Property": "onSimulationEnd",
       "Description": "Callback function that will be called when the simulation stops.",
       "Default": null,
-      "py_name": "simulation_on_end",
+      "py_name": "on_simulation_end",
       "type": "() => void"
     },
     {
-      "Property": "simulation.onPause",
+      "Property": "onSimulationPause",
       "Description": "Callback function that will be called when the simulation gets paused.",
       "Default": null,
-      "py_name": "simulation_on_pause",
+      "py_name": "on_simulation_pause",
       "type": "() => void"
     },
     {
-      "Property": "simulation.onRestart",
+      "Property": "onSimulationRestart",
       "Description": "Callback function that will be called when the simulation is restarted.",
       "Default": null,
-      "py_name": "simulation_on_restart",
+      "py_name": "on_simulation_restart",
       "type": "() => void"
     },
     {
-      "Property": "events.onClick",
+      "Property": "onClick",
       "Description": "Callback function that will be called on every canvas click. If clicked on a node, its data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event as the forth argument: (node: Node | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void",
       "Default": null,
-      "py_name": "events_on_click",
+      "py_name": "on_click",
       "type": "(clickedNode: N | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void"
     },
     {
-      "Property": "events.onMouseMove",
+      "Property": "onMouseMove",
       "Description": "Callback function that will be called when mouse movement happens. If the mouse moves over a node, its data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event as the forth argument: (node: Node | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void",
       "Default": null,
-      "py_name": "events_on_mouse_move",
+      "py_name": "on_mouse_move",
       "type": "(hoveredNode: N | undefined, index: number | undefined, nodePosition: [number, number] | undefined, event: MouseEvent) => void"
     },
     {
-      "Property": "events.onNodeMouseOver",
+      "Property": "onNodeMouseOver",
       "Description": "Callback function that will be called when a node appears under the mouse as a result of a mouse event, zooming and panning, or movement of nodes. The node data will be passed as the first argument, index as the second argument, position as the third argument and the corresponding mouse event or D3's zoom event as the forth argument: (node: Node, index: number, nodePosition: [number, number], event: MouseEvent | D3ZoomEvent | undefined) => void",
       "Default": null,
-      "py_name": "events_on_node_mouse_over",
+      "py_name": "on_node_mouse_over",
       "type": "(hoveredNode: N, index: number, nodePosition: [number, number], event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | undefined) => void"
     },
     {
-      "Property": "events.onNodeMouseOut",
+      "Property": "onNodeMouseOut",
       "Description": "Callback function that will be called when node is no longer underneath the mouse pointer because of a mouse event, zoom/pan event, or movement of nodes. The corresponding mouse event or D3's zoom event will be passed as the first argument: (event: MouseEvent | D3ZoomEvent | undefined) => void",
       "Default": null,
-      "py_name": "events_on_node_mouse_out",
+      "py_name": "on_node_mouse_out",
       "type": "(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | undefined) => void"
     },
     {
-      "Property": "events.onZoomStart",
+      "Property": "onZoomStart",
       "Description": "Callback function that will be called when zooming or panning starts. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
       "Default": null,
-      "py_name": "events_on_zoom_start",
+      "py_name": "on_zoom_start",
       "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
     },
     {
-      "Property": "events.onZoom",
+      "Property": "onZoom",
       "Description": "Callback function that will be called continuously during zooming or panning. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
       "Default": null,
-      "py_name": "events_on_zoom",
+      "py_name": "on_zoom",
       "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
     },
     {
-      "Property": "events.onZoomEnd",
+      "Property": "onZoomEnd",
       "Description": "Callback function that will be called when zooming or panning ends. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): (event: D3ZoomEvent, userDriven: boolean) => void",
       "Default": null,
-      "py_name": "events_on_zoom_end",
+      "py_name": "on_zoom_end",
       "type": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void"
     },
     {
@@ -384,6 +391,104 @@
       "Default": 150,
       "py_name": "node_sampling_distance",
       "type": "number"
+    },
+    {
+      "Property": "showDynamicLabels",
+      "Description": "Show labels for the nodes that are currently visible on the screen, and automatically update to reflect the current zoom level.",
+      "Default": true,
+      "py_name": "show_dynamic_labels",
+      "type": "boolean"
+    },
+    {
+      "Property": "showTopLabels",
+      "Description": "Show labels for the top nodes.",
+      "Default": false,
+      "py_name": "show_top_labels",
+      "type": "boolean"
+    },
+    {
+      "Property": "showTopLabelsLimit",
+      "Description": "Sets the maximum number of top nodes to show labels for.",
+      "Default": 100,
+      "py_name": "show_top_labels_limit",
+      "type": "number"
+    },
+    {
+      "Property": "showTopLabelsValueKey",
+      "Description": "Specify the key that is used to determine the top nodes. By default, the top nodes are determined by the node degree.",
+      "Default": null,
+      "py_name": "show_top_labels_value_key",
+      "type": "string"
+    },
+    {
+      "Property": "showLabelsFor",
+      "Description": "An array of nodes to show labels for.",
+      "Default": null,
+      "py_name": "show_labels_for",
+      "type": "Node[]"
+    },
+    {
+      "Property": "showHoveredNodeLabel",
+      "Description": "Whether to show a hovered node label.",
+      "Default": false,
+      "py_name": "show_hovered_node_label",
+      "type": "boolean"
+    },
+    {
+      "Property": "nodeLabelAccessor",
+      "Description": "Function that  generate custom text for each label.",
+      "Default": "n => n.id",
+      "py_name": "node_label_accessor",
+      "type": "(node: N) => string;"
+    },
+    {
+      "Property": "nodeLabelClassName",
+      "Description": "Specifies the CSS class to use for the labels.",
+      "Default": null,
+      "py_name": "node_label_class_name",
+      "type": "string | (node: N) => string;"
+    },
+    {
+      "Property": "nodeLabelColor",
+      "Description": "Specifies the CSS color to use for the labels.",
+      "Default": null,
+      "py_name": "node_label_color",
+      "type": "string | (node: N) => string;"
+    },
+    {
+      "Property": "hoveredNodeLabelClassName",
+      "Description": "Specifies the CSS class to use for the hovered node label.",
+      "Default": null,
+      "py_name": "hovered_node_label_class_name",
+      "type": "string | (node: N) => string;"
+    },
+    {
+      "Property": "hoveredNodeLabelColor",
+      "Description": "Specifies the CSS color to use for the hovered node label.",
+      "Default": null,
+      "py_name": "hovered_node_label_color",
+      "type": "string | (node: N) => string;"
+    },
+    {
+      "Property": "onSetData",
+      "Description": "Callback function that will be called when the data was updated",
+      "Default": null,
+      "py_name": "on_set_data",
+      "type": "(nodes: N[], links: L[]) => void;"
+    },
+    {
+      "Property": "onNodesFiltered",
+      "Description": "Callback function that will be called when the nodes was filtered by Node Crossfilter.",
+      "Default": null,
+      "py_name": "on_nodes_filtered",
+      "type": "(filteredNodes: N[] | undefined) => void;"
+    },
+    {
+      "Property": "onLinksFiltered",
+      "Description": "Callback function that will be called when the links was filtered by Link Crossfilter.",
+      "Default": null,
+      "py_name": "on_links_filtered",
+      "type": "(filteredLinks: L[] | undefined) => void;"
     }
   ]
 }
