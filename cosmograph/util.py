@@ -114,9 +114,9 @@ def data_to_html_obj(data):
     return html_obj
 
 
-_js_mk_containers_and_graphs = js_files["mk_containers_and_graphs"]
-_js_mk_new_container_and_graph = js_files["mk_new_container_and_graph"]
-_js_mk_api_methods = js_files["mk_api_methods"]
+# _js_mk_containers_and_graphs = js_files["mk_containers_and_graphs"]
+# _js_mk_new_container_and_graph = js_files["mk_new_container_and_graph"]
+# _js_mk_api_methods = js_files["mk_api_methods"]
 
 
 _canvas_ids = (f"canvas_{id_:02.0f}" for id_ in count())
@@ -236,6 +236,13 @@ def _cosmos_html(cosmo_id="cosmos", pre_script="", post_script=""):
         </script>
     """
 
+
+def add_attributes(obj, **attrs):
+    for k, v in attrs.items():
+        setattr(obj, k, v)
+    return obj
+
+
 # TODO: Use jy!!! (makes the next todo mute.)
 # TODO: Make signature for config parameters.
 def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
@@ -254,11 +261,9 @@ def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     # config = {k: dflt_py_to_js_value_trans(v) for k, v in config.items()}
     # print(f"After: {config=}")
 
-    html_str = _cosmos_html(
-        canvas_id,
-        pre_script=init_cosmos(canvas_id=canvas_id),
-        post_script=alt_set_data(links, config, nodes, canvas_id),
-    )
+    pre_script = init_cosmos(canvas_id=canvas_id)
+    post_script = alt_set_data(links, config, nodes, canvas_id)
+    html_str = _cosmos_html(canvas_id, pre_script=pre_script, post_script=post_script)
 
     # Olya: This repairs it -- so alt_set_data is the problem. Doesn't handle
     # configs correctly
@@ -266,7 +271,7 @@ def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     # print(html_str)  # Olya: Diagnose link_arrow=False issue with this
 
     html_obj = HTML(html_str)
-    html_obj.canvas_id = canvas_id
+    add_attributes(html_obj, canvas_id=canvas_id)
 
     # fit_view(canvas_id)  # doesn't work
     if canvas_id not in canvas_ids_used:
@@ -446,11 +451,13 @@ def _py_cosmos_call(canvas, **config):
 
 def _mk_py_cosmos_arg_description():
     """Generates the docstring 'argument description' snippet for _py_cosmos_call"""
+
     def gen():
         yield "    :param canvas: Canvas element to render to"
         for py_name, description in _description_of_py_name.items():
             # TODO: Replace occurences of JS camel property name with python snake name
             yield f"    :param {py_name}: {description}"
+
     return "\n" + "\n".join(gen())
 
 
@@ -483,6 +490,7 @@ def _tmp_test_of_py_costmos_call():
     )
 
     import pytest
+
     with pytest.raises(TypeError) as excinfo:
         _py_cosmos_call('WTF', invalid_arg='whatevs')
         assert "Invalid argument names: {'invalid_arg'}" in str(excinfo.value)
@@ -522,7 +530,6 @@ def convert_js_to_py_val(x):
             return x
 
 
-
 @lru_cache
 def cosmos_config_info():
     # TODO: Do we really want to source our config info from the wiki?
@@ -549,6 +556,7 @@ def cosmos_config_info():
 
 def _download_and_save_config_info():
     import json
+
     config_info = cosmos_config_info()
     data_files['config_info.json'] = json.dumps(config_info).encode()
 
@@ -556,13 +564,15 @@ def _download_and_save_config_info():
 # # TODO: Take out of try/catch once we have a stable source of config info
 try:
     import json
+
     config_info = json.loads(data_files['config_info.json'])
     _config_dflts = [
         {
             'name': d['py_name'],
             'kind': Sig.KEYWORD_ONLY,
-            'default': convert_js_to_py_val(d['Default'])
-        } for d in config_info
+            'default': convert_js_to_py_val(d['Default']),
+        }
+        for d in config_info
     ]
 
     _original_cosmo_sig = Sig(cosmo)
