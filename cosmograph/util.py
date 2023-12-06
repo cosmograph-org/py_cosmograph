@@ -149,15 +149,12 @@ def _one_time_setup():
 ipython_display(Javascript(_one_time_setup()))
 
 from jy import add_js_funcs
+js = add_js_funcs(js_files["interface"] + js_files["mk_new_container_and_graph"])
 
-js = add_js_funcs(js_files["interface"])
 
-
-@lru_cache
-def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%"):
-    return f"""
-        globalThis.CreateContainerAndCosmographById("{canvas_id}", "{canvas_height}", "{canvas_width}")
-    """
+# @lru_cache
+def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%", config={}):
+    return js.CreateContainerAndCosmographById(canvas_id, canvas_height, canvas_width, config)
 
 
 def cosmos_html(cosmo_id="cosmos"):
@@ -179,9 +176,9 @@ def set_data(data, canvas_id=DFLT_CANVAS):
     return f'if (SetData) SetData("{canvas_id}", {nodes}, {links})'
 
 
-def alt_set_data(links, config, nodes=None, canvas_id=DFLT_CANVAS):
+def alt_set_data(links, nodes=None, canvas_id=DFLT_CANVAS):
     links, nodes = _ensure_links_and_nodes(links, nodes)
-    return js.cosmos__set_data(canvas_id, links, nodes, config)
+    return js.cosmos__set_data(canvas_id, links, nodes)
 
 
 def fit_view(canvas_id=DFLT_CANVAS):
@@ -260,9 +257,8 @@ def cosmo(links, nodes=None, canvas_id=None, *, display=False, **config):
     # print(f"Before: {config=}")
     # config = {k: dflt_py_to_js_value_trans(v) for k, v in config.items()}
     # print(f"After: {config=}")
-
-    pre_script = init_cosmos(canvas_id=canvas_id)
-    post_script = alt_set_data(links, config, nodes, canvas_id)
+    pre_script = init_cosmos(canvas_id=canvas_id, config=config)
+    post_script = alt_set_data(links, nodes, canvas_id)
     html_str = _cosmos_html(canvas_id, pre_script=pre_script, post_script=post_script)
 
     # Olya: This repairs it -- so alt_set_data is the problem. Doesn't handle
