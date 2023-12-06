@@ -25308,7 +25308,7 @@ void main() {
           containerNode.appendChild(this._canvasElement);
           containerNode.appendChild(this._labelsDivElement);
           containerNode.appendChild(this._watermarkDivElement);
-          this.cosmos = new Graph(this._canvasElement, this._createCosmosConfig(config));
+          this._cosmos = new Graph(this._canvasElement, this._createCosmosConfig(config));
           this._linksFilter.setAccessor(d => ([d.source, d.target]));
           this._nodesFilter.setAccessor(d => d.id);
           this._selectedNodesFilter.setAccessor(d => d.id);
@@ -25317,10 +25317,10 @@ void main() {
               let selectedNodes;
               if (this._nodesCrossfilter.isAnyFiltersActive()) {
                   selectedNodes = this._nodesCrossfilter.getFilteredRecords();
-                  this.cosmos.selectNodesByIds(selectedNodes.map(d => d.id));
+                  this._cosmos.selectNodesByIds(selectedNodes.map(d => d.id));
               }
               else {
-                  this.cosmos.unselectNodes();
+                  this._cosmos.unselectNodes();
               }
               this._updateSelectedNodesSet(selectedNodes);
               (_b = (_a = this._config).onNodesFiltered) === null || _b === void 0 ? void 0 : _b.call(_a, selectedNodes);
@@ -25342,6 +25342,26 @@ void main() {
           return this._data;
       }
       /**
+       * Progress value indicates how far the simulation goes from 0 to 1,
+       * where 0 represents the start of the simulation and 1 represents the end.
+       */
+      get progress() {
+          return this._cosmos.progress;
+      }
+      /**
+       * A value that gives information about the running simulation status.
+       */
+      get isSimulationRunning() {
+          return this._cosmos.isSimulationRunning;
+      }
+      /**
+       * The maximum point size.
+       * This value is the maximum size of the `gl.POINTS` primitive that WebGL can render on the user's hardware.
+       */
+      get maxPointSize() {
+          return this._cosmos.maxPointSize;
+      }
+      /**
        * Sets the data for the graph.
        * @param nodes - Nodes to be added to the graph.
        * @param links - Links to be added to the graph.
@@ -25349,7 +25369,7 @@ void main() {
       setData(nodes, links) {
           var _a, _b;
           this._data = { nodes, links };
-          this.cosmos.setData(nodes, links);
+          this._cosmos.setData(nodes, links);
           this._nodesCrossfilter.addRecords(nodes);
           this._linksCrossfilter.addRecords(links);
           this._updateLabels();
@@ -25383,7 +25403,7 @@ void main() {
       setConfig(config) {
           var _a;
           this._config = a$8(defaultCosmographConfig, config !== null && config !== void 0 ? config : {});
-          this.cosmos.setConfig(this._createCosmosConfig(config));
+          this._cosmos.setConfig(this._createCosmosConfig(config));
           if (config === null || config === void 0 ? void 0 : config.backgroundColor) {
               const hexColor = (_a = color(config === null || config === void 0 ? void 0 : config.backgroundColor)) === null || _a === void 0 ? void 0 : _a.formatHex();
               if (hexColor) {
@@ -25419,8 +25439,8 @@ void main() {
        */
       selectNodesInRange(selection) {
           var _a;
-          this.cosmos.selectNodesInRange(selection);
-          const selectedNodeIds = new Set(((_a = this.cosmos.getSelectedNodes()) !== null && _a !== void 0 ? _a : []).map(d => d.id));
+          this._cosmos.selectNodesInRange(selection);
+          const selectedNodeIds = new Set(((_a = this.getSelectedNodes()) !== null && _a !== void 0 ? _a : []).map(d => d.id));
           this._selectedNodesFilter.applyFilter(d => selectedNodeIds.has(d));
       }
       /**
@@ -25437,7 +25457,7 @@ void main() {
        * @param selectAdjacentNodes Optional parameter determining whether to also select the connected nodes.
        */
       selectNode(node, selectAdjacentNodes = false) {
-          const selectedNodes = new Set([node, ...(selectAdjacentNodes ? (this.cosmos.getAdjacentNodes(node.id) || []) : [])].map(d => d.id));
+          const selectedNodes = new Set([node, ...(selectAdjacentNodes ? (this._cosmos.getAdjacentNodes(node.id) || []) : [])].map(d => d.id));
           this._selectedNodesFilter.applyFilter(d => selectedNodes.has(d));
       }
       /**
@@ -25447,11 +25467,68 @@ void main() {
           this._selectedNodesFilter.clear();
       }
       /**
+       * Get nodes that are currently selected.
+       * @returns Array of selected nodes.
+       */
+      getSelectedNodes() {
+          return this._cosmos.getSelectedNodes();
+      }
+      /**
        * Center the view and zoom in to a node.
        * @param node Node to be zoomed in.
        */
       zoomToNode(node) {
-          this.cosmos.zoomToNodeById(node.id);
+          this._cosmos.zoomToNodeById(node.id);
+      }
+      /**
+       * Zoom the view in or out to the specified zoom level.
+       * @param value Zoom level
+       * @param duration Duration of the zoom in/out transition.
+       */
+      setZoomLevel(value, duration = 0) {
+          this._cosmos.setZoomLevel(value, duration);
+      }
+      /**
+       * Get zoom level.
+       * @returns Zoom level value of the view.
+       */
+      getZoomLevel() {
+          return this._cosmos.getZoomLevel();
+      }
+      /**
+       * Get current X and Y coordinates of the nodes.
+       * @returns Object where keys are the ids of the nodes and values are corresponding `{ x: number; y: number }` objects.
+       */
+      getNodePositions() {
+          return this._cosmos.getNodePositions();
+      }
+      /**
+       * Get current X and Y coordinates of the nodes.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
+       */
+      getNodePositionsMap() {
+          return this._cosmos.getNodePositionsMap();
+      }
+      /**
+       * Get current X and Y coordinates of the nodes.
+       * @returns Array of `[x: number, y: number]` arrays.
+       */
+      getNodePositionsArray() {
+          return this._cosmos.getNodePositionsArray();
+      }
+      /**
+       * Center and zoom in/out the view to fit all nodes in the scene.
+       * @param duration Duration of the center and zoom in/out animation in milliseconds (`250` by default).
+       */
+      fitView(duration = 250) {
+          this._cosmos.fitView(duration);
+      }
+      /**
+       * Center and zoom in/out the view to fit nodes by their ids in the scene.
+       * @param duration Duration of the center and zoom in/out animation in milliseconds (`250` by default).
+       */
+      fitViewByNodeIds(ids, duration = 250) {
+          this._cosmos.fitViewByNodeIds(ids, duration);
       }
       /**
        * Set focus on a node. A ring will be drawn around the focused node.
@@ -25459,7 +25536,77 @@ void main() {
        * @param node Node to be focused.
        */
       focusNode(node) {
-          this.cosmos.setFocusedNodeById(node === null || node === void 0 ? void 0 : node.id);
+          this._cosmos.setFocusedNodeById(node === null || node === void 0 ? void 0 : node.id);
+      }
+      /**
+       * Get nodes that are adjacent to a specific node by its id.
+       * @param id Id of the node.
+       * @returns Array of adjacent nodes.
+       */
+      getAdjacentNodes(id) {
+          return this._cosmos.getAdjacentNodes(id);
+      }
+      /**
+       * Converts the X and Y node coordinates from the space coordinate system to the screen coordinate system.
+       * @param spacePosition Array of x and y coordinates in the space coordinate system.
+       * @returns Array of x and y coordinates in the screen coordinate system.
+       */
+      spaceToScreenPosition(spacePosition) {
+          return this._cosmos.spaceToScreenPosition(spacePosition);
+      }
+      /**
+       * Converts the node radius value from the space coordinate system to the screen coordinate system.
+       * @param spaceRadius Radius of Node in the space coordinate system.
+       * @returns Radius of Node in the screen coordinate system.
+       */
+      spaceToScreenRadius(spaceRadius) {
+          return this._cosmos.spaceToScreenRadius(spaceRadius);
+      }
+      /**
+       * Get node radius by its index.
+       * @param index Index of the node.
+       * @returns Radius of the node.
+       */
+      getNodeRadiusByIndex(index) {
+          return this._cosmos.getNodeRadiusByIndex(index);
+      }
+      /**
+       * Get node radius by its id.
+       * @param id Id of the node.
+       * @returns Radius of the node.
+       */
+      getNodeRadiusById(id) {
+          return this._cosmos.getNodeRadiusById(id);
+      }
+      /**
+       * Track multiple node positions by their ids on each Cosmos tick.
+       * @param ids Array of nodes ids.
+       */
+      trackNodePositionsByIds(ids) {
+          return this._cosmos.trackNodePositionsByIds(ids);
+      }
+      /**
+       * Track multiple node positions by their indices on each Cosmos tick.
+       * @param ids Array of nodes indices.
+       */
+      trackNodePositionsByIndices(indices) {
+          return this._cosmos.trackNodePositionsByIndices(indices);
+      }
+      /**
+       * Get current X and Y coordinates of the tracked nodes.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
+       */
+      getTrackedNodePositionsMap() {
+          return this._cosmos.getTrackedNodePositionsMap();
+      }
+      /**
+       * For the nodes that are currently visible on the screen, get a sample of node ids with their coordinates.
+       * The resulting number of nodes will depend on the `nodeSamplingDistance` configuration property,
+       * and the sampled nodes will be evenly distributed.
+       * @returns A Map object where keys are the ids of the nodes and values are their corresponding X and Y coordinates in the [number, number] format.
+       */
+      getSampledNodePositionsMap() {
+          return this._cosmos.getSampledNodePositionsMap();
       }
       /**
        * Starts the simulation.
@@ -25467,31 +25614,49 @@ void main() {
        * the more initial energy the simulation will get.
        */
       start(alpha = 1) {
-          this.cosmos.start(alpha);
+          this._cosmos.start(alpha);
       }
       /**
        * Pause the simulation.
        */
       pause() {
-          this.cosmos.pause();
+          this._cosmos.pause();
       }
       /**
        * Restarts the simulation.
        */
       restart() {
-          this.cosmos.restart();
+          this._cosmos.restart();
+      }
+      /**
+       * Render only one frame of the simulation (stops the simulation if it was running).
+       */
+      step() {
+          this._cosmos.step();
       }
       /**
        * Destroy the graph and clean up the context.
        */
       remove() {
-          this.cosmos.destroy();
+          this._cosmos.destroy();
           if (this._isLabelsDestroyed)
               return;
           this._containerNode.innerHTML = '';
           this._isLabelsDestroyed = true;
           this._hoveredCssLabel.destroy();
           this._cssLabelsRenderer.destroy();
+      }
+      /**
+       * Create new Cosmos instance.
+       */
+      create() {
+          this._cosmos.create();
+      }
+      /**
+       * Returns an array of nodes with their degree values in the order they were sent to Cosmograph.
+       */
+      getNodeDegrees() {
+          return this._cosmos.graph.degree;
       }
       _createCosmosConfig(config) {
           return {
@@ -25539,10 +25704,10 @@ void main() {
                   });
               }
               else {
-                  sortedNodes = Object.entries(this.cosmos.graph.degree)
+                  sortedNodes = Object.entries(this._cosmos.graph.degree)
                       .sort((a, b) => b[1] - a[1])
                       .slice(0, showTopLabelsLimit)
-                      .map(d => this.cosmos.graph.getNodeByIndex(+d[0]));
+                      .map(d => this._cosmos.graph.getNodeByIndex(+d[0]));
               }
               for (let i = 0; i < showTopLabelsLimit; i++) {
                   if (i >= nodes.length)
@@ -25555,7 +25720,7 @@ void main() {
           this._nodesForForcedLabels.clear();
           showLabelsFor === null || showLabelsFor === void 0 ? void 0 : showLabelsFor.forEach(this._nodesForForcedLabels.add, this._nodesForForcedLabels);
           this._trackedNodeToLabel.clear();
-          this.cosmos.trackNodePositionsByIds([
+          this.trackNodePositionsByIds([
               ...(showTopLabels ? this._nodesForTopLabels : []),
               ...this._nodesForForcedLabels,
           ].map(d => {
@@ -25582,13 +25747,13 @@ void main() {
               return;
           const { _selectedNodesSet, _config: { showDynamicLabels, nodeLabelAccessor, nodeLabelColor, nodeLabelClassName } } = this;
           let labels = [];
-          const trackedNodesPositions = this.cosmos.getTrackedNodePositionsMap();
+          const trackedNodesPositions = this.getTrackedNodePositionsMap();
           const nodeToLabelInfo = new Map();
           if (showDynamicLabels) {
-              const sampledNodesPositions = this.cosmos.getSampledNodePositionsMap();
+              const sampledNodesPositions = this.getSampledNodePositionsMap();
               sampledNodesPositions.forEach((positions, id) => {
                   var _a;
-                  const node = this.cosmos.graph.getNodeById(id);
+                  const node = this._cosmos.graph.getNodeById(id);
                   if (node)
                       nodeToLabelInfo.set(node, [(_a = nodeLabelAccessor === null || nodeLabelAccessor === void 0 ? void 0 : nodeLabelAccessor(node)) !== null && _a !== void 0 ? _a : node.id, positions, modules_558a7fde.cosmographShowDynamicLabels, 0.7]);
               });
@@ -25601,8 +25766,8 @@ void main() {
           });
           labels = [...nodeToLabelInfo.entries()].map(([p, [text, positions, className, weight]]) => {
               var _a, _b, _c;
-              const screenPosition = this.cosmos.spaceToScreenPosition([(_a = positions === null || positions === void 0 ? void 0 : positions[0]) !== null && _a !== void 0 ? _a : 0, (_b = positions === null || positions === void 0 ? void 0 : positions[1]) !== null && _b !== void 0 ? _b : 0]);
-              const radius = this.cosmos.spaceToScreenRadius(this.cosmos.config.nodeSizeScale * this.cosmos.getNodeRadiusById(p.id));
+              const screenPosition = this.spaceToScreenPosition([(_a = positions === null || positions === void 0 ? void 0 : positions[0]) !== null && _a !== void 0 ? _a : 0, (_b = positions === null || positions === void 0 ? void 0 : positions[1]) !== null && _b !== void 0 ? _b : 0]);
+              const radius = this.spaceToScreenRadius(this._cosmos.config.nodeSizeScale * this.getNodeRadiusById(p.id));
               const hasSelectedNodes = !!_selectedNodesSet;
               const isNodeSelected = _selectedNodesSet === null || _selectedNodesSet === void 0 ? void 0 : _selectedNodesSet.has(p);
               return {
@@ -25626,8 +25791,8 @@ void main() {
           if (this._isLabelsDestroyed)
               return;
           if (showHoveredNodeLabel && node && nodeSpacePosition) {
-              const screenPosition = this.cosmos.spaceToScreenPosition(nodeSpacePosition);
-              const radius = this.cosmos.spaceToScreenRadius(this.cosmos.getNodeRadiusById(node.id));
+              const screenPosition = this.spaceToScreenPosition(nodeSpacePosition);
+              const radius = this.spaceToScreenRadius(this.getNodeRadiusById(node.id));
               this._hoveredCssLabel.setText((_a = nodeLabelAccessor === null || nodeLabelAccessor === void 0 ? void 0 : nodeLabelAccessor(node)) !== null && _a !== void 0 ? _a : node.id);
               this._hoveredCssLabel.setVisibility(true);
               this._hoveredCssLabel.setPosition(screenPosition[0], screenPosition[1] - (radius + 2));
@@ -25764,7 +25929,7 @@ void main() {
       }
       _onSelectResult(node) {
           var _a, _b;
-          this._cosmograph.cosmos.pause();
+          this._cosmograph.pause();
           this._cosmograph.zoomToNode(node);
           this._cosmograph.selectNode(node);
           (_b = (_a = this._config).onSelectResult) === null || _b === void 0 ? void 0 : _b.call(_a, node);
