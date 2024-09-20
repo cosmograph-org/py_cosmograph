@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+node_modules
+cosmograph/static/
+yarn.lock
+package-lock.json
+
+__pycache__/
+.ipynb_checkpoints
