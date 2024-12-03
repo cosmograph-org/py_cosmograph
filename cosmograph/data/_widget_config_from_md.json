@@ -1,0 +1,642 @@
+{
+    "interfaces": [
+        {
+            "name": "CosmographConfig",
+            "description": "The configuration parameters for the Cosmograph widget.",
+            "properties": [
+                {
+                    "name": "points",
+                    "type": "DataFrame",
+                    "description": "Data in a pandas DataFrame format.",
+                    "group": "Minimal Configuration for Points",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_id",
+                    "type": "string",
+                    "description": "Unique identifier column for each point.",
+                    "group": "Minimal Configuration for Points",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_index",
+                    "type": "integer",
+                    "description": "Ordinal index of each point ranging from 0 to x (the number of unique points).",
+                    "group": "Minimal Configuration for Points",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_color",
+                    "type": "string",
+                    "description": "Column name for point colors.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_size",
+                    "type": "string",
+                    "description": "Column name for point sizes.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_label",
+                    "type": "string",
+                    "description": "Column name for associated point labels.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_label_weight",
+                    "type": "string",
+                    "description": "Column name for point label weights.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_x",
+                    "type": "string",
+                    "description": "Column name for the x-coordinate.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_y",
+                    "type": "string",
+                    "description": "Column name for the y-coordinate.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "point_include_columns",
+                    "type": "array",
+                    "description": "An array of additional column names to include in point data.",
+                    "group": "Additional Points Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "links",
+                    "type": "DataFrame",
+                    "description": "Data in a pandas DataFrame format.",
+                    "group": "Minimal Configuration for Links",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_source",
+                    "type": "string",
+                    "description": "Column with the unique identifier for source points.",
+                    "group": "Minimal Configuration for Links",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_source_index",
+                    "type": "integer",
+                    "description": "Index column of the source point, corresponding to point_index.",
+                    "group": "Minimal Configuration for Links",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_target",
+                    "type": "string",
+                    "description": "Column with the unique identifier for target points.",
+                    "group": "Minimal Configuration for Links",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_target_index",
+                    "type": "integer",
+                    "description": "Index column of the target point, corresponding to point_index.",
+                    "group": "Minimal Configuration for Links",
+                    "optional": false,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_color",
+                    "type": "string",
+                    "description": "Column name for link colors.",
+                    "group": "Additional Links Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_width",
+                    "type": "string",
+                    "description": "Column name for link widths.",
+                    "group": "Additional Links Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_arrow",
+                    "type": "string",
+                    "description": "Column name that indicates links with arrows.",
+                    "group": "Additional Links Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_strength",
+                    "type": "string",
+                    "description": "Column name for link strengths.",
+                    "group": "Additional Links Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "link_include_columns",
+                    "type": "array",
+                    "description": "An array of additional column names to include in link data.",
+                    "group": "Additional Links Configuration",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "disable_simulation",
+                    "type": "boolean",
+                    "description": "Prevents the simulation from running, merely rendering the graph.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "simulation_decay",
+                    "type": "integer",
+                    "description": "Defines how quickly the simulation cools down.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "1000"
+                },
+                {
+                    "name": "simulation_gravity",
+                    "type": "integer",
+                    "description": "Coefficient for gravity force.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "0"
+                },
+                {
+                    "name": "simulation_center",
+                    "type": "integer",
+                    "description": "Centers the mass force coefficient.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "0"
+                },
+                {
+                    "name": "simulation_repulsion",
+                    "type": "number",
+                    "description": "Configures point repulsion between points.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "0.1"
+                },
+                {
+                    "name": "simulation_repulsion_theta",
+                    "type": "number",
+                    "description": "Decreases / increases the detalization of the Many-Body force calculations.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "1.7"
+                },
+                {
+                    "name": "simulation_link_spring",
+                    "type": "number",
+                    "description": "Spring constant for links.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "1"
+                },
+                {
+                    "name": "simulation_link_distance",
+                    "type": "number",
+                    "description": "Default distance for links.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "2"
+                },
+                {
+                    "name": "simulation_link_dist_random_variation_range",
+                    "type": "array",
+                    "description": "Random link distance range.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "[1, 1.2]"
+                },
+                {
+                    "name": "simulation_repulsion_from_mouse",
+                    "type": "number",
+                    "description": "Mouse position repulsion coefficient, activated by right-click.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "2"
+                },
+                {
+                    "name": "simulation_friction",
+                    "type": "number",
+                    "description": "Sets simulation friction.",
+                    "group": "Simulation Settings",
+                    "optional": true,
+                    "default": "0.85"
+                },
+                {
+                    "name": "use_quadtree",
+                    "type": "boolean",
+                    "description": "Activates quadtree algorithm for Many-Body force when set to True.",
+                    "group": "Quadtree algorithm settings",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "simulation_repulsion_quadtree_levels",
+                    "type": "integer",
+                    "description": "Barnes\u2013Hut approximation depth, usable when useQuadtree is set to True.",
+                    "group": "Quadtree algorithm settings",
+                    "optional": true,
+                    "default": "12"
+                },
+                {
+                    "name": "background_color",
+                    "type": "string",
+                    "description": "Canvas background color.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'#222222'"
+                },
+                {
+                    "name": "space_size",
+                    "type": "integer",
+                    "description": "Size of the simulation space.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "4096"
+                },
+                {
+                    "name": "default_point_color",
+                    "type": "string",
+                    "description": "Default point size when point_color not specified.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'#b3b3b3'"
+                },
+                {
+                    "name": "point_greyout_opacity",
+                    "type": "number",
+                    "description": "Opacity of unselected nodes during selection.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.1"
+                },
+                {
+                    "name": "default_point_size",
+                    "type": "number",
+                    "description": "The default size value to use for points when no point_size are provided.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "4"
+                },
+                {
+                    "name": "point_size_scale",
+                    "type": "number",
+                    "description": "Scale factor for point sizes.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "1"
+                },
+                {
+                    "name": "hovered_point_cursor",
+                    "type": "string",
+                    "description": "Cursor type when hovering over a point.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'auto'"
+                },
+                {
+                    "name": "render_hovered_point_ring",
+                    "type": "boolean",
+                    "description": "Enables ring around hovered points.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "hovered_point_ring_color",
+                    "type": "string",
+                    "description": "Color of hovered point ring.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'white'"
+                },
+                {
+                    "name": "focused_point_ring_color",
+                    "type": "string",
+                    "description": "Color of the focused point ring.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'white'"
+                },
+                {
+                    "name": "focused_point_index",
+                    "type": "integer",
+                    "description": "Index of the focused point, prioritized over focus_point method.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "render_links",
+                    "type": "boolean",
+                    "description": "Enables or disables link rendering.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "True"
+                },
+                {
+                    "name": "default_link_color",
+                    "type": "string",
+                    "description": "Default link color when link_color not specified.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "'#666666'"
+                },
+                {
+                    "name": "link_greyout_opacity",
+                    "type": "number",
+                    "description": "Opacity of unselected links during selection.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.1"
+                },
+                {
+                    "name": "default_link_width",
+                    "type": "number",
+                    "description": "Default link width when link_width not specified.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "1"
+                },
+                {
+                    "name": "link_width_scale",
+                    "type": "number",
+                    "description": "Scale factor for link widths.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "1"
+                },
+                {
+                    "name": "curved_links",
+                    "type": "boolean",
+                    "description": "Enables or disables curved links.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "curved_link_segments",
+                    "type": "integer",
+                    "description": "Segments defining curved links.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "19"
+                },
+                {
+                    "name": "curved_link_weight",
+                    "type": "number",
+                    "description": "Weight factor for link curvature.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.8"
+                },
+                {
+                    "name": "curved_link_control_point_distance",
+                    "type": "number",
+                    "description": "Control point positioning for curves.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.5"
+                },
+                {
+                    "name": "default_link_arrows",
+                    "type": "boolean",
+                    "description": "Enables or disables arrows on links when link_arrow not specified.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "link_arrows_size_scale",
+                    "type": "number",
+                    "description": "Scale factor for link arrow size.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "1"
+                },
+                {
+                    "name": "link_visibility_distance_range",
+                    "type": "array",
+                    "description": "Pixel distance range for link transparency.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "[50, 150]"
+                },
+                {
+                    "name": "link_visibility_min_transparency",
+                    "type": "number",
+                    "description": "Minimum transparency of links based on link_visibility_distance_range.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.25"
+                },
+                {
+                    "name": "scale_points_on_zoom",
+                    "type": "boolean",
+                    "description": "Scales point sizes when zooming.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "True"
+                },
+                {
+                    "name": "initial_zoom_level",
+                    "type": "number",
+                    "description": "Starting zoom level.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "disable_zoom",
+                    "type": "boolean",
+                    "description": "Enables or disables zooming.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "enable_drag",
+                    "type": "boolean",
+                    "description": "Allows graph dragging.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "fit_view_on_init",
+                    "type": "boolean",
+                    "description": "Automatically fits view to all points upon initialization.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "True"
+                },
+                {
+                    "name": "fit_view_delay",
+                    "type": "integer",
+                    "description": "Delay for fitting view after initialization in milliseconds.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "250"
+                },
+                {
+                    "name": "fit_view_padding",
+                    "type": "number",
+                    "description": "Padding around fit view area.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "0.1"
+                },
+                {
+                    "name": "fit_view_duration",
+                    "type": "integer",
+                    "description": "Animation duration for view fitting in milliseconds.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "250"
+                },
+                {
+                    "name": "fit_view_by_points_in_rect",
+                    "type": "string",
+                    "description": "Fits view to specified rectangle of points, active when fit_view_on_init is True.",
+                    "group": "Graph Appearance",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "show_dynamic_labels",
+                    "type": "boolean",
+                    "description": "Flag to show dynamic labels for visible points.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "show_labels_for",
+                    "type": "array",
+                    "description": "An array of point ids for which to show labels.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "show_top_labels",
+                    "type": "boolean",
+                    "description": "Flag to display labels for the top points.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "show_top_labels_limit",
+                    "type": "integer",
+                    "description": "Maximum number of top points to show labels for.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "100"
+                },
+                {
+                    "name": "show_top_labels_by",
+                    "type": "string",
+                    "description": "Column to determine which points are considered as a top.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "static_label_weight",
+                    "type": "number",
+                    "description": "Weight of static labels.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "0.8"
+                },
+                {
+                    "name": "dynamic_label_weight",
+                    "type": "number",
+                    "description": "Weight of dynamic labels.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "0.7"
+                },
+                {
+                    "name": "label_padding",
+                    "type": "number",
+                    "description": "Padding around labels in the graph.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "NO_DEFAULT"
+                },
+                {
+                    "name": "show_hovered_point_label",
+                    "type": "boolean",
+                    "description": "Flag to display the label for the currently hovered point.",
+                    "group": "Label Options",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "show_FPS_monitor",
+                    "type": "boolean",
+                    "description": "Display an FPS counter in the upper right corner of the canvas.",
+                    "group": "Additional Parameters",
+                    "optional": true,
+                    "default": "False"
+                },
+                {
+                    "name": "pixel_ratio",
+                    "type": "number",
+                    "description": "Canvas pixel ratio.",
+                    "group": "Additional Parameters",
+                    "optional": true,
+                    "default": "2"
+                },
+                {
+                    "name": "random_seed",
+                    "type": "string",
+                    "description": "Seed value for generating random numbers in simulations.",
+                    "group": "Additional Parameters",
+                    "optional": true,
+                    "default": "None"
+                },
+                {
+                    "name": "point_sampling_distance",
+                    "type": "number",
+                    "description": "Distance threshold for sampling points.",
+                    "group": "Additional Parameters",
+                    "optional": true,
+                    "default": "150"
+                }
+            ]
+        }
+    ]
+}

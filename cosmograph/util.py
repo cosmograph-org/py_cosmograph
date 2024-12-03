@@ -11,6 +11,7 @@ from IPython.display import HTML, Javascript, display as ipython_display
 from dol import (
     TextFiles,
     Files,
+    JsonFiles,
     wrap_kvs,
     filt_iter,
     invertible_maps,
@@ -37,6 +38,7 @@ js_dir = files / "js"
 js_dir_path = str(js_dir)
 
 data_files = Files(data_dir_path)
+json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 
 
 def _postprocess(func, egress):
@@ -149,12 +151,17 @@ def _one_time_setup():
 ipython_display(Javascript(_one_time_setup()))
 
 from jy import add_js_funcs
+
 js = add_js_funcs(js_files["interface"] + js_files["mk_new_container_and_graph"])
 
 
 # @lru_cache
-def init_cosmos(canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%", config={}):
-    return js.CreateContainerAndCosmographById(canvas_id, canvas_height, canvas_width, config)
+def init_cosmos(
+    canvas_id=DFLT_CANVAS, canvas_height="400px", canvas_width="100%", config={}
+):
+    return js.CreateContainerAndCosmographById(
+        canvas_id, canvas_height, canvas_width, config
+    )
 
 
 def cosmos_html(cosmo_id="cosmos"):
