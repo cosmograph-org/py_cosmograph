@@ -41,6 +41,13 @@ data_files = Files(data_dir_path)
 json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 
 
+color_names_set = set(json_files['color_names.json'])
+
+
+
+# --------------------------------------------------------------------------------------
+# Old stuff (TODO: Deprecate and remove)
+
 def _postprocess(func, egress):
     return Pipe(func, egress)
 
