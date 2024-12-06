@@ -21,6 +21,7 @@ from dol import (
 from dol.sources import AttrContainer
 
 from cosmograph.validation import validate_data
+import pandas as pd 
 
 try:
     import importlib.resources
@@ -43,6 +44,16 @@ json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 
 color_names_set = set(json_files['color_names.json'])
 
+
+
+# --------------------------------------------------------------------------------------
+# Misc utils
+
+def move_to_front(df: pd.DataFrame, cols) -> pd.DataFrame:
+    """
+    Move the columns in `cols` to the front of the DataFrame
+    """
+    return df[cols + [col for col in df.columns if col not in cols]]
 
 
 # --------------------------------------------------------------------------------------

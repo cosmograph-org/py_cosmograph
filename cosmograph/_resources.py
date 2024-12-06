@@ -17,6 +17,7 @@ from dol import (
     read_from_bytes,
     Pipe,
 )
+import lkj
 from dol.filesys import mk_json_bytes_wrap
 from i2 import postprocess
 
@@ -95,83 +96,6 @@ class ResourcesDacc:
 resources_dacc = ResourcesDacc()
 
 # -------------------------------------------------------------------------------------
-# Colors
-
-
-from typing import Literal, Sequence, Tuple, Union, Callable, Any
-import re
-
-import pandas as pd
-
-
-rgb_hex_color_re = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
-
-
-def is_html_color_name(x):
-    return isinstance(x, str) and x.lower() in resources_dacc.color_names_set
-
-
-def is_rgb_color_tuple(x):
-    return (
-        isinstance(x, Sequence) and len(x) == 3 and all(isinstance(x_, int) for x_ in x)
-    )
-
-
-def is_hex_color_str(x):
-    return isinstance(x, str) and rgb_hex_color_re.match(x)
-
-
-def is_valid_color(x):
-    # TODO: Better check than this please!
-    return is_hex_color_str(x) or is_rgb_color_tuple(x) or is_html_color_name(x)
-
-
-ColorHex = str
-ColorName = str
-ColorRGBTuple = Tuple[int, int, int]
-Color = Union[ColorHex, ColorName, ColorRGBTuple]
-DataValue = Any
-ColorSourceKinds = Literal['numerical', 'categorical', 'color']
-ColorDataMapper = Callable[[Sequence[DataValue]], Sequence[Color]]
-
-
-def _resolve_point_color(
-    df: pd.DataFrame,
-    point_color: str = None,
-    *,
-    point_color_field: str = None,  # explicitly indicate that the color should be taken from a data field
-    point_color_data_kind: ColorSourceKinds = None,  # explicitly indicate the kind of data is in the point_color field
-    data_to_color_mapper: ColorDataMapper = None,
-    default_color=None,
-) -> Sequence[Color]:
-    """Resolve inputs to a valid color_array.
-
-    If:
-
-    _ point_color is a valid color array (hex, rgb, or html color name), of the same length as the df, return it
-    _ point_color is a column in the df,
-        - and the values of this column are valid colors, return the column
-        - if not, map
-
-    """
-    if (
-        point_color_field is None  # if no explicit field is given
-        and point_color in df.columns  # and the point_color is a column in the df
-        and not is_valid_color(point_color)  # and it's not a valid color
-    ):
-        # then we can (probably) safely assume that the point_color is reall a point_color_field
-        point_color_field = point_color
-
-    if point_color_kind is None:
-        if isinstance(point_color, str):
-            point_color_kind = 'categorical'
-        else:
-            point_color_kind = 'numerical'
-
-    return point_color, point_color_kind
-
-
-# -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------
 # Creating the configs source files from various sources
 """
@@ -234,6 +158,9 @@ cache_to_config_jsons = partial(
 )
 cache_to_prep_jsons = partial(cache_this, cache='prep_jsons', key=add_extension('json'))
 
+from lkj import camel_to_snake
+from dol import flatten_dict
+
 
 class ConfigsDacc:
     """
@@ -287,18 +214,324 @@ class ConfigsDacc:
         for k in source_url_groups['types']:
             yield k, ai_ts_parser(self.source_strings[k])
 
-    # TODO: Add diagnosis code here
+    @cached_property
+    def traitlets(self):
+        from cosmograph_widget import Cosmograph
+        from traitlets.traitlets import BaseDescriptor
+
+        return {
+            k: v for k, v in vars(Cosmograph).items() if isinstance(v, BaseDescriptor)
+        }
+
+    @property
+    def _defaults(self):
+        return self.parsed_defaults['cosmos/variables.ts']
+
+    @property
+    def _descriptions(self):
+        return self.parsed_descriptions['cosmograph/configuration.mdx']['interfaces'][
+            0
+        ]['properties']
+
+    def _interfaces(self, *, assert_expected_keys=True):
+        if assert_expected_keys:
+            assert sorted(self.parsed_types) == [
+                'cosmograph/config.ts',
+                'cosmograph/data.ts',
+                'cosmograph/labels.ts',
+                'cosmograph/simulation.ts',
+                'cosmos/config.ts',
+            ], f"Not the keys I expected! If you want to ignore this, set assert_expected_keys=False"
+
+        for widget_config_value in self.parsed_types.values():
+            assert set(widget_config_value) == {'interfaces'}
+            interfaces = widget_config_value['interfaces']
+            for interface in interfaces:
+                assert set(interface) == {'description', 'name', 'properties'}
+                for prop in interface['properties']:
+                    assert set(prop).issuperset(
+                        {'description', 'name', 'type'}
+                    ), f"missing fields: {set(['description', 'name', 'type']) - set(prop)=})"
+                    prop['py_name'] = camel_to_snake(prop['name'])
+                    prop['origin_name'] = interface['name']
+                    yield prop
+
+    @property
+    def defaults(self):
+        """
+        First, flattens the defaults dictionary, then transforms the keys to match
+        traitlets keys.
+
+        Steps:
+        - Converts camelCase to snake_case.
+        - Removes prefixes like 'default_'.
+        - Maps specific terms (e.g., 'node' -> 'point', 'link' -> 'link').
+        - Collapses nested structures by combining components.
+        - takes care of edge cases
+
+        Args:
+            flat_defaults (dict): The flat dictionary of defaults.
+
+        Returns:
+            dict: A new dictionary with transformed keys.
+        """
+        flat_defaults = {
+            camel_to_snake(k): v
+            for k, v in flatten_dict(self._defaults, sep='_').items()
+        }
+        return transform_defaults_keys(flat_defaults)
+
+    @property
+    def _md_descriptions_df(self):
+        df = self.parsed_descriptions['cosmograph/configuration.mdx']['interfaces'][0][
+            'properties'
+        ]
+        return pd.DataFrame(df).set_index('name')
+
+    @property
+    def _traitlets_df(self):
+        return sig_to_df(self.traitlets_sig)  # .set_index('name', drop=True)
+
+    @property
+    def _ts_types_df(self, *, assert_expected_keys=True, verbose=False):
+        from lkj import camel_to_snake
+
+        # widget_config = json_files['_widget_config.json']
+
+        interfaces = list(self._interfaces(assert_expected_keys=assert_expected_keys))
+        # print(f"{len(interfaces)=}")
+
+        # Solve all duplicates taking the CosmographConfig orgin_name
+
+        def dedupper(name_group):
+            if len(name_group) == 1:
+                return name_group[0]
+            elif (
+                cosmo_config := next(
+                    filter(
+                        lambda x: x['origin_name'] == 'CosmographConfig', name_group
+                    ),
+                    None,
+                )
+                is not None
+            ):
+                return cosmo_config
+            else:
+                if verbose:
+                    print(
+                        f"Unresolved duplicate, I'll just take the first mention: {name_group=}"
+                    )
+                return name_group[0]
+
+        # dedupped_interfaces = list(map(dedupper, interfaces))
+
+        props_grouped_by_name = dict(
+            find_duplicates(
+                ((x['name'], x) for x in interfaces), val_filt=lambda x: True
+            )
+        )
+        dedupped_interfaces = list(map(dedupper, props_grouped_by_name.values()))
+
+        widget_config_properties = to_dict(dedupped_interfaces, 'py_name')
+
+        assert len(widget_config_properties) == len(
+            dedupped_interfaces
+        ), f"widget_config had some duplicate properties"
+        # print(f"{len(widget_config_properties)=}")
+        return pd.DataFrame(widget_config_properties).T
 
     # @cache_to_prep_jsons
     @cached_property
     def params_info(self):
         return {
-            'defaults': self.parsed_defaults['cosmos/variables.ts'],
-            'descriptions': self.parsed_descriptions['cosmograph/configuration.mdx'][
-                'interfaces'
-            ][0]['properties'],
+            'defaults': self.defaults,
+            'descriptions': self._md_descriptions,
             'types': self.parsed_types,
+            'names': list(self._traitlets_df.index.values),
         }
+
+    def _flat_keys_to_original_default_keys(self):
+        original_defaults = self.parsed_defaults['cosmos/variables.ts']
+        return {
+            camel_to_snake(k): v
+            for k, v in flatten_dict(leaf_paths(original_defaults), sep='_').items()
+        }
+
+    @property
+    def matched_info_df(self):
+        from cosmograph.util import move_to_front
+
+        front_cols = [
+            'defaults_default',
+            'md_descriptions_description',
+            'traitlet_annotation',
+            'ts_types_type',
+        ]
+
+        # traitlets data
+
+        df = self._traitlets_df[['default', 'annotation']]
+        # rename all columns to have a "traitlet_" prefix
+        df = df.rename(columns={col: f"traitlet_{col}" for col in df.columns})
+
+        # merge in defaults (but keep all traitlets)
+        df = df.merge(
+            pd.Series(self.defaults, name='defaults_default'),
+            left_index=True,
+            right_index=True,
+            how='left',
+        )
+
+        # md descriptions source
+        descriptions_df = self._md_descriptions_df.copy()
+        # rename all columns to have a "md_descriptions" prefix
+        descriptions_df = descriptions_df.rename(
+            columns={col: f"md_descriptions_{col}" for col in descriptions_df.columns}
+        )
+        df = df.merge(
+            descriptions_df,
+            left_index=True,
+            right_index=True,
+            how='left',
+        )
+
+        # ts types source
+        types_df = self._ts_types_df.copy()
+        # rename all columns to have a "ts_types_" prefix
+        types_df = types_df.rename(
+            columns={col: f"ts_types_{col}" for col in types_df.columns}
+        )
+        # merge (but keep all traitlets)
+        df = df.merge(
+            types_df,
+            left_index=True,
+            right_index=True,
+            how='left',
+        )
+
+        return move_to_front(df, front_cols)
+
+    @cached_property
+    def traitlets_sig(self):
+
+        py_annotations = {k: trait_to_py(v) for k, v in self.traitlets.items()}
+        py_defaults = {
+            k: getattr(v, 'default_value', Undefined) for k, v in self.traitlets.items()
+        }
+        param_dicts = [
+            {
+                'name': name,
+                'kind': Sig.KEYWORD_ONLY,
+                'annotation': py_annotations[name],
+                'default': py_defaults[name],
+            }
+            for name in self.traitlets
+        ]
+
+        return Sig([Param(**d) for d in param_dicts])
+
+    @cached_property
+    def sig_dfs(self):
+        from ju import trait_to_py
+        from traitlets import Undefined
+        from i2 import Sig, Param
+
+        c = self.c
+
+        traitlet_sig = self.traitlets_sig
+
+        widget_config_from_ts_sig = config_dict_to_sig(c.widget_config_from_ts)
+        widget_config_from_md_sig = config_dict_to_sig(c.widget_config_from_md)
+
+        return {
+            'traitlets': sig_to_df(self.traitlets_sig),
+            'widget_config_from_ts': sig_to_df(widget_config_from_ts_sig),
+            'widget_config_from_md': sig_to_df(widget_config_from_md_sig),
+        }
+
+    # ----------------------------------------------------------------------------------
+    # DIAGNOSIS
+
+    def print_traitlet_and_ts_diffs(self):
+        print_signature_diffs()
+
+    def print_traitlet_and_md_diffs(self):
+        print_traitlet_and_md_diffs()
+
+    def print_diagnosis(self):
+        t = self._duplicates_of_types_group()
+        if t:
+            t = pd.DataFrame({k: [x['origin_name'] for x in v] for k, v in t.items()}).T
+            print("\nDuplicates of types group:")
+            print(t.to_string())
+
+    def _duplicates_of_types_group(
+        self, key_field='name', *, assert_expected_keys=True
+    ):
+        name_and_value_pairs = ((x[key_field], x) for x in self._interfaces())
+        return find_duplicates(name_and_value_pairs, val_filt=lambda x: len(x) > 1)
+
+
+import re
+from dol import flatten_dict
+from lkj import camel_to_snake
+
+extra_default_key_to_traitlet_mapping = {
+    'greyout_point_opacity': 'point_greyout_opacity',
+    'hovered_point_ring_opacity': 'render_hovered_point_ring',  # Or add 'hovered_point_ring_opacity' if missing
+    'greyout_link_opacity': 'link_greyout_opacity',
+    'focused_point_ring_opacity': 'focused_point_ring_color',  # Or add 'focused_point_ring_opacity' if missing
+    'scale_to_zoom': 'initial_zoom_level',
+    'arrow_links': 'default_link_arrows',
+    'arrow_size_scale': 'link_arrows_size_scale',
+}
+
+
+def transform_defaults_keys(flat_defaults):
+    """
+    Transforms the keys of the flat defaults dictionary to match traitlets keys.
+
+    Steps:
+    - Converts camelCase to snake_case.
+    - Removes prefixes like 'default_'.
+    - Maps specific terms (e.g., 'node' -> 'point', 'link' -> 'link').
+    - Collapses nested structures by combining components.
+
+    Args:
+        flat_defaults (dict): The flat dictionary of defaults.
+
+    Returns:
+        dict: A new dictionary with transformed keys.
+    """
+    transformed = {}
+
+    for key, value in flat_defaults.items():
+        # Step 1: Convert camelCase to snake_case
+        key_snake = camel_to_snake(key)
+
+        # Step 2: Remove "default_" prefix if present
+        if key_snake.startswith("default_"):
+            key_snake = key_snake[len("default_") :]
+
+        # Step 3: Handle nested prefixes
+        key_snake = key_snake.replace("config_values_", "")
+
+        # Step 4: Map specific terms to align with traitlets keys
+        key_snake = key_snake.replace("node", "point")  # Map 'node' to 'point'
+        key_snake = key_snake.replace(
+            "link_visibility_", "link_visibility_"
+        )  # Ensure key clarity
+
+        # Handle FPS capitalization edge case
+        key_snake = key_snake.replace("show_fps_monitor", "show_FPS_monitor")
+
+        if key_snake in extra_default_key_to_traitlet_mapping:
+            key_snake = extra_default_key_to_traitlet_mapping[key_snake]
+
+        # Step 5: Store the transformed key and its corresponding value
+        transformed[key_snake] = value
+
+    return transformed
 
 
 # --------------------------------------------------------------------------------------
@@ -487,7 +720,12 @@ from cosmograph.util import json_files
 
 
 def gather_items(pairs, *, val_filt: Callable = lambda x: True):
-    """Group (k, v) items by k and filter the resulting grouped list of values"""
+    """Group (k, v) items by k and filter the resulting grouped list of values
+
+    >>> gather_items([('a', 1), ('b', 2), ('a', 3)], val_filt=lambda x: len(x) > 1)
+    {'a': [1, 3]}
+
+    """
     d = defaultdict(list)
     for key, value in pairs:
         d[key].append(value)
@@ -498,6 +736,12 @@ find_duplicates = partial(gather_items, val_filt=lambda x: len(x) > 1)
 
 
 def to_dict(iterable, key_field: str):
+    """Convert an iterable of dictionaries to a dictionary of dictionaries
+
+    >>> to_dict([{'a': 1, 'b': 2}, {'a': 3, 'b': 4}], 'a')
+    {1: {'a': 1, 'b': 2}, 3: {'a': 3, 'b': 4}}
+
+    """
     extract_key = itemgetter(key_field)
     return {extract_key(x): x for x in iterable}
 
@@ -685,10 +929,10 @@ class ConfigAnalysisDacc:
     def _edit_defaults(self, defaults):
         return defaults.apply(Pipe(to_int_or_float, none_if_null, tuple_if_list))
 
-    def save_sots(self):
-        from cosmograph.util import json_files
+    # def save_sots(self):
+    #     from cosmograph.util import json_files
 
-        save_sots(self.sig_and_doc_info)
+    #     save_sots(self.sig_and_doc_info)
 
     # ----------------------------------------------------------------------------------
     # Diagnosis and analysis

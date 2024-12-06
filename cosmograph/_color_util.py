@@ -7,9 +7,9 @@ from numbers import Number
 import pandas as pd
 import numpy as np
 
-from cosmograph._resources import resources_dacc
+from cosmograph.util import color_names_set
 
-html_color_names_set = resources_dacc.color_names_set
+html_color_names_set = color_names_set
 
 # Regular expression to match hex color codes
 rgb_hex_color_re = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
