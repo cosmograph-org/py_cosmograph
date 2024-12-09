@@ -21,6 +21,7 @@ import lkj
 from dol.filesys import mk_json_bytes_wrap
 from i2 import postprocess
 
+
 from cosmograph.util import data_dir_path, json_files, data_files
 
 
@@ -160,6 +161,10 @@ cache_to_prep_jsons = partial(cache_this, cache='prep_jsons', key=add_extension(
 
 from lkj import camel_to_snake
 from dol import flatten_dict
+from i2.doc_mint import params_to_docstring
+from i2 import Sig, Param
+
+EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
 
 
 class ConfigsDacc:
@@ -177,7 +182,25 @@ class ConfigsDacc:
     the json files in the `config_files_dir` or `prep_dir` directory and they
     will be recomputed as soon as they are accessed.
 
+    Main methods and properties:
+
+    - `matched_info_df`: A dataframe that shows the comparison of the defaults,
+        descriptions, and types of the various sources.
+    - `source_strings`: The raw source strings from the various sources.
+    - `parsed_*`: The parsed versions of the raw sources.
+
+    - `diagnosis_items`: A generator of diagnosis items, which are dataframes of
+        duplicates or other issues found in the sources.
+    - `print_diagnosis`: Print the diagnosis items.
+
     """
+
+    # A few configuration options
+    exclude_params_in_sig = EXCLUDE_PARAMS
+    rm_default_if_nan_in_sig = False
+    set_default_to_none_if_nan = True
+    rm_param_if_no_description_in_sig = False
+    take_name_of_types_in_docs = True
 
     def __init__(self, config_files_dir=DFLT_CONFIG_FILES_DIR, prep_dir=None) -> None:
         self.config_files_dir = os.path.abspath(os.path.expanduser(config_files_dir))
@@ -357,57 +380,160 @@ class ConfigsDacc:
             for k, v in flatten_dict(leaf_paths(original_defaults), sep='_').items()
         }
 
-    @property
-    def matched_info_df(self):
-        from cosmograph.util import move_to_front
-
-        front_cols = [
-            'defaults_default',
-            'md_descriptions_description',
-            'traitlet_annotation',
-            'ts_types_type',
-        ]
-
-        # traitlets data
-
+    def info_dfs(self):
         df = self._traitlets_df[['default', 'annotation']]
         # rename all columns to have a "traitlet_" prefix
         df = df.rename(columns={col: f"traitlet_{col}" for col in df.columns})
+        yield 'traitlets', df
 
-        # merge in defaults (but keep all traitlets)
-        df = df.merge(
-            pd.Series(self.defaults, name='defaults_default'),
-            left_index=True,
-            right_index=True,
-            how='left',
+        # defaults
+        yield 'defaults', pd.Series(self.defaults, name='defaults_default')
+
+        # descriptions
+        descriptions_df = self._md_descriptions_df.copy()
+        # change "NO_DEFAULT" values of "default" column to NaNs
+        descriptions_df['default'] = descriptions_df['default'].replace(
+            'NO_DEFAULT', pd.NA
         )
 
-        # md descriptions source
-        descriptions_df = self._md_descriptions_df.copy()
         # rename all columns to have a "md_descriptions" prefix
         descriptions_df = descriptions_df.rename(
             columns={col: f"md_descriptions_{col}" for col in descriptions_df.columns}
         )
-        df = df.merge(
-            descriptions_df,
-            left_index=True,
-            right_index=True,
-            how='left',
-        )
+        yield 'descriptions', descriptions_df
 
-        # ts types source
+        # types
         types_df = self._ts_types_df.copy()
         # rename all columns to have a "ts_types_" prefix
         types_df = types_df.rename(
             columns={col: f"ts_types_{col}" for col in types_df.columns}
         )
-        # merge (but keep all traitlets)
-        df = df.merge(
-            types_df,
-            left_index=True,
-            right_index=True,
-            how='left',
+        yield 'types', types_df
+
+    def cosmograph_base_params(self, param_names=None):
+        """
+        Get the params information for the cosmograph base class.
+        """
+
+        param_names = param_names or list(self.traitlets)
+        param_names = [
+            x for x in param_names if x not in self.exclude_params_in_sig
+        ]  # keeps order
+
+        df = self.matched_info_df
+        for name in param_names:
+            d = {
+                'name': name,
+                'kind': Sig.KEYWORD_ONLY,
+                'default': df.defaults_default.get(name),
+                'annotation': df.traitlet_annotation.get(name),
+                'description': df.md_descriptions_description.get(name),
+            }
+            if (
+                self.rm_param_if_no_description_in_sig
+                and d['description'] is pd.NA
+                or not d['description']
+            ):
+                continue  # without yielding d
+            if isinstance(d['default'], float) and pd.isna(d['default']):
+                if self.set_default_to_none_if_nan:
+                    d['default'] = None
+                elif self.rm_default_if_nan_in_sig:
+                    del d['default']
+            yield d
+
+    def cosmograph_base_docs(self, param_names=None):
+        """Get the params information part of a docstring"""
+        params = self.cosmograph_base_params(param_names)
+        return params_to_docstring(
+            params, take_name_of_types=self.take_name_of_types_in_docs
         )
+
+    def cosmograph_base_signature(self, param_names=None):
+        params = self.cosmograph_base_params(param_names)
+
+        def prep_for_param(d):
+            d = d.copy()
+            if d.get('annotation') is None:
+                del d['annotation']
+            del d['description']
+            return d
+
+        return Sig([Param(**prep_for_param(d)) for d in params])
+
+    @property
+    def matched_info_df(self):
+        from cosmograph.util import move_to_front
+
+        front_cols = [
+            'traitlet_annotation',
+            'defaults_default',
+            'ts_types_default',
+            'md_descriptions_default',
+            'md_descriptions_description',
+            'ts_types_description',
+            'ts_types_type',
+        ]
+
+        info_dfs = dict(self.info_dfs())
+
+        merge_dfs = partial(pd.merge, left_index=True, right_index=True, how='left')
+
+        df = info_dfs.pop("traitlets")
+
+        for k, v in info_dfs.items():
+            df = merge_dfs(df, v)
+
+        return move_to_front(df, front_cols)
+
+    def matched_info_df_prepared_for_export(self):
+        t = self.matched_info_df.fillna("")
+        t['traitlet_annotation'] = t['traitlet_annotation'].apply(
+            lambda x: x.__name__ if isinstance(x, type) else x
+        )
+        t.columns = t.columns.str.replace('_', ' ')
+        return t
+
+        # # traitlets data
+
+        # df = self._traitlets_df[['default', 'annotation']]
+        # # rename all columns to have a "traitlet_" prefix
+        # df = df.rename(columns={col: f"traitlet_{col}" for col in df.columns})
+
+        # # merge in defaults (but keep all traitlets)
+        # df = df.merge(
+        #     pd.Series(self.defaults, name='defaults_default'),
+        #     left_index=True,
+        #     right_index=True,
+        #     how='left',
+        # )
+
+        # # md descriptions source
+        # descriptions_df = self._md_descriptions_df.copy()
+        # # rename all columns to have a "md_descriptions" prefix
+        # descriptions_df = descriptions_df.rename(
+        #     columns={col: f"md_descriptions_{col}" for col in descriptions_df.columns}
+        # )
+        # df = df.merge(
+        #     descriptions_df,
+        #     left_index=True,
+        #     right_index=True,
+        #     how='left',
+        # )
+
+        # # ts types source
+        # types_df = self._ts_types_df.copy()
+        # # rename all columns to have a "ts_types_" prefix
+        # types_df = types_df.rename(
+        #     columns={col: f"ts_types_{col}" for col in types_df.columns}
+        # )
+        # # merge (but keep all traitlets)
+        # df = df.merge(
+        #     types_df,
+        #     left_index=True,
+        #     right_index=True,
+        #     how='left',
+        # )
 
         return move_to_front(df, front_cols)
 
@@ -458,12 +584,18 @@ class ConfigsDacc:
     def print_traitlet_and_md_diffs(self):
         print_traitlet_and_md_diffs()
 
-    def print_diagnosis(self):
+    def diagnosis_items(self):
         t = self._duplicates_of_types_group()
         if t:
             t = pd.DataFrame({k: [x['origin_name'] for x in v] for k, v in t.items()}).T
-            print("\nDuplicates of types group:")
-            print(t.to_string())
+            yield "Duplicates of types group", t
+        # TODO: add more (e.g. source differences defaults, descriptions, etc.)
+
+    def print_diagnosis(self):
+        for k, v in self.diagnosis_items():
+            if isinstance(v, pd.DataFrame):
+                print(f"\n{k}:\n")
+                print(v.to_string())
 
     def _duplicates_of_types_group(
         self, key_field='name', *, assert_expected_keys=True
@@ -471,6 +603,8 @@ class ConfigsDacc:
         name_and_value_pairs = ((x[key_field], x) for x in self._interfaces())
         return find_duplicates(name_and_value_pairs, val_filt=lambda x: len(x) > 1)
 
+
+configs_dacc = ConfigsDacc()
 
 import re
 from dol import flatten_dict
