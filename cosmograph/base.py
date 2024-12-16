@@ -21,7 +21,7 @@ def base_cosmo(**kwargs):
 
 
 @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
-# @cosmo_base_sig.inject_into_keyword_variadic
+@cosmo_base_sig.inject_into_keyword_variadic
 def cosmo(data=None, **kwargs):
     """
     Thin layer over CosmographWidget to provide a base interface to the widget object
