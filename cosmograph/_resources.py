@@ -162,13 +162,9 @@ from dol import flatten_dict
 from i2.doc_mint import params_to_docstring
 from i2 import Sig, Param
 
+from cosmograph._traitlets_util import trait_to_py  # only dependency on ju
+
 EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
-
-
-def trait_to_py(trait):
-    from ju import trait_to_py as _trait_to_py
-
-    return _trait_to_py(trait)
 
 
 class ConfigsDacc:
