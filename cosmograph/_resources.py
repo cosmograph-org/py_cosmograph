@@ -165,6 +165,12 @@ from i2 import Sig, Param
 EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
 
 
+def trait_to_py(trait):
+    from ju import trait_to_py as _trait_to_py
+
+    return _trait_to_py(trait)
+
+
 class ConfigsDacc:
     """
     A class to manage the various sources of Cosmograph configuration information.
@@ -539,7 +545,6 @@ class ConfigsDacc:
 
     @cached_property
     def traitlets_sig(self):
-
         py_annotations = {k: trait_to_py(v) for k, v in self.traitlets.items()}
         py_defaults = {
             k: getattr(v, 'default_value', Undefined) for k, v in self.traitlets.items()
@@ -558,7 +563,6 @@ class ConfigsDacc:
 
     @cached_property
     def sig_dfs(self):
-        from ju import trait_to_py
         from traitlets import Undefined
         from i2 import Sig, Param
 
@@ -1112,7 +1116,6 @@ class ConfigAnalysisDacc:
 
     @cached_property
     def sig_dfs(self):
-        from ju import trait_to_py
         from traitlets import Undefined
         from i2 import Sig, Param
 
@@ -1175,7 +1178,6 @@ def _change_type_to_str(x):
     return x
 
 
-from ju import trait_to_py
 from traitlets import Undefined
 from i2 import Sig, Param
 
