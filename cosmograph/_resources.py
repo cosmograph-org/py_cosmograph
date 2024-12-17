@@ -1,6 +1,7 @@
 """Define and acquire resources for the Cosmograph package."""
 
 import os
+from typing import Optional, Union
 from functools import lru_cache, cached_property, partial
 
 import pandas as pd
@@ -29,7 +30,7 @@ from cosmograph.util import data_dir_path, json_files, data_files
 
 
 _json_wrap = mk_json_bytes_wrap(dumps_kwargs={'indent': 4})
-JsonFiles = _json_wrap(TextFiles)
+JsonFiles = _json_wrap(TextFiles)  # TODO: should we add json filter? change name?
 
 cache_to_json_files = partial(cache_this, cache=json_files, key=add_extension('json'))
 resources_jsons = filt_iter.suffixes(['.json'])(JsonFiles(data_dir_path))
@@ -168,6 +169,59 @@ from cosmograph._traitlets_util import trait_to_py  # vendorized from ju
 EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
 
 
+def get_module_from_url(
+    url, __file__: Optional[str] = None, module_name='remote_module'
+):
+    """
+    Get a (loaded) module from a url.
+
+    Note: The url has to be one whose text is the code of the module.
+    This means, for example, if you're using github, that a normal github url won't work,
+    your need to specify the raw url for the module.
+
+    WARNING: This is a dangerous function, as it executes code from the url.
+    Only use this if you trust the source of the url.
+    """
+    import requests
+    import types
+
+    response = requests.get(url)
+    response.raise_for_status()
+    code = response.text
+
+    # Create a module and define the __file__ attribute before execution
+    module = types.ModuleType(module_name)
+    if __file__ is not None:
+        module.__file__ = __file__
+    exec(code, module.__dict__)
+
+    return module
+
+
+def get_cosmograph_widget_class(
+    cosmograph_widget_source: Optional[Union[str, type]] = None
+):
+
+    if cosmograph_widget_source is None:
+        # if no source is give, take the current (locally installed) cosmograph class
+        from cosmograph_widget import Cosmograph
+    elif isinstance(cosmograph_widget_source, type):
+        Cosmograph = cosmograph_widget_source
+    elif isinstance(
+        cosmograph_widget_source, str
+    ) and cosmograph_widget_source.startswith('http'):
+        url = cosmograph_widget_source
+        module_behind_url = get_module_from_url(
+            url, __file__=__import__('cosmograph_widget').__file__
+        )
+        Cosmograph = getattr(module_behind_url, 'Cosmograph')
+    else:
+        raise ValueError(
+            f"cosmograph_widget_source must be a class or a url string, not {cosmograph_widget_source}"
+        )
+    return Cosmograph
+
+
 class ConfigsDacc:
     """
     A class to manage the various sources of Cosmograph configuration information.
@@ -203,12 +257,19 @@ class ConfigsDacc:
     rm_param_if_no_description_in_sig = False
     take_name_of_types_in_docs = True
 
-    def __init__(self, config_files_dir=DFLT_CONFIG_FILES_DIR, prep_dir=None) -> None:
+    def __init__(
+        self,
+        config_files_dir=DFLT_CONFIG_FILES_DIR,
+        prep_dir=None,
+        *,
+        cosmograph_widget_source: Optional[Union[str, type]] = None,
+    ) -> None:
         self.config_files_dir = os.path.abspath(os.path.expanduser(config_files_dir))
         self.prep_dir = prep_dir or os.path.join(self.config_files_dir, 'config_prep')
         ensure_dir(self.prep_dir, max_dirs_to_make=1)
         self.config_jsons = JsonFiles(self.config_files_dir)
         self.prep_jsons = JsonFiles(self.prep_dir)
+        self.cosmograph_widget_source = cosmograph_widget_source
 
     @cache_to_prep_jsons
     def source_strings(self):
@@ -243,6 +304,7 @@ class ConfigsDacc:
         from cosmograph_widget import Cosmograph
         from traitlets.traitlets import BaseDescriptor
 
+        Cosmograph = get_cosmograph_widget_class(self.cosmograph_widget_source)
         return {
             k: v for k, v in vars(Cosmograph).items() if isinstance(v, BaseDescriptor)
         }
@@ -307,6 +369,9 @@ class ConfigsDacc:
 
     @property
     def _md_descriptions_df(self):
+        """
+        Dataframe of descriptions from the ("documentation") md file.
+        """
         df = self.parsed_descriptions['cosmograph/configuration.mdx']['interfaces'][0][
             'properties'
         ]
@@ -314,10 +379,14 @@ class ConfigsDacc:
 
     @property
     def _traitlets_df(self):
+        """Dataframe of traitlets properties (only signature attributes)"""
         return sig_to_df(self.traitlets_sig)  # .set_index('name', drop=True)
 
     @property
     def _ts_types_df(self, *, assert_expected_keys=True, verbose=False):
+        """
+        Dataframe containing various features of properties extracted from the TS files.
+        """
         # widget_config = json_files['_widget_config.json']
 
         interfaces = list(self._interfaces(assert_expected_keys=assert_expected_keys))
@@ -362,7 +431,6 @@ class ConfigsDacc:
         # print(f"{len(widget_config_properties)=}")
         return pd.DataFrame(widget_config_properties).T
 
-    # @cache_to_prep_jsons
     @cached_property
     def params_info(self):
         return {
@@ -382,6 +450,9 @@ class ConfigsDacc:
         }
 
     def info_dfs(self):
+        """
+        A dictionary of dataframes of the various sources of configuration information.
+        """
         df = self._traitlets_df[['default', 'annotation']]
         # rename all columns to have a "traitlet_" prefix
         df = df.rename(columns={col: f"traitlet_{col}" for col in df.columns})
@@ -411,7 +482,7 @@ class ConfigsDacc:
         )
         yield 'types', types_df
 
-    def cosmograph_base_params(self, param_names=None):
+    def cosmograph_base_params(self, param_names=None, *, kind=None):
         """
         Get the params information for the cosmograph base class.
         """
@@ -425,11 +496,12 @@ class ConfigsDacc:
         for name in param_names:
             d = {
                 'name': name,
-                'kind': Sig.KEYWORD_ONLY,
                 'default': df.defaults_default.get(name),
                 'annotation': df.traitlet_annotation.get(name),
                 'description': df.md_descriptions_description.get(name),
             }
+            if kind:
+                d['kind'] = kind
             if (
                 self.rm_param_if_no_description_in_sig
                 and d['description'] is pd.NA
@@ -443,6 +515,7 @@ class ConfigsDacc:
                     del d['default']
             yield d
 
+
     def cosmograph_base_docs(self, param_names=None):
         """Get the params information part of a docstring"""
         params = self.cosmograph_base_params(param_names)
@@ -450,8 +523,8 @@ class ConfigsDacc:
             params, take_name_of_types=self.take_name_of_types_in_docs
         )
 
-    def cosmograph_base_signature(self, param_names=None):
-        params = self.cosmograph_base_params(param_names)
+    def cosmograph_base_signature(self):
+        params = self.cosmograph_base_params(kind=Sig.KEYWORD_ONLY)
 
         def prep_for_param(d):
             d = d.copy()
@@ -536,7 +609,7 @@ class ConfigsDacc:
         #     how='left',
         # )
 
-        return move_to_front(df, front_cols)
+        # return move_to_front(df, front_cols)
 
     @cached_property
     def traitlets_sig(self):
@@ -556,29 +629,28 @@ class ConfigsDacc:
 
         return Sig([Param(**d) for d in param_dicts])
 
-    @cached_property
-    def sig_dfs(self):
-        from traitlets import Undefined
-        from i2 import Sig, Param
 
-        c = self.c
+    # TODO: Might be an old one. Consider deleting! No widget_config_from_ts attr
+    #    Find its definition in ConfigSourceDicts class
+    # @cached_property
+    # def sig_dfs(self):
+    #     from traitlets import Undefined
+    #     from i2 import Sig, Param
 
-        traitlet_sig = self.traitlets_sig
+    #     widget_config_from_ts_sig = config_dict_to_sig(self.widget_config_from_ts)
+    #     widget_config_from_md_sig = config_dict_to_sig(self.widget_config_from_md)
 
-        widget_config_from_ts_sig = config_dict_to_sig(c.widget_config_from_ts)
-        widget_config_from_md_sig = config_dict_to_sig(c.widget_config_from_md)
-
-        return {
-            'traitlets': sig_to_df(self.traitlets_sig),
-            'widget_config_from_ts': sig_to_df(widget_config_from_ts_sig),
-            'widget_config_from_md': sig_to_df(widget_config_from_md_sig),
-        }
+    #     return {
+    #         'traitlets': sig_to_df(self.traitlets_sig),
+    #         'widget_config_from_ts': sig_to_df(widget_config_from_ts_sig),
+    #         'widget_config_from_md': sig_to_df(widget_config_from_md_sig),
+    #     }
 
     # ----------------------------------------------------------------------------------
     # DIAGNOSIS
 
     def print_traitlet_and_ts_diffs(self):
-        print_signature_diffs()
+        print_traitlet_and_ts_diffs()
 
     def print_traitlet_and_md_diffs(self):
         print_traitlet_and_md_diffs()
@@ -1059,6 +1131,10 @@ class ConfigSourceDicts:
             k: v for k, v in vars(Cosmograph).items() if isinstance(v, BaseDescriptor)
         }
 
+
+
+# --------------------------------------------------------------------------------------
+# TODO: might want to deprecate much of the below
 
 def get_various_configs():
     _callable_attrs = filter(callable, vars(ConfigSourceDicts).values())

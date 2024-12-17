@@ -7,7 +7,7 @@
                 "properties": [
                     {
                         "name": "points",
-                        "type": "dataframe",
+                        "type": "DataFrame",
                         "description": "Data in a pandas DataFrame format.",
                         "group": "Minimal Configuration for Points",
                         "optional": false,
@@ -23,7 +23,7 @@
                     },
                     {
                         "name": "point_index",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Ordinal index of each point ranging from 0 to x (the number of unique points).",
                         "group": "Minimal Configuration for Points",
                         "optional": false,
@@ -87,7 +87,7 @@
                     },
                     {
                         "name": "links",
-                        "type": "dataframe",
+                        "type": "DataFrame",
                         "description": "Data in a pandas DataFrame format.",
                         "group": "Minimal Configuration for Links",
                         "optional": false,
@@ -103,7 +103,7 @@
                     },
                     {
                         "name": "link_source_index",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Index column of the source point, corresponding to point_index.",
                         "group": "Minimal Configuration for Links",
                         "optional": false,
@@ -119,7 +119,7 @@
                     },
                     {
                         "name": "link_target_index",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Index column of the target point, corresponding to point_index.",
                         "group": "Minimal Configuration for Links",
                         "optional": false,
@@ -175,7 +175,7 @@
                     },
                     {
                         "name": "simulation_decay",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Defines how quickly the simulation cools down.",
                         "group": "Simulation Settings",
                         "optional": true,
@@ -183,7 +183,7 @@
                     },
                     {
                         "name": "simulation_gravity",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Coefficient for gravity force.",
                         "group": "Simulation Settings",
                         "optional": true,
@@ -191,7 +191,7 @@
                     },
                     {
                         "name": "simulation_center",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Centers the mass force coefficient.",
                         "group": "Simulation Settings",
                         "optional": true,
@@ -263,7 +263,7 @@
                     },
                     {
                         "name": "simulation_repulsion_quadtree_levels",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Barnes\u2013Hut approximation depth, usable when useQuadtree is set to True.",
                         "group": "Quadtree algorithm settings",
                         "optional": true,
@@ -279,7 +279,7 @@
                     },
                     {
                         "name": "space_size",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Size of the simulation space.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -351,7 +351,7 @@
                     },
                     {
                         "name": "focused_point_index",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Index of the focused point, prioritized over focus_point method.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -407,7 +407,7 @@
                     },
                     {
                         "name": "curved_link_segments",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Segments defining curved links.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -503,7 +503,7 @@
                     },
                     {
                         "name": "fit_view_delay",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Delay for fitting view after initialization in milliseconds.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -519,7 +519,7 @@
                     },
                     {
                         "name": "fit_view_duration",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Animation duration for view fitting in milliseconds.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -527,7 +527,7 @@
                     },
                     {
                         "name": "fit_view_by_points_in_rect",
-                        "type": "string",
+                        "type": "array",
                         "description": "Fits view to specified rectangle of points, active when fit_view_on_init is True.",
                         "group": "Graph Appearance",
                         "optional": true,
@@ -559,7 +559,7 @@
                     },
                     {
                         "name": "show_top_labels_limit",
-                        "type": "integer",
+                        "type": "number",
                         "description": "Maximum number of top points to show labels for.",
                         "group": "Label Options",
                         "optional": true,

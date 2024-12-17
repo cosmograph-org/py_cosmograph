@@ -4,6 +4,7 @@ from functools import cached_property, partial
 from i2.doc_mint import inject_docstring_content
 from cosmograph_widget import Cosmograph
 
+# TODO: Should we instead have a class, make the configs_dacc, then offload both?
 from cosmograph._resources import configs_dacc
 from cosmograph.util import snake_to_camel_case
 
