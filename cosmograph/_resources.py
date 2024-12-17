@@ -162,7 +162,8 @@ from dol import flatten_dict
 from i2.doc_mint import params_to_docstring
 from i2 import Sig, Param
 
-from cosmograph._traitlets_util import trait_to_py  # only dependency on ju
+# TODO: Note, we need ju for config_dict_to_sig and for trait_to_py. Consider vendorizing config_dict_to_sig
+from cosmograph._traitlets_util import trait_to_py  # vendorized from ju
 
 EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
 
