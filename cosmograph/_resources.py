@@ -17,7 +17,6 @@ from dol import (
     read_from_bytes,
     Pipe,
 )
-import lkj
 from dol.filesys import mk_json_bytes_wrap
 from i2 import postprocess
 
@@ -159,7 +158,6 @@ cache_to_config_jsons = partial(
 )
 cache_to_prep_jsons = partial(cache_this, cache='prep_jsons', key=add_extension('json'))
 
-from lkj import camel_to_snake
 from dol import flatten_dict
 from i2.doc_mint import params_to_docstring
 from i2 import Sig, Param
@@ -374,6 +372,8 @@ class ConfigsDacc:
         }
 
     def _flat_keys_to_original_default_keys(self):
+        from dol import leaf_paths
+
         original_defaults = self.parsed_defaults['cosmos/variables.ts']
         return {
             camel_to_snake(k): v
@@ -608,7 +608,6 @@ configs_dacc = ConfigsDacc()
 
 import re
 from dol import flatten_dict
-from lkj import camel_to_snake
 
 extra_default_key_to_traitlet_mapping = {
     'greyout_point_opacity': 'point_greyout_opacity',
@@ -668,12 +667,32 @@ def transform_defaults_keys(flat_defaults):
     return transformed
 
 
+def camel_to_snake(name):
+    from lkj import camel_to_snake as _camel_to_snake
+
+    return _camel_to_snake(name)
+
+
 # --------------------------------------------------------------------------------------
 # Parsing Typescript (with AI)
 
 from functools import partial
-from jy.ts_parse import parse_ts_with_oa, parse_ts as grammar_ts_parser
 from dol import Pipe
+
+
+def parse_ts_with_oa(*args, **kwargs):
+    from jy.ts_parse import parse_ts_with_oa as _parse_ts_with_oa
+
+    return _parse_ts_with_oa(*args, **kwargs)
+
+
+def grammar_ts_parser(*args, **kwargs):
+    """ts parser based on grammar.
+    I'd prefer to use this one, but it's not complete enough for our purposes (yet).
+    """
+    from jy.ts_parse import parse_ts as _parse_ts
+
+    return _parse_ts(*args, **kwargs)
 
 
 _extra_contexts = {
@@ -1125,7 +1144,6 @@ get_sig_dfs = lambda: dacc.sig_dfs
 # Diagnosis
 
 
-from tabled import dataframe_diffs
 import ju
 import pandas as pd
 from i2.signatures import parameter_to_dict
@@ -1172,6 +1190,7 @@ def signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
 
     ```
     """
+    from tabled import dataframe_diffs
 
     def _ensure_df(sig):
         if isinstance(sig, pd.DataFrame):
