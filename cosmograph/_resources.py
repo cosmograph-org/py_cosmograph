@@ -1143,13 +1143,13 @@ get_sig_dfs = lambda: dacc.sig_dfs
 # Diagnosis
 
 
-import ju
 import pandas as pd
 from i2.signatures import parameter_to_dict
 from dol import Pipe
 
 
 def config_dict_to_sig(config_dict):
+    import ju
     return ju.json_schema_to_signature({'properties': config_dict})
 
 
