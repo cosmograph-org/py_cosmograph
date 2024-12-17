@@ -317,8 +317,6 @@ class ConfigsDacc:
 
     @property
     def _ts_types_df(self, *, assert_expected_keys=True, verbose=False):
-        from lkj import camel_to_snake
-
         # widget_config = json_files['_widget_config.json']
 
         interfaces = list(self._interfaces(assert_expected_keys=assert_expected_keys))
@@ -667,10 +665,37 @@ def transform_defaults_keys(flat_defaults):
     return transformed
 
 
-def camel_to_snake(name):
-    from lkj import camel_to_snake as _camel_to_snake
+import re
 
-    return _camel_to_snake(name)
+# Compiled regex to handle camel case to snake case conversions, including acronyms
+_camel_to_snake_re = re.compile(r'((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+
+
+def camel_to_snake(camel_string):
+    """
+    Convert a CamelCase string to snake_case. Useful for converting class
+    names to variable names.
+
+    Args:
+        camel_string (str): The CamelCase string to convert.
+
+    Returns:
+        str: The converted snake_case string.
+
+    Examples:
+        >>> camel_to_snake('BasicParseTest')
+        'basic_parse_test'
+        >>> camel_to_snake('HTMLParser')
+        'html_parser'
+        >>> camel_to_snake('CamelCaseExample')
+        'camel_case_example'
+
+        Note that acronyms are handled correctly:
+
+        >>> camel_to_snake('XMLHttpRequestTest')
+        'xml_http_request_test'
+    """
+    return _camel_to_snake_re.sub(r'_\1', camel_string).lower()
 
 
 # --------------------------------------------------------------------------------------
@@ -960,8 +985,6 @@ class ConfigSourceDicts:
 
     @staticmethod
     def widget_config_from_ts():
-        from lkj import camel_to_snake
-
         widget_config = json_files['_widget_config.json']
 
         def _widget_config_properties():
@@ -1150,6 +1173,7 @@ from dol import Pipe
 
 def config_dict_to_sig(config_dict):
     import ju
+
     return ju.json_schema_to_signature({'properties': config_dict})
 
 
