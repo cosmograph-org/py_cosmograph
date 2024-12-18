@@ -1,18 +1,18 @@
 """Old util stuff"""
 
-
 # --------------------------------------------------------------------------------------
 # And more old stuff
+from functools import lru_cache
 from cosmograph.util import data_files
+import json
 
-cosmos_config = json.loads(data_files['cosmos_config.json'])['config']
+cosmos_config = json.loads(data_files['_old_cosmos_config.json'])['config']
 
 _cosmos_config_info = cosmos_config
 _default_of_py_name = {d["py_name"]: d["Default"] for d in _cosmos_config_info}
 _prop_of_py_name = {d["py_name"]: d["Property"] for d in _cosmos_config_info}
 # _py_name_of_prop = {d["Property"]: d["py_name"] for d in _cosmos_config_info}
 _description_of_py_name = {d["py_name"]: d["Description"] for d in _cosmos_config_info}
-
 
 
 # def set_data(data, canvas_id=DFLT_CANVAS):
@@ -33,7 +33,6 @@ _description_of_py_name = {d["py_name"]: d["Description"] for d in _cosmos_confi
 
 # def fit_view(canvas_id=DFLT_CANVAS):
 #     return f'if (FitView) FitView("{canvas_id}")'
-
 
 
 # The raw call is a two arg function
@@ -135,8 +134,6 @@ def _tmp_test_of_py_costmos_call():
     # """
 
 
-
-
 # ------------------------------------------------------------------------------
 # Putting a signature on cosmo
 
@@ -188,7 +185,7 @@ def _download_and_save_config_info():
     import json
 
     config_info = cosmos_config_info()
-    data_files['config_info.json'] = json.dumps(config_info).encode()
+    data_files['_old_cosmos_config.json'] = json.dumps(config_info).encode()
 
 
 # # TODO: Take out of try/catch once we have a stable source of config info

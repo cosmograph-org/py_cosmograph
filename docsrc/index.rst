@@ -1,4 +1,4 @@
-Welcome to cosmograph's documentation!
+Welcome to Cosmograph's documentation!
 ======================================
 
 
