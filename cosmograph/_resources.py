@@ -515,6 +515,13 @@ class ConfigsDacc:
                     del d['default']
             yield d
 
+    def cosmograph_base_params_json(self):
+        from cosmograph.util import annotation_to_str
+
+        params = pd.DataFrame(list(self.cosmograph_base_params()))
+        params['description'] = params['description'].fillna('')
+        params['annotation'] = params['annotation'].apply(annotation_to_str)
+        return params.to_json(orient='records', indent=4)
 
     def cosmograph_base_docs(self, param_names=None):
         """Get the params information part of a docstring"""

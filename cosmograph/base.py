@@ -4,12 +4,14 @@ from functools import cached_property, partial
 from i2.doc_mint import inject_docstring_content
 from cosmograph_widget import Cosmograph
 
-# TODO: Should we instead have a class, make the configs_dacc, then offload both?
-from cosmograph._resources import configs_dacc
-from cosmograph.util import snake_to_camel_case
+from cosmograph.util import (
+    snake_to_camel_case,
+    cosmograph_base_docs,
+    cosmograph_base_signature,
+)
 
-cosmo_base_sig = configs_dacc.cosmograph_base_signature()
-cosmo_base_params_doc_str = configs_dacc.cosmograph_base_docs()
+cosmo_base_sig = cosmograph_base_signature()
+cosmo_base_params_doc_str = cosmograph_base_docs()
 
 
 @inject_docstring_content(cosmo_base_params_doc_str, position=-1)

@@ -1,0 +1,578 @@
+[
+    {
+        "name":"disable_simulation",
+        "default":false,
+        "annotation":"bool",
+        "description":"Prevents the simulation from running, merely rendering the graph."
+    },
+    {
+        "name":"simulation_decay",
+        "default":1000,
+        "annotation":"float",
+        "description":"Defines how quickly the simulation cools down."
+    },
+    {
+        "name":"simulation_gravity",
+        "default":0,
+        "annotation":"float",
+        "description":"Coefficient for gravity force."
+    },
+    {
+        "name":"simulation_center",
+        "default":0,
+        "annotation":"float",
+        "description":"Centers the mass force coefficient."
+    },
+    {
+        "name":"simulation_repulsion",
+        "default":0.1,
+        "annotation":"float",
+        "description":"Configures point repulsion between points."
+    },
+    {
+        "name":"simulation_repulsion_theta",
+        "default":1.7,
+        "annotation":"float",
+        "description":"Decreases \/ increases the detalization of the Many-Body force calculations."
+    },
+    {
+        "name":"simulation_repulsion_quadtree_levels",
+        "default":12,
+        "annotation":"float",
+        "description":"Barnes\u2013Hut approximation depth, usable when useQuadtree is set to True."
+    },
+    {
+        "name":"simulation_link_spring",
+        "default":1,
+        "annotation":"float",
+        "description":"Spring constant for links."
+    },
+    {
+        "name":"simulation_link_distance",
+        "default":2,
+        "annotation":"float",
+        "description":"Default distance for links."
+    },
+    {
+        "name":"simulation_link_dist_random_variation_range",
+        "default":[
+            1,
+            1.2
+        ],
+        "annotation":"list[typing.Any]",
+        "description":"Random link distance range."
+    },
+    {
+        "name":"simulation_repulsion_from_mouse",
+        "default":2,
+        "annotation":"float",
+        "description":"Mouse position repulsion coefficient, activated by right-click."
+    },
+    {
+        "name":"simulation_friction",
+        "default":0.85,
+        "annotation":"float",
+        "description":"Sets simulation friction."
+    },
+    {
+        "name":"simulation_cluster",
+        "default":null,
+        "annotation":"float",
+        "description":""
+    },
+    {
+        "name":"background_color",
+        "default":"#222222",
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"Canvas background color."
+    },
+    {
+        "name":"space_size",
+        "default":4096,
+        "annotation":"int",
+        "description":"Size of the simulation space."
+    },
+    {
+        "name":"point_color",
+        "default":"#b3b3b3",
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"Column name for point colors."
+    },
+    {
+        "name":"point_greyout_opacity",
+        "default":0.1,
+        "annotation":"float",
+        "description":"Opacity of unselected nodes during selection."
+    },
+    {
+        "name":"point_size",
+        "default":4,
+        "annotation":"float",
+        "description":"Column name for point sizes."
+    },
+    {
+        "name":"point_size_scale",
+        "default":1,
+        "annotation":"float",
+        "description":"Scale factor for point sizes."
+    },
+    {
+        "name":"hovered_point_cursor",
+        "default":null,
+        "annotation":"str",
+        "description":"Cursor type when hovering over a point."
+    },
+    {
+        "name":"render_hovered_point_ring",
+        "default":0.7,
+        "annotation":"bool",
+        "description":"Enables ring around hovered points."
+    },
+    {
+        "name":"hovered_point_ring_color",
+        "default":"white",
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"Color of hovered point ring."
+    },
+    {
+        "name":"focused_point_ring_color",
+        "default":0.95,
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"Color of the focused point ring."
+    },
+    {
+        "name":"focused_point_index",
+        "default":null,
+        "annotation":"int",
+        "description":"Index of the focused point, prioritized over focus_point method."
+    },
+    {
+        "name":"render_links",
+        "default":true,
+        "annotation":"bool",
+        "description":"Enables or disables link rendering."
+    },
+    {
+        "name":"link_color",
+        "default":"#666666",
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"Column name for link colors."
+    },
+    {
+        "name":"link_greyout_opacity",
+        "default":0.1,
+        "annotation":"float",
+        "description":"Opacity of unselected links during selection."
+    },
+    {
+        "name":"link_width",
+        "default":1,
+        "annotation":"float",
+        "description":"Column name for link widths."
+    },
+    {
+        "name":"link_width_scale",
+        "default":1,
+        "annotation":"float",
+        "description":"Scale factor for link widths."
+    },
+    {
+        "name":"curved_links",
+        "default":false,
+        "annotation":"bool",
+        "description":"Enables or disables curved links."
+    },
+    {
+        "name":"curved_link_segments",
+        "default":19,
+        "annotation":"int",
+        "description":"Segments defining curved links."
+    },
+    {
+        "name":"curved_link_weight",
+        "default":0.8,
+        "annotation":"float",
+        "description":"Weight factor for link curvature."
+    },
+    {
+        "name":"curved_link_control_point_distance",
+        "default":0.5,
+        "annotation":"float",
+        "description":"Control point positioning for curves."
+    },
+    {
+        "name":"link_arrows",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"link_arrows_size_scale",
+        "default":1,
+        "annotation":"float",
+        "description":"Scale factor for link arrow size."
+    },
+    {
+        "name":"link_visibility_distance_range",
+        "default":[
+            50,
+            150
+        ],
+        "annotation":"list[float]",
+        "description":"Pixel distance range for link transparency."
+    },
+    {
+        "name":"link_visibility_min_transparency",
+        "default":0.25,
+        "annotation":"float",
+        "description":"Minimum transparency of links based on link_visibility_distance_range."
+    },
+    {
+        "name":"use_quadtree",
+        "default":false,
+        "annotation":"bool",
+        "description":"Activates quadtree algorithm for Many-Body force when set to True."
+    },
+    {
+        "name":"show_FPS_monitor",
+        "default":false,
+        "annotation":"bool",
+        "description":"Display an FPS counter in the upper right corner of the canvas."
+    },
+    {
+        "name":"pixel_ratio",
+        "default":2,
+        "annotation":"float",
+        "description":"Canvas pixel ratio."
+    },
+    {
+        "name":"scale_points_on_zoom",
+        "default":true,
+        "annotation":"bool",
+        "description":"Scales point sizes when zooming."
+    },
+    {
+        "name":"initial_zoom_level",
+        "default":3,
+        "annotation":"float",
+        "description":"Starting zoom level."
+    },
+    {
+        "name":"disable_zoom",
+        "default":false,
+        "annotation":"bool",
+        "description":"Enables or disables zooming."
+    },
+    {
+        "name":"enable_drag",
+        "default":null,
+        "annotation":"bool",
+        "description":"Allows graph dragging."
+    },
+    {
+        "name":"fit_view_on_init",
+        "default":true,
+        "annotation":"bool",
+        "description":"Automatically fits view to all points upon initialization."
+    },
+    {
+        "name":"fit_view_delay",
+        "default":250,
+        "annotation":"float",
+        "description":"Delay for fitting view after initialization in milliseconds."
+    },
+    {
+        "name":"fit_view_padding",
+        "default":null,
+        "annotation":"float",
+        "description":"Padding around fit view area."
+    },
+    {
+        "name":"fit_view_duration",
+        "default":null,
+        "annotation":"float",
+        "description":"Animation duration for view fitting in milliseconds."
+    },
+    {
+        "name":"fit_view_by_points_in_rect",
+        "default":null,
+        "annotation":"list[list[float]]",
+        "description":"Fits view to specified rectangle of points, active when fit_view_on_init is True."
+    },
+    {
+        "name":"random_seed",
+        "default":null,
+        "annotation":"typing.Union[int, str]",
+        "description":"Seed value for generating random numbers in simulations."
+    },
+    {
+        "name":"point_sampling_distance",
+        "default":150,
+        "annotation":"int",
+        "description":"Distance threshold for sampling points."
+    },
+    {
+        "name":"point_id_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_index_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_color_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_size_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_size_range",
+        "default":null,
+        "annotation":"list[float]",
+        "description":""
+    },
+    {
+        "name":"point_label_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_label_weight_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_x_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_y_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_cluster_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_cluster_strength_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"point_include_columns",
+        "default":null,
+        "annotation":"list[str]",
+        "description":"An array of additional column names to include in point data."
+    },
+    {
+        "name":"link_source_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_source_index_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_target_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_target_index_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_color_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_width_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_arrow_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_strength_by",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"link_strength_range",
+        "default":null,
+        "annotation":"list[float]",
+        "description":""
+    },
+    {
+        "name":"link_include_columns",
+        "default":null,
+        "annotation":"list[str]",
+        "description":"An array of additional column names to include in link data."
+    },
+    {
+        "name":"show_labels",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"show_dynamic_labels",
+        "default":null,
+        "annotation":"bool",
+        "description":"Flag to show dynamic labels for visible points."
+    },
+    {
+        "name":"show_labels_for",
+        "default":null,
+        "annotation":"list[str]",
+        "description":"An array of point ids for which to show labels."
+    },
+    {
+        "name":"show_top_labels",
+        "default":null,
+        "annotation":"bool",
+        "description":"Flag to display labels for the top points."
+    },
+    {
+        "name":"show_top_labels_limit",
+        "default":null,
+        "annotation":"int",
+        "description":"Maximum number of top points to show labels for."
+    },
+    {
+        "name":"show_top_labels_by",
+        "default":null,
+        "annotation":"str",
+        "description":"Column to determine which points are considered as a top."
+    },
+    {
+        "name":"static_label_weight",
+        "default":null,
+        "annotation":"float",
+        "description":"Weight of static labels."
+    },
+    {
+        "name":"dynamic_label_weight",
+        "default":null,
+        "annotation":"float",
+        "description":"Weight of dynamic labels."
+    },
+    {
+        "name":"label_margin",
+        "default":null,
+        "annotation":"float",
+        "description":""
+    },
+    {
+        "name":"show_hovered_point_label",
+        "default":null,
+        "annotation":"bool",
+        "description":"Flag to display the label for the currently hovered point."
+    },
+    {
+        "name":"disable_point_size_legend",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"disable_link_width_legend",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"disable_point_color_legend",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"disable_link_color_legend",
+        "default":null,
+        "annotation":"bool",
+        "description":""
+    },
+    {
+        "name":"points",
+        "default":null,
+        "annotation":"object",
+        "description":"Data in a pandas DataFrame format."
+    },
+    {
+        "name":"links",
+        "default":null,
+        "annotation":"object",
+        "description":"Data in a pandas DataFrame format."
+    },
+    {
+        "name":"clicked_point_index",
+        "default":null,
+        "annotation":"int",
+        "description":""
+    },
+    {
+        "name":"clicked_point_id",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
+        "name":"selected_point_indices",
+        "default":null,
+        "annotation":"list[int]",
+        "description":""
+    },
+    {
+        "name":"selected_point_ids",
+        "default":null,
+        "annotation":"list[str]",
+        "description":""
+    },
+    {
+        "name":"changePoints",
+        "default":null,
+        "annotation":"typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]",
+        "description":""
+    },
+    {
+        "name":"changeLinks",
+        "default":null,
+        "annotation":"typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]",
+        "description":""
+    }
+]

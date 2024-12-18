@@ -48,6 +48,147 @@ json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 color_names_set = set(json_files['color_names.json'])
 
 # --------------------------------------------------------------------------------------
+# Extracting the interface from the data
+
+import typing
+import re
+from typing import Any, Callable
+from i2 import Sig, Param, params_to_docstring
+
+PARAMS_SSOT_PATH = data_dir / "params_ssot.json"
+
+
+def _params_ssot(param_names=None):
+    params_ssot = json.loads(PARAMS_SSOT_PATH.read_text())
+    if param_names is not None:
+        params_ssot = [d for d in params_ssot if d["name"] in param_names]
+    return params_ssot
+
+
+def cosmograph_base_signature(param_names=None):
+    params_ssot = _params_ssot(param_names)
+    for d in params_ssot:
+        d.pop('description', None)  # delete description if any
+        d.update(
+            annotation=str_to_annotation(d["annotation"])
+        )  # convert annotation to type
+        d['kind'] = Sig.KEYWORD_ONLY
+
+    return Sig([Param(**d) for d in params_ssot])
+
+
+def cosmograph_base_docs(take_name_of_types=True):
+    """Get the params information part of a docstring"""
+    params_ssot = _params_ssot(param_names)
+    return params_to_docstring(params_ssot)
+
+
+def is_parameterized_type(obj):
+    """
+    Determines if an object is a parameterized type (e.g., list[int]) or not.
+
+    Args:
+        obj: The object to check.
+
+    Returns:
+        True if it's a parameterized type, False otherwise.
+    """
+    return typing.get_origin(obj) is not None
+
+
+def annotation_to_str(annotation):
+    """
+    Encodes Python type annotations as strings for JSON serialization.
+
+    This is part of a specialized Python-to-string codec designed to encode and decode
+    Python type annotations in a way that allows them to be serialized and deserialized
+    in JSON-compatible formats.
+
+    Args:
+        annotation: The type annotation to encode.
+
+    Returns:
+        A string representation of the annotation.
+
+    Raises:
+        ValueError: If the annotation type is unknown.
+
+    Examples:
+    >>> original = [
+    ...     bool,
+    ...     float,
+    ...     list[Any],
+    ...     typing.Union[str, list[float]],
+    ...     int,
+    ...     str,
+    ...     list[float],
+    ...     list[list[float]],
+    ...     typing.Union[int, str],
+    ...     list[str],
+    ...     object,
+    ...     list[int],
+    ...     typing.Callable[[typing.Dict[str, Any]], Any]
+    ... ]
+    >>> encoded = list(map(annotation_to_str, original))
+    >>> encoded
+    ['bool', 'float', 'list[typing.Any]', 'typing.Union[str, list[float]]', 'int', 'str', \
+'list[float]', 'list[list[float]]', 'typing.Union[int, str]', 'list[str]', 'object', 'list[int]', \
+'typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]']
+    """
+    if isinstance(annotation, str):
+        return annotation
+    elif is_parameterized_type(annotation):
+        return str(annotation)
+    elif isinstance(annotation, type):
+        return annotation.__name__
+    else:
+        raise ValueError(f"Unknown annotation type: {annotation}")
+
+
+def default_is_safe(string: str) -> bool:
+    """
+    Checks if a string is safe to evaluate as a type annotation.
+
+    The string is considered safe if:
+    - It contains only alphanumericals, spaces, dots, commas, and brackets.
+    - It starts with one of a predefined list of allowed prefixes.
+
+    Args:
+        string: The string to check.
+
+    Returns:
+        True if the string is safe, False otherwise.
+    """
+    allowed_prefixes = ["bool", "float", "list", "typing", "int", "object", "str"]
+    allowed_chars = re.compile(r"^[\w\s.,\[\]()]+$")
+
+    return allowed_chars.match(string) is not None and any(
+        string.strip().startswith(prefix) for prefix in allowed_prefixes
+    )
+
+
+def str_to_annotation(string, is_safe: Callable[[str], bool] = default_is_safe):
+    """
+    Decodes a string representation of a Python type annotation back into the annotation.
+
+    Args:
+        string: The string representation of the annotation.
+        is_safe: A function that determines if the string is safe to evaluate.
+
+    Returns:
+        The decoded Python type annotation.
+
+    Raises:
+        ValueError: If the string is not safe to evaluate.
+    """
+    if not is_safe(string):
+        raise ValueError(
+            f"The string '{string}' is not considered safe for evaluation."
+        )
+    return eval(string)
+
+
+# --------------------------------------------------------------------------------------
 # General/Misc utils
 
 from functools import lru_cache
@@ -59,7 +200,6 @@ def move_to_front(df: pd.DataFrame, cols) -> pd.DataFrame:
     Move the columns in `cols` to the front of the DataFrame
     """
     return df[cols + [col for col in df.columns if col not in cols]]
-
 
 
 def ordered_unique(iterable):
@@ -135,7 +275,6 @@ def _assert_camel_and_snake_sanity(camel_cases, snake_cases):
 #         )
 
 # _cosmos_config_info = cosmos_config_info()
-
 
 
 # --------------------------------------------------------------------------------------
