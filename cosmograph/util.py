@@ -77,7 +77,7 @@ def cosmograph_base_signature(param_names=None):
     return Sig([Param(**d) for d in params_ssot])
 
 
-def cosmograph_base_docs(take_name_of_types=True):
+def cosmograph_base_docs(param_names=None, take_name_of_types=True):
     """Get the params information part of a docstring"""
     params_ssot = _params_ssot(param_names)
     return params_to_docstring(params_ssot)
