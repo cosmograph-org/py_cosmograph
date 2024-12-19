@@ -20,8 +20,8 @@ def base_cosmo(**kwargs):
     """
     Thin layer over CosmographWidget to provide a base interface to the widget object.
 
-    All this layer does is pass on the arguments to the CosmographWidget object. 
-    The only difference between this and the cosmograph object is that this one has 
+    All this layer does is pass on the arguments to the CosmographWidget object.
+    The only difference between this and the cosmograph object is that this one has
     an actual signature, with argument names, defaults, and type annotations.
     """
     return Cosmograph(**kwargs)
@@ -31,13 +31,16 @@ def base_cosmo(**kwargs):
 @cosmo_base_sig.inject_into_keyword_variadic
 def cosmo(data=None, **kwargs):
     """
-    Thin layer over CosmographWidget to provide a base interface to the widget object, 
-    with signature, docs with argument descriptions, and a more flexible interface 
-    comprising some data processing, argument aliasing and validation, error handling, 
+    Thin layer over CosmographWidget to provide a base interface to the widget object,
+    with signature, docs with argument descriptions, and a more flexible interface
+    comprising some data processing, argument aliasing and validation, error handling,
     etc.
-    
+
     """
     kwargs = process_cosmo_input(data, kwargs)
+    if 'points' not in kwargs and 'links' not in kwargs:
+        # If no data is given, just return a partial function with the kwargs filled in
+        return partial(cosmo, **kwargs)
     return Cosmograph(**kwargs)
 
 
