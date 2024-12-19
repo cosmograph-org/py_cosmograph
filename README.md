@@ -62,7 +62,7 @@ The widget will render an interactive graph visualization inline, allowing you t
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
 
-- [Cosmograph Widget in Colab ✌️](https://colab.research.google.com/gist/thorwhalen/86be7dbec9f45e2fc3008fdb7602bc8d/cosmograph-widget-in-colab.ipynb)
+- [Cosmograph Widget in Colab ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
 - [Mobius in Cosmograph Widget 🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
 - [Clusters in Cosmograph Widget 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
 
