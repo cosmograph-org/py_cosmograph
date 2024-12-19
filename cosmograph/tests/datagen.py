@@ -5,7 +5,7 @@ in view of testing the visualization tools.
 https://github.com/cosmograph-org/py_cosmograph/issues/1
 """
 
-from cosmograph.datasrc import mini_dot_to_graph_jdict
+from linked import mini_dot_to_graph_jdict
 
 
 class TestData:
