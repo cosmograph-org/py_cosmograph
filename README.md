@@ -28,12 +28,14 @@ Once installed, you can start using it in your notebooks immediately.
 After installation, you can import and use the widget in any Python-based notebook environment:
 
 ```python
+import pandas as pd
 from cosmograph import cosmo
 
 points = pd.DataFrame({
     'id': [1, 2, 3, 4, 5],
     'label': ['Node A', 'Node B', 'Node C', 'Node D', 'Node E'],
-    'value': [10, 20, 15, 25, 30]
+    'value': [10, 20, 15, 25, 30],
+    'category': ['A', 'B', 'A', 'B', 'A']
 })
 
 links = pd.DataFrame({
@@ -48,7 +50,7 @@ widget = cosmo(
   point_id_by='id',
   link_source_by='source',
   link_target_by='target',
-
+  point_color_by='category',
   point_include_columns=['value'],
   point_label_by='label',
   link_include_columns=['value'],
@@ -58,6 +60,16 @@ widget
 
 The widget will render an interactive graph visualization inline, allowing you to 
 explore and manipulate your data directly. 
+
+![image](https://github.com/user-attachments/assets/f057c15a-fc36-4b85-8bfa-fe6af12813c5)
+
+You also use the widget object to interact with the rendered graph.
+
+```python
+widget.fit_view()  # recenter the view (often useful when you've lost your graph (or within your graph)
+widget.selected_point_ids  # if you've selected some points and want to get info about the selection...
+# etc.
+```
 
 
 ## 🎉 Examples
