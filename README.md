@@ -42,7 +42,7 @@ links = pd.DataFrame({
     'value': [1.0, 2.0, 1.5, 0.5, 1.8]
 })
 
-cosmo(
+widget = cosmo(
   points=points,
   links=links,
   point_id_by='id',
@@ -53,18 +53,20 @@ cosmo(
   point_label_by='label',
   link_include_columns=['value'],
 )
+widget
 ```
 
-The widget will render an interactive graph visualization inline, allowing you to explore and manipulate your data directly.
+The widget will render an interactive graph visualization inline, allowing you to 
+explore and manipulate your data directly. 
 
 
 ## 🎉 Examples
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
 
-- [Cosmograph Widget in Colab ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
-- [Mobius in Cosmograph Widget 🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
-- [Clusters in Cosmograph Widget 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
+- [Cosmograph Widget (Colab notebook) ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
+- [Mobius in Cosmograph Widget (Colab notebook)🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
+- [Clusters in Cosmograph (Colab notebook) 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
 
 ## 🛸 Issues and Feedback
 
