@@ -27,6 +27,8 @@ Once installed, you can start using it in your notebooks immediately.
 
 After installation, you can import and use the widget in any Python-based notebook environment:
 
+### Tiny example
+
 ```python
 import pandas as pd
 from cosmograph import cosmo
@@ -71,14 +73,92 @@ widget.selected_point_ids  # if you've selected some points and want to get info
 # etc.
 ```
 
+### Nicer example
 
-## 🎉 Examples
+Let's download a big dataset of English words, plus some hyponym-hypernym relationships. 
+(A hyponym-hypernym relationship is a “type-of” relationship where a hyponym is a more 
+specific term (e.g., “dog”) and a hypernym is a broader term (e.g., “animal”).)
+
+```python
+import pandas as pd
+from cosmograph import cosmo
+
+df = pd.read_parquet('https://www.dropbox.com/scl/fi/4mnk1e2wx31j9mdsjzecy/wordnet_feature_meta.parquet?rlkey=ixjiiso80s1uk4yhx1v38ekhm&dl=1')
+hyponyms = pd.read_parquet('https://www.dropbox.com/scl/fi/pl72ixv34soo1o8zanfrz/hyponyms.parquet?rlkey=t4d606fmq1uinn29qmli7bx6r&dl=1')
+```
+
+Peep at the data:
+
+```python
+print(f"{df.shape=}")
+df.iloc[0]
+```
+
+```python
+print(f"{hyponyms.shape=}")
+hyponyms.iloc[0]
+```
+
+Let's plot the data using the [UMAP projection](https://umap-learn.readthedocs.io/en/latest/) 
+of the (OpenAI) [embeddings](https://www.deepset.ai/blog/the-beginners-guide-to-text-embeddings)
+of the words, coloring by "part-of-speech" and sizing by the usage frequency of the word.
+
+```python
+g = cosmo(
+    df,
+    point_id_by='lemma',
+    point_label_by='word',
+    point_x_by='umap_x',
+    point_y_by='umap_y',
+    point_color_by='pos',
+    point_size_by='frequency',
+    point_size_scale=0.01,  # often have to play with this number to get the size right
+)
+g
+```
+
+![image](https://github.com/user-attachments/assets/532c592b-7e04-49fa-b8fa-c319bbceeaad)
+
+Zooming in a bit:
+
+![image](https://github.com/user-attachments/assets/47e1f012-eea9-4d48-95f8-cbf4b247c81a)
+
+
+And now, let's put some hypernym-hyponym links, and let the network converge to a stable 
+layout using a force-directed simulation (try it yourself, the convergence is pretty!)
+
+```python
+h = cosmo(
+    points=df,
+    links=hyponyms,
+    link_source_by='source',
+    link_target_by='target',
+    point_id_by='lemma',
+    point_label_by='word',
+    # point_x_by='umap_x',
+    # point_y_by='umap_y',
+    point_color_by='pos',
+    point_size_by='frequency',
+    point_size_scale=0.01,  # often have to play with this number to get the size right
+)
+h
+```
+
+![image](https://github.com/user-attachments/assets/5c2a6b21-60e0-42b9-93bf-9537015550b9)
+
+Zooming in a bit:
+
+![image](https://github.com/user-attachments/assets/8cf95878-b4a3-49ae-985e-e017d346886b)
+
+
+## 🎉 More Examples
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
 
 - [Cosmograph Widget (Colab notebook) ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
 - [Mobius in Cosmograph Widget (Colab notebook)🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
 - [Clusters in Cosmograph (Colab notebook) 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
+- [English Words 🔤](https://colab.research.google.com/drive/1jZ2tPJw4gHpTCJVwCggRPWLmasfJIjPc?usp=sharing)
 
 
 ## 🛸 Issues and Feedback
