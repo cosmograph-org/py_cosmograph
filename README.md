@@ -63,7 +63,7 @@ widget
 The widget will render an interactive graph visualization inline, allowing you to 
 explore and manipulate your data directly. 
 
-![image](https://github.com/user-attachments/assets/f057c15a-fc36-4b85-8bfa-fe6af12813c5)
+![](https://github.com/user-attachments/assets/328ff643-dcd8-479b-938a-40d43246cd39)
 
 You also use the widget object to interact with the rendered graph.
 
@@ -117,11 +117,11 @@ g = cosmo(
 g
 ```
 
-![image](https://github.com/user-attachments/assets/532c592b-7e04-49fa-b8fa-c319bbceeaad)
+![image](https://github.com/user-attachments/assets/22bf49e9-a4ee-41f4-ba74-4557a0b52d98)
 
 Zooming in a bit:
 
-![image](https://github.com/user-attachments/assets/47e1f012-eea9-4d48-95f8-cbf4b247c81a)
+![image](https://github.com/user-attachments/assets/ad81eb4e-401d-433b-945a-f460a44c81de)
 
 
 And now, let's put some hypernym-hyponym links, and let the network converge to a stable 
@@ -140,11 +140,12 @@ h = cosmo(
     point_color_by='pos',
     point_size_by='frequency',
     point_size_scale=0.01,  # often have to play with this number to get the size right
+    space_size=8112
 )
 h
 ```
 
-![image](https://github.com/user-attachments/assets/5c2a6b21-60e0-42b9-93bf-9537015550b9)
+![image](https://github.com/user-attachments/assets/23312ab7-7b28-495d-a69e-9b6e44c61842)
 
 Zooming in a bit:
 
