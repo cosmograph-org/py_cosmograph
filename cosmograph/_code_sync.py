@@ -68,7 +68,9 @@ def replace_function_definition_in_module(module, function_name, new_function_co
     ... '''
     >>> updated = replace_function_definition_in_module(original_code, 'foo', new_foo_code)
     >>> print(updated)
+    <BLANKLINE>
     import math
+    <BLANKLINE>
     <BLANKLINE>
     def foo(x, y=10):
         return x + y
