@@ -80,7 +80,9 @@ def cosmograph_base_signature(param_names=None):
 
 def validate_signature(sig):
     """Validate a signature. 
-    Namely, check that all non-None default types are "subclasses" of the annotation type
+    Namely, check that all non-None default types are "subclasses" of the annotation type.
+
+    TODO: Implement
     """
     pass
 
