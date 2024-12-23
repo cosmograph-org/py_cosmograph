@@ -22,7 +22,6 @@ Once installed, you can start using it in your notebooks immediately.
 [![PyPI Version](https://img.shields.io/pypi/v/cosmograph)](https://pypi.org/project/cosmograph/)
 
 
-
 ## 🛠️ Quick Start
 
 After installation, you can import and use the widget in any Python-based notebook environment:
