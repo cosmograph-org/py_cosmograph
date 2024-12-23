@@ -124,7 +124,7 @@
     },
     {
         "name":"render_hovered_point_ring",
-        "default":0.7,
+        "default":false,
         "annotation":"bool",
         "description":"Enables ring around hovered points."
     },
@@ -136,7 +136,7 @@
     },
     {
         "name":"focused_point_ring_color",
-        "default":0.95,
+        "default":null,
         "annotation":"typing.Union[str, list[float]]",
         "description":"Color of the focused point ring."
     },

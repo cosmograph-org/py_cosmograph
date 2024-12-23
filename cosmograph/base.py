@@ -1,5 +1,6 @@
 """Base functionality of cosmograph"""
 
+from typing import Dict, Any, Union, Callable
 from functools import cached_property, partial
 from i2.doc_mint import inject_docstring_content
 from cosmograph_widget import Cosmograph
@@ -27,9 +28,108 @@ def base_cosmo(**kwargs):
     return Cosmograph(**kwargs)
 
 
+# @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
+# @cosmo_base_sig.inject_into_keyword_variadic
 @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
-@cosmo_base_sig.inject_into_keyword_variadic
-def cosmo(data=None, **kwargs):
+def cosmo(
+    data=None,
+    *,
+    disable_simulation: bool = False,
+    simulation_decay: float = 1000,
+    simulation_gravity: float = 0,
+    simulation_center: float = 0,
+    simulation_repulsion: float = 0.1,
+    simulation_repulsion_theta: float = 1.7,
+    simulation_repulsion_quadtree_levels: float = 12,
+    simulation_link_spring: float = 1,
+    simulation_link_distance: float = 2,
+    simulation_link_dist_random_variation_range: list[Any] = [1, 1.2],
+    simulation_repulsion_from_mouse: float = 2,
+    simulation_friction: float = 0.85,
+    simulation_cluster: float = None,
+    background_color: Union[str, list[float]] = '#222222',
+    space_size: int = 4096,
+    point_color: Union[str, list[float]] = '#b3b3b3',
+    point_greyout_opacity: float = 0.1,
+    point_size: float = 4,
+    point_size_scale: float = 1,
+    hovered_point_cursor: str = None,
+    render_hovered_point_ring: bool = False,
+    hovered_point_ring_color: Union[str, list[float]] = 'white',
+    focused_point_ring_color: Union[str, list[float]] = None,
+    focused_point_index: int = None,
+    render_links: bool = True,
+    link_color: Union[str, list[float]] = '#666666',
+    link_greyout_opacity: float = 0.1,
+    link_width: float = 1,
+    link_width_scale: float = 1,
+    curved_links: bool = False,
+    curved_link_segments: int = 19,
+    curved_link_weight: float = 0.8,
+    curved_link_control_point_distance: float = 0.5,
+    link_arrows: bool = None,
+    link_arrows_size_scale: float = 1,
+    link_visibility_distance_range: list[float] = [50, 150],
+    link_visibility_min_transparency: float = 0.25,
+    use_quadtree: bool = False,
+    show_FPS_monitor: bool = False,
+    pixel_ratio: float = 2,
+    scale_points_on_zoom: bool = True,
+    initial_zoom_level: float = 3,
+    disable_zoom: bool = False,
+    enable_drag: bool = None,
+    fit_view_on_init: bool = True,
+    fit_view_delay: float = 250,
+    fit_view_padding: float = None,
+    fit_view_duration: float = None,
+    fit_view_by_points_in_rect: list[list[float]] = None,
+    random_seed: Union[int, str] = None,
+    point_sampling_distance: int = 150,
+    point_id_by: str = None,
+    point_index_by: str = None,
+    point_color_by: str = None,
+    point_size_by: str = None,
+    point_size_range: list[float] = None,
+    point_label_by: str = None,
+    point_label_weight_by: str = None,
+    point_x_by: str = None,
+    point_y_by: str = None,
+    point_cluster_by: str = None,
+    point_cluster_strength_by: str = None,
+    point_include_columns: list[str] = None,
+    link_source_by: str = None,
+    link_source_index_by: str = None,
+    link_target_by: str = None,
+    link_target_index_by: str = None,
+    link_color_by: str = None,
+    link_width_by: str = None,
+    link_arrow_by: str = None,
+    link_strength_by: str = None,
+    link_strength_range: list[float] = None,
+    link_include_columns: list[str] = None,
+    show_labels: bool = None,
+    show_dynamic_labels: bool = None,
+    show_labels_for: list[str] = None,
+    show_top_labels: bool = None,
+    show_top_labels_limit: int = None,
+    show_top_labels_by: str = None,
+    static_label_weight: float = None,
+    dynamic_label_weight: float = None,
+    label_margin: float = None,
+    show_hovered_point_label: bool = None,
+    disable_point_size_legend: bool = None,
+    disable_link_width_legend: bool = None,
+    disable_point_color_legend: bool = None,
+    disable_link_color_legend: bool = None,
+    points: object = None,
+    links: object = None,
+    clicked_point_index: int = None,
+    clicked_point_id: str = None,
+    selected_point_indices: list[int] = None,
+    selected_point_ids: list[str] = None,
+    changePoints: Callable[[Dict[str, Any]], Any] = None,
+    changeLinks: Callable[[Dict[str, Any]], Any] = None,
+):
     """
     Thin layer over CosmographWidget to provide a base interface to the widget object,
     with signature, docs with argument descriptions, and a more flexible interface
@@ -37,14 +137,15 @@ def cosmo(data=None, **kwargs):
     etc.
 
     """
-    kwargs = process_cosmo_input(data, kwargs)
+    kwargs = process_cosmo_input(locals())
     if 'points' not in kwargs and 'links' not in kwargs:
         # If no data is given, just return a partial function with the kwargs filled in
         return partial(cosmo, **kwargs)
     return Cosmograph(**kwargs)
 
 
-def process_cosmo_input(data, kwargs):
+def process_cosmo_input(kwargs):
+    data = kwargs.pop('data', None)
     return CosmoArguments(data, kwargs).prepare_kwargs()
 
 

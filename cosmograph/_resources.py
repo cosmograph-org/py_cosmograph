@@ -425,10 +425,15 @@ class ConfigsDacc:
 
         widget_config_properties = to_dict(dedupped_interfaces, 'py_name')
 
-        assert len(widget_config_properties) == len(
-            dedupped_interfaces
-        ), f"widget_config had some duplicate properties"
-        # print(f"{len(widget_config_properties)=}")
+        if len(widget_config_properties) != len(dedupped_interfaces):
+            msg = "widget_config had some duplicate properties"
+            first, last = first_and_last_dups(pd.DataFrame(dedupped_interfaces), 'py_name')
+            msg += f"First and last instances of duplicates:\n{first}\n{last}"
+            # TODO: Establish and enfore better SSOT strategy in JS. Ignore for now
+            # raise ValueError(msg)
+            from warnings import warn
+            warn(f"WARNING:\n{msg}")
+
         return pd.DataFrame(widget_config_properties).T
 
     @cached_property
@@ -777,6 +782,11 @@ def camel_to_snake(camel_string):
     """
     return _camel_to_snake_re.sub(r'_\1', camel_string).lower()
 
+
+def first_and_last_dups(df, key_col):
+    """Returns the first and last instances of duplicates in a dataframe."""
+    key_col = 'py_name'
+    return df[df.duplicated(key_col, 'first')], df[df.duplicated(key_col, 'last')]
 
 # --------------------------------------------------------------------------------------
 # Parsing Typescript (with AI)

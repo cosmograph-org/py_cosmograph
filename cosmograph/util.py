@@ -57,6 +57,7 @@ from i2 import Sig, Param, params_to_docstring
 
 PARAMS_SSOT_PATH = data_dir / "params_ssot.json"
 
+# TODO: add ssot validation
 
 def _params_ssot(param_names=None):
     params_ssot = json.loads(PARAMS_SSOT_PATH.read_text())
@@ -76,6 +77,12 @@ def cosmograph_base_signature(param_names=None):
 
     return Sig([Param(**d) for d in params_ssot])
 
+
+def validate_signature(sig):
+    """Validate a signature. 
+    Namely, check that all non-None default types are "subclasses" of the annotation type
+    """
+    pass
 
 def cosmograph_base_docs(param_names=None, take_name_of_types=True):
     """Get the params information part of a docstring"""
