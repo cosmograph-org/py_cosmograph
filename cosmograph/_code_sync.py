@@ -586,6 +586,106 @@ def execute_and_get_function(code_str, func_name=None):
     return namespace[func_name]
 
 
+import inspect
+import typing
+from typing import get_origin, get_args
+
+
+def diagnose_parameter_default(param: inspect.Parameter) -> dict:
+    """
+    Examines the alignment between an inspect.Parameter object's default value
+    and its type annotation. Returns a dictionary with various diagnostic flags
+    that may be of interest when analyzing function signatures.
+
+    Example fields:
+      - "missing_annotation": True if there is no type annotation.
+      - "missing_default": True if there is no default value.
+      - "none_without_optional": True if the default is None but the annotation does not allow None.
+      - "default_not_in_type": True if the default is not None and is not an instance of the annotated type.
+      - "suspected_type_mismatch": True if the type annotation suggests a container or union and
+        the default fails rudimentary consistency checks.
+
+    Notes:
+      - Uses only standard library for type inspection. If a more robust approach
+        is needed, especially for containers (e.g., List[int] or Dict[str, str]) or
+        deeper type checks, third-party libraries like 'typeguard' could be considered.
+    """
+
+    diagnosis = {}
+
+    # 1. Check if annotation is missing.
+    if param.annotation is inspect._empty:
+        diagnosis["missing_annotation"] = True
+        return diagnosis
+    else:
+        diagnosis["missing_annotation"] = False
+
+    # 2. Check if default is missing.
+    if param.default is inspect._empty:
+        diagnosis["missing_default"] = True
+        # Still return partial results, no reason to proceed with default-based checks
+        return diagnosis
+    else:
+        diagnosis["missing_default"] = False
+
+    # Helper to detect if an annotation is an optional type (including Union[..., NoneType]).
+    def is_annotation_optional(anno) -> bool:
+        # Detect Optional[X] which is a Union[X, type(None)]
+        # or some Union that includes None.
+        origin = get_origin(anno)
+        if origin is typing.Union:
+            args = get_args(anno)
+            return any(a is type(None) for a in args)
+        return False
+
+    # Helper to check if val matches the annotated type. This is a limited check:
+    # - If annotation is a Union, check if val is instance of any type in the union
+    # - If annotation is a generic container, this won't fully check subtype correctness
+    #   but it will check the container type itself (e.g., list vs. dict).
+    # For deeper checks, a library like 'typeguard' is more suitable.
+    def is_value_instance_of_annotation(val, anno) -> bool:
+        origin = get_origin(anno)
+        if origin is typing.Union:
+            # For Union types, check membership in any possibility
+            args = get_args(anno)
+            return any(is_value_instance_of_annotation(val, arg) for arg in args)
+        elif origin is None:
+            # Not a Union or a generic type; just do regular isinstance check
+            if anno is type(None):
+                return val is None
+            return isinstance(val, anno)
+        else:
+            # A generic type like list, dict, etc. We'll just compare the origin type
+            # with the type of the object (e.g., 'list' if it's List[int], etc.).
+            # This won't validate item subtypes (e.g., List[int] vs List[str]).
+            if isinstance(val, origin):
+                return True
+            return False
+
+    # 3. Check if the default is None without being optional.
+    if param.default is None and not is_annotation_optional(param.annotation):
+        diagnosis["none_without_optional"] = True
+    else:
+        diagnosis["none_without_optional"] = False
+
+    # 4. Check if the default value is out of alignment with the annotation.
+    if param.default is not None:
+        if not is_value_instance_of_annotation(param.default, param.annotation):
+            diagnosis["default_not_in_type"] = True
+        else:
+            diagnosis["default_not_in_type"] = False
+    else:
+        # If default is None, it's either allowed or not, and that's covered above
+        diagnosis["default_not_in_type"] = False
+
+    # Optionally, add more granular checks here for container or union complexity.
+    # For instance, we could identify if the annotation is a container type
+    # (List, Set, Dict, etc.) and attempt deeper checks. That is beyond this
+    # minimal demonstration.
+
+    return diagnosis
+
+
 # import inspect
 # import textwrap
 # import ast
