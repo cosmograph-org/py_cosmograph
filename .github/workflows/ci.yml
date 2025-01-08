@@ -60,11 +60,14 @@ jobs:
 
       - name: Install Package
         run: |
-          pip install --upgrade pip
-          pip install .
-          
+          python -m pip install --upgrade pip
+          python -m pip install .
+          # If pytest is not already installed through setup.cfg or setup.py requirements,
+          # include the line below:
+          python -m pip install pytest
+
       - name: Run Tests
-        run: pytest --maxfail=1 --disable-warnings
+        run: python -m pytest --maxfail=1 --disable-warnings
 
   publish:
     name: Publish
