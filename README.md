@@ -11,6 +11,8 @@ The **Cosmograph Widget** brings the power of Cosmograph's GPU-accelerated force
 
 ## 🚀 Installation
 
+Note: You'll need python 3.10 or greater. 
+
 To install the Cosmograph widget, simply run:
 
 ```sh
