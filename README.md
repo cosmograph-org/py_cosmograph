@@ -2,6 +2,7 @@
 
 The **Cosmograph Widget** brings the power of Cosmograph's GPU-accelerated force layout graph visualization right into your Jupyter notebooks. Built on top of [Anywidget](https://anywidget.dev/), this widget provides a seamless, interactive graph exploration experience directly within your data science workflow, making it easier than ever to visualize complex data relationships and embeddings.
 
+
 ## ✨ Key Features
 
 - **Interactive Visualization**: Pan, zoom, select, and hover to explore large, complex network graphs right in your notebook.
