@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph.base &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cosmograph.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cosmograph.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base functionality of cosmograph&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span><span class="p">,</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2.doc_mint</span><span class="w"> </span><span class="kn">import</span> <span class="n">inject_docstring_content</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph_widget</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmograph</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">snake_to_camel_case</span><span class="p">,</span>
+    <span class="n">cosmograph_base_docs</span><span class="p">,</span>
+    <span class="n">cosmograph_base_signature</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">cosmo_base_sig</span> <span class="o">=</span> <span class="n">cosmograph_base_signature</span><span class="p">()</span>
+<span class="n">cosmo_base_params_doc_str</span> <span class="o">=</span> <span class="n">cosmograph_base_docs</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="base_cosmo">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.base_cosmo">[docs]</a>
+<span class="nd">@inject_docstring_content</span><span class="p">(</span><span class="n">cosmo_base_params_doc_str</span><span class="p">,</span> <span class="n">position</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nd">@cosmo_base_sig</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">base_cosmo</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thin layer over CosmographWidget to provide a base interface to the widget object.</span>
+
+<span class="sd">    All this layer does is pass on the arguments to the CosmographWidget object.</span>
+<span class="sd">    The only difference between this and the cosmograph object is that this one has</span>
+<span class="sd">    an actual signature, with argument names, defaults, and type annotations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Cosmograph</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># @inject_docstring_content(cosmo_base_params_doc_str, position=-1)</span>
+<span class="c1"># @cosmo_base_sig.inject_into_keyword_variadic</span>
+<div class="viewcode-block" id="cosmo">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.cosmo">[docs]</a>
+<span class="nd">@inject_docstring_content</span><span class="p">(</span><span class="n">cosmo_base_params_doc_str</span><span class="p">,</span> <span class="n">position</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">disable_simulation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
+    <span class="n">simulation_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1000,</span>
+    <span class="n">simulation_gravity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0,</span>
+    <span class="n">simulation_center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0,</span>
+    <span class="n">simulation_repulsion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
+    <span class="n">simulation_repulsion_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1.7,</span>
+    <span class="n">simulation_repulsion_quadtree_levels</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#12,</span>
+    <span class="n">simulation_link_spring</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">simulation_link_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
+    <span class="n">simulation_link_dist_random_variation_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#[1, 1.2],</span>
+    <span class="n">simulation_repulsion_from_mouse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
+    <span class="n">simulation_friction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.85,</span>
+    <span class="n">simulation_cluster</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">background_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#222222&#39;,</span>
+    <span class="n">space_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#4096,</span>
+    <span class="n">point_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#b3b3b3&#39;,</span>
+    <span class="n">point_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
+    <span class="n">point_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#4,</span>
+    <span class="n">point_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">hovered_point_cursor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">render_hovered_point_ring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
+    <span class="n">hovered_point_ring_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;white&#39;,</span>
+    <span class="n">focused_point_ring_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">focused_point_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">render_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#True,</span>
+    <span class="n">link_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#666666&#39;,</span>
+    <span class="n">link_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
+    <span class="n">link_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">link_width_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">curved_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
+    <span class="n">curved_link_segments</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#19,</span>
+    <span class="n">curved_link_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.8,</span>
+    <span class="n">curved_link_control_point_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.5,</span>
+    <span class="n">link_arrows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_arrows_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">link_visibility_distance_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#[50, 150],</span>
+    <span class="n">link_visibility_min_transparency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.25,</span>
+    <span class="n">use_quadtree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
+    <span class="n">show_FPS_monitor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
+    <span class="n">pixel_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
+    <span class="n">scale_points_on_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #True,</span>
+    <span class="n">initial_zoom_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #3,</span>
+    <span class="n">disable_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #False,</span>
+    <span class="n">enable_drag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fit_view_on_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#True,</span>
+    <span class="n">fit_view_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#250,</span>
+    <span class="n">fit_view_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fit_view_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fit_view_by_points_in_rect</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_sampling_distance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#150,</span>
+    <span class="n">point_id_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_index_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_size_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_size_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_label_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_label_weight_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_x_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_y_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_cluster_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_cluster_strength_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">point_include_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_source_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_source_index_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_target_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_target_index_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_width_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_arrow_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_strength_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_strength_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">link_include_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_dynamic_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_labels_for</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_top_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_top_labels_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_top_labels_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_label_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dynamic_label_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">label_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_hovered_point_label</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">disable_point_size_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">disable_link_width_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">disable_point_color_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">disable_link_color_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">points</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">links</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">clicked_point_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">clicked_point_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">selected_point_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">changePoints</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">changeLinks</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thin layer over CosmographWidget to provide a base interface to the widget object,</span>
+<span class="sd">    with signature, docs with argument descriptions, and a more flexible interface</span>
+<span class="sd">    comprising some data processing, argument aliasing and validation, error handling,</span>
+<span class="sd">    etc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">process_cosmo_input</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+    <span class="k">if</span> <span class="s1">&#39;points&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;links&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="c1"># If no data is given, just return a partial function with the kwargs filled in</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">cosmo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Cosmograph</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_cosmo_input</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CosmoArguments</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_kwargs</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_none_values</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="CosmoArguments">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.CosmoArguments">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CosmoArguments</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Container for cosmograph arguments, along with diagnosis and processing methods</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># TODO: Should any Nones actually be passed on?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_kwargs</span><span class="p">()</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points_and_links</span><span class="p">()</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">remove_none_values</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="n">links</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">valid_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cosmo_base_sig</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">invalid_keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">valid_names</span>
+
+        <span class="c1"># check that all keys of kwargs are in valid_names</span>
+        <span class="k">if</span> <span class="n">invalid_keywords</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;I didn&#39;t recognize some of your arguments:</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">if</span> <span class="n">invalid_kws_that_are_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">argument_aliases</span><span class="p">):</span>
+                <span class="c1"># make a message for the aliases, mentioning the keyword they are aliases for</span>
+                <span class="c1"># and should be replaced by</span>
+                <span class="n">error_msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;You said `</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">`: Did you mean `</span><span class="si">{</span><span class="n">argument_aliases</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span><span class="si">}</span><span class="s2">`?&quot;</span>
+                    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">invalid_kws_that_are_aliases</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">invalid_kws_that_are_not_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="n">argument_aliases</span>
+            <span class="p">):</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_kws_that_are_not_aliases</span><span class="p">)</span>
+                <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;And these I have no idea about: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CosmoArguments.points_and_links">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.CosmoArguments.points_and_links">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">points_and_links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the points and links from the arguments, and raise an error if both are</span>
+<span class="sd">        specified and `data` is also specified.</span>
+
+<span class="sd">        The rules:</span>
+<span class="sd">        - If `data` is not given (i.e. `None`), then `points` and `links` are returned as is.</span>
+<span class="sd">        - If `data` is given, then:</span>
+<span class="sd">            - If `points` is not given, then `points` is taken to be `data`.</span>
+<span class="sd">            - If `links` is not given, then `links` is taken to be `data`.</span>
+<span class="sd">            - If both `points` and `links` are given, raise an error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;links&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># If points is None, take data to be points (whether links is None or not)</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">elif</span> <span class="n">links</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># and points is not None</span>
+                <span class="c1"># If points are given, but links is None, use data as links</span>
+                <span class="n">links</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If both points and links are given, raise an error</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot specify `points` and `links` if you&#39;ve specified `data`&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">links</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">non_none_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">non_nones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_nones_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_are_none</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_nones</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">none_are_none</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">non_nones</span><span class="p">(</span><span class="n">names</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Make aliases for the arguments</span>
+<span class="n">argument_aliases</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="s1">&#39;points&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;edges&#39;</span><span class="p">:</span> <span class="s1">&#39;links&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="c1"># camel case aliases</span>
+<span class="n">argument_aliases</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">argument_aliases</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">snake_to_camel_case</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cosmo_base_sig</span><span class="o">.</span><span class="n">names</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">argument_aliases</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">argument_aliases</span><span class="p">,</span>
+    <span class="o">**</span><span class="p">{</span>
+        <span class="n">snake_to_camel_case</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">first_char_trans</span><span class="o">=</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">):</span> <span class="n">k</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cosmo_base_sig</span><span class="o">.</span><span class="n">names</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Some old code that might be useful</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="n">NodeId</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># TODO: Also include ints? Oblige ids to be valid python identifiers?</span>
+
+
+<div class="viewcode-block" id="Node">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.Node">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Node</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">NodeId</span></div>
+
+
+
+<div class="viewcode-block" id="Link">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.Link">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Link</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">NodeId</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">NodeId</span></div>
+
+
+
+<span class="c1"># TODO: Find a way to make these have a .validate (with pydantic)</span>
+<span class="n">Nodes</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span>
+<span class="n">Links</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span><span class="n">Link</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="GraphJson">
+<a class="viewcode-back" href="../../module_docs/cosmograph/base.html#cosmograph.base.GraphJson">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphJson</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">links</span><span class="p">:</span> <span class="n">Links</span>
+    <span class="n">nodes</span><span class="p">:</span> <span class="n">Nodes</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_json_string</span>
+
+
+<span class="n">html_code_data_def_template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">&lt;div&gt;</span>
+<span class="s1">    &lt;canvas&gt;&lt;/canvas&gt;</span>
+<span class="s1">&lt;/div&gt;</span>
+
+<span class="s1">&lt;script&gt;</span>
+<span class="s1">    const data = </span><span class="si">{json_data_str}</span>
+<span class="s1">    const canvas = document.querySelector(&quot;canvas&quot;);</span>
+<span class="s1">    const graph = new cosmos.Graph(canvas);</span>
+<span class="s1">    graph.setData(data.nodes, data.links);</span>
+<span class="s1">    graph.fitView();</span>
+<span class="s1">&lt;/script&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+
+<span class="c1"># TODO: Function should be moved to a better place</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mk_html_code</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">ensure_json_string</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">html_code_data_def_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json_data_str</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

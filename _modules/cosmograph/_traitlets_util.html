@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph._traitlets_util &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cosmograph._traitlets_util</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cosmograph._traitlets_util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utils for traitlets</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Note: Vendorized from ju package. Please keep them synchronized.</span>
+<span class="c1"># Consider adding ju as dependency.</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">traitlets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">traitlets</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraitType</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections.abc</span>
+
+<span class="n">ObserveHandlerPyType</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">]</span>
+
+<span class="c1"># Mapping from traitlets types to Python types (as defined previously)</span>
+<span class="n">py_type_for_traitlet_type</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># C* types before their base types</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CBool</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Bool</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CBytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CComplex</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Complex</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CFloat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CInt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Int</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CUnicode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Unicode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CRegExp</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">DottedObjectName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">ObjectName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">CaselessStrEnum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">FuzzyEnum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Enum</span><span class="p">:</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">TCPAddress</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+    <span class="c1"># Container types and their subclasses</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">List</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Tuple</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Container</span><span class="p">:</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Container</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="c1"># Class and instance types</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">ForwardDeclaredInstance</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Instance</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">ForwardDeclaredType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">This</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">ClassBasedTraitType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+    <span class="c1"># Other types</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Callable</span><span class="p">:</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">ObserveHandler</span><span class="p">:</span> <span class="n">ObserveHandlerPyType</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">UseEnum</span><span class="p">:</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+    <span class="n">traitlets</span><span class="o">.</span><span class="n">TraitType</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="trait_to_py">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_traitlets_util.html#cosmograph._traitlets_util.trait_to_py">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">trait_to_py</span><span class="p">(</span><span class="n">trait</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">TraitType</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">TraitType</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">type</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a traitlets trait (instance or type) to a Python object (instance or type)</span>
+
+<span class="sd">    &gt;&gt;&gt; trait_to_py(traitlets.Bool())</span>
+<span class="sd">    &lt;class &#39;bool&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; trait_to_py(traitlets.Union([traitlets.Unicode(), traitlets.Float()]))</span>
+<span class="sd">    typing.Union[str, float]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trait</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="c1"># Trait is a type (class), map it directly</span>
+        <span class="k">if</span> <span class="n">trait</span> <span class="ow">in</span> <span class="n">py_type_for_traitlet_type</span><span class="p">:</span>
+            <span class="n">py_type</span> <span class="o">=</span> <span class="n">py_type_for_traitlet_type</span><span class="p">[</span><span class="n">trait</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">py_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown traitlet type: </span><span class="si">{</span><span class="n">trait</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Trait is an instance</span>
+        <span class="n">trait_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">trait</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Instance</span><span class="p">:</span>
+            <span class="c1"># For Instance traits, return the class if available</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">klass</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">trait</span><span class="o">.</span><span class="n">klass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
+        <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">UseEnum</span><span class="p">:</span>
+            <span class="c1"># For UseEnum traits, return the enum class</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trait</span><span class="p">,</span> <span class="s1">&#39;enum_class&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">trait</span><span class="o">.</span><span class="n">enum_class</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span>
+        <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Type</span><span class="p">:</span>
+            <span class="c1"># For Type traits, return Type[class]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">klass</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">trait</span><span class="o">.</span><span class="n">klass</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Get the base Python type</span>
+            <span class="n">py_type</span> <span class="o">=</span> <span class="n">trait_to_py</span><span class="p">(</span><span class="n">trait_type</span><span class="p">)</span>
+            <span class="c1"># Extract type parameters if any</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">extract_type_params</span><span class="p">(</span><span class="n">trait_type</span><span class="p">,</span> <span class="n">trait</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+                <span class="c1"># For typing generics, apply the type parameters</span>
+                <span class="k">return</span> <span class="n">py_type</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">py_type</span></div>
+
+
+
+<div class="viewcode-block" id="extract_type_params">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_traitlets_util.html#cosmograph._traitlets_util.extract_type_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_type_params</span><span class="p">(</span><span class="n">trait_type</span><span class="p">,</span> <span class="n">trait</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract type parameters for a trait.</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_type_params(</span>
+<span class="sd">    ...     traitlets.Union, traitlets.Union([traitlets.Unicode(), traitlets.Float()])</span>
+<span class="sd">    ... )</span>
+<span class="sd">    (&lt;class &#39;str&#39;&gt;, &lt;class &#39;float&#39;&gt;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+        <span class="c1"># For Union traits, get the types of the inner traits</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">trait_to_py</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trait</span><span class="o">.</span><span class="n">trait_types</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">List</span><span class="p">:</span>
+        <span class="c1"># For List traits, get the element type</span>
+        <span class="k">if</span> <span class="n">trait</span><span class="o">.</span><span class="n">_trait</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">trait_to_py</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">_trait</span><span class="p">),)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,)</span>
+    <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Tuple</span><span class="p">:</span>
+        <span class="c1"># For Tuple traits, get the types of the elements</span>
+        <span class="k">if</span> <span class="n">trait</span><span class="o">.</span><span class="n">_traits</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">trait_to_py</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trait</span><span class="o">.</span><span class="n">_traits</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span>
+        <span class="c1"># For Set traits, get the element type</span>
+        <span class="k">if</span> <span class="n">trait</span><span class="o">.</span><span class="n">_trait</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">trait_to_py</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">_trait</span><span class="p">),)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,)</span>
+    <span class="k">elif</span> <span class="n">trait_type</span> <span class="ow">is</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
+        <span class="c1"># For Dict traits, get the key and value types</span>
+        <span class="n">key_type</span> <span class="o">=</span> <span class="n">trait_to_py</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">_key_trait</span><span class="p">)</span> <span class="k">if</span> <span class="n">trait</span><span class="o">.</span><span class="n">_key_trait</span> <span class="k">else</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
+        <span class="n">value_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">trait_to_py</span><span class="p">(</span><span class="n">trait</span><span class="o">.</span><span class="n">_value_trait</span><span class="p">)</span> <span class="k">if</span> <span class="n">trait</span><span class="o">.</span><span class="n">_value_trait</span> <span class="k">else</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">key_type</span><span class="p">,</span> <span class="n">value_type</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># For other types, no type parameters</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

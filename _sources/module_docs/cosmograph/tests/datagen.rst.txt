@@ -1,0 +1,4 @@
+cosmograph.tests.datagen
+========================
+.. automodule:: cosmograph.tests.datagen
+   :members:

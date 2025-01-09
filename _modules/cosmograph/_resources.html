@@ -1,0 +1,1667 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph._resources &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cosmograph._resources</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cosmograph._resources</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Define and acquire resources for the Cosmograph package.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">,</span> <span class="n">partial</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cache_this</span><span class="p">,</span>
+    <span class="n">ensure_dir</span><span class="p">,</span>
+    <span class="n">TextFiles</span><span class="p">,</span>
+    <span class="n">add_extension</span><span class="p">,</span>
+    <span class="n">Files</span><span class="p">,</span>
+    <span class="n">filt_iter</span><span class="p">,</span>
+    <span class="n">wrap_kvs</span><span class="p">,</span>
+    <span class="n">written_bytes</span><span class="p">,</span>
+    <span class="n">read_from_bytes</span><span class="p">,</span>
+    <span class="n">Pipe</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol.filesys</span><span class="w"> </span><span class="kn">import</span> <span class="n">mk_json_bytes_wrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2</span><span class="w"> </span><span class="kn">import</span> <span class="n">postprocess</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_dir_path</span><span class="p">,</span> <span class="n">json_files</span><span class="p">,</span> <span class="n">data_files</span>
+
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="c1"># General utils</span>
+
+
+<span class="n">_json_wrap</span> <span class="o">=</span> <span class="n">mk_json_bytes_wrap</span><span class="p">(</span><span class="n">dumps_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+<span class="n">JsonFiles</span> <span class="o">=</span> <span class="n">_json_wrap</span><span class="p">(</span><span class="n">TextFiles</span><span class="p">)</span>  <span class="c1"># TODO: should we add json filter? change name?</span>
+
+<span class="n">cache_to_json_files</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">cache_this</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">json_files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">add_extension</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">))</span>
+<span class="n">resources_jsons</span> <span class="o">=</span> <span class="n">filt_iter</span><span class="o">.</span><span class="n">suffixes</span><span class="p">([</span><span class="s1">&#39;.json&#39;</span><span class="p">])(</span><span class="n">JsonFiles</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">))</span>
+
+
+<span class="n">parquet_codec</span> <span class="o">=</span> <span class="n">wrap_kvs</span><span class="p">(</span>
+    <span class="n">value_encoder</span><span class="o">=</span><span class="n">written_bytes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">,</span> <span class="n">obj_arg_position_in_writer</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">value_decoder</span><span class="o">=</span><span class="n">read_from_bytes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">parquet_files</span> <span class="o">=</span> <span class="n">parquet_codec</span><span class="p">(</span><span class="n">filt_iter</span><span class="o">.</span><span class="n">suffixes</span><span class="p">(</span><span class="s1">&#39;.parquet&#39;</span><span class="p">)(</span><span class="n">data_files</span><span class="p">))</span>
+<span class="n">cache_to_parquet_files</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">cache_this</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">parquet_files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">add_extension</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="c1"># Getting official color names</span>
+
+
+<span class="nd">@lru_cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_fresh_color_table</span><span class="p">():</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://www.w3.org/TR/css-color-4/#named-colors&#39;</span>
+    <span class="n">all_tables_of_page</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">_color_table_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Color</span><span class="se">\xa0</span><span class="s1">name&#39;</span><span class="p">,</span> <span class="s1">&#39;Hex</span><span class="se">\xa0</span><span class="s1">rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;Decimal&#39;</span><span class="p">]</span>
+    <span class="n">_is_color_table</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">_color_table_columns</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">color_table</span> <span class="o">:=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">_is_color_table</span><span class="p">,</span> <span class="n">all_tables_of_page</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Could not find the color table on the page with columns: </span><span class="si">{</span><span class="n">_color_table_columns</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="c1"># clean up and normalize the column names</span>
+    <span class="n">color_table</span> <span class="o">=</span> <span class="n">color_table</span><span class="p">[</span><span class="n">_color_table_columns</span><span class="p">]</span>
+    <span class="n">color_table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">color_table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\xa0</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">color_table</span><span class="p">[</span><span class="s1">&#39;color_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">color_table</span>
+    <span class="p">),</span> <span class="s2">&quot;color names are not unique&quot;</span>
+    <span class="k">return</span> <span class="n">color_table</span>
+
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourcesDacc</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_dir</span><span class="o">=</span><span class="n">data_dir_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_dir</span> <span class="o">=</span> <span class="n">resources_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_jsons</span> <span class="o">=</span> <span class="n">JsonFiles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_files</span> <span class="o">=</span> <span class="n">Files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources_dir</span><span class="p">)</span>
+
+    <span class="nd">@cache_to_parquet_files</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_color_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_get_fresh_color_table</span><span class="p">()</span>
+
+    <span class="nd">@cache_to_json_files</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_table</span><span class="p">[</span><span class="s1">&#39;color_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_names_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color_names</span><span class="p">)</span>
+
+
+<span class="n">resources_dacc</span> <span class="o">=</span> <span class="n">ResourcesDacc</span><span class="p">()</span>
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="c1"># Creating the configs source files from various sources</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Analyze properties of the various sources of Cosmograph configuration information,</span>
+<span class="sd">compare them, generate a reports, and finally, generate a SoT for the python</span>
+<span class="sd">cosmograph interfaces.</span>
+
+<span class="sd">In this module, we gather the tools needed to:</span>
+<span class="sd">* make normalized configs data from various sources</span>
+<span class="sd">* compare these to the existing saved ones</span>
+<span class="sd">* update the existing saved ones</span>
+<span class="sd">* diagnose/compare these saved configs</span>
+
+
+<span class="sd">(From [this Dec 2024 section below](https://github.com/cosmograph-org/cosmograph/discussions/292#discussioncomment-11447302):)</span>
+<span class="sd">* Defaults: From the [cosmos/.../variables.ts](https://github.com/cosmograph-org/cosmos/blob/main/src/variables.ts) file of the main branch. This file uses a standard, `export const NAME = DEFAULT_VALUE` format, so can robustly be parsed. </span>
+<span class="sd">* Types: From the five TS files;</span>
+<span class="sd">   * from default branch: [cosmos/config.ts](https://github.com/cosmograph-org/cosmos/blob/next/src/config.ts)</span>
+<span class="sd">   * from cosmograph/config dev branch; [config.ts](https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/config.ts), [data.ts](https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/data.ts), [labels.ts](https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/labels.ts), [simulation.ts](https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/simulation.ts)</span>
+<span class="sd">* Descriptions: Could be from the TS files above, and/or from md docs. Permanent source to be determined, but currently was pointed to [this commit](https://github.com/cosmograph-org/cosmograph/blob/8c868898f256a207e12085a17566943bea49c28a/packages/website/pages/docs/v2/widget/configuration.mdx)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="c1"># Creating the configs source files from various sources</span>
+
+<span class="n">DFLT_CONFIG_FILES_DIR</span> <span class="o">=</span> <span class="n">data_dir_path</span>
+<span class="n">DFLT_CONFIG_PREP_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DFLT_CONFIG_FILES_DIR</span><span class="p">,</span> <span class="s1">&#39;config_prep&#39;</span><span class="p">)</span>
+
+<span class="n">source_urls</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;cosmos/variables.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmos/blob/main/src/variables.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmos/config.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmos/blob/next/src/config.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmograph/config.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/config.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmograph/data.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/data.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmograph/labels.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/labels.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmograph/simulation.ts&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/simulation.ts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cosmograph/configuration.mdx&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/cosmograph-org/cosmograph/blob/8c868898f256a207e12085a17566943bea49c28a/packages/website/pages/docs/v2/widget/configuration.mdx&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">source_url_groups</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;defaults&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cosmos/variables.ts&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;types&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;cosmos/config.ts&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cosmograph/config.ts&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cosmograph/data.ts&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cosmograph/labels.ts&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cosmograph/simulation.ts&#39;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;descriptions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cosmograph/configuration.mdx&#39;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="c1"># # Note:</span>
+<span class="c1"># # For public urls, you just need to get a raw url, and download normally</span>
+<span class="c1"># # But for private urls, you need to authenticate first, so we&#39;re not going to go the raw url route</span>
+<span class="c1"># raw_file_url = partial(transform_github_url, target_url_type=&#39;raw_file&#39;)</span>
+<span class="c1"># source_raw_urls = {k: raw_file_url(v) for k, v in source_urls.items()}</span>
+
+<span class="n">cache_to_config_jsons</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">cache_this</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="s1">&#39;config_jsons&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">add_extension</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">cache_to_prep_jsons</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">cache_this</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="s1">&#39;prep_jsons&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">add_extension</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2.doc_mint</span><span class="w"> </span><span class="kn">import</span> <span class="n">params_to_docstring</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">Param</span>
+
+<span class="c1"># TODO: Note, we need ju for config_dict_to_sig and for trait_to_py. Consider vendorizing config_dict_to_sig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph._traitlets_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">trait_to_py</span>  <span class="c1"># vendorized from ju</span>
+
+<span class="n">EXCLUDE_PARAMS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_ipc_points&#39;</span><span class="p">,</span> <span class="s1">&#39;_ipc_links&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_module_from_url">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.get_module_from_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_module_from_url</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span> <span class="vm">__file__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">module_name</span><span class="o">=</span><span class="s1">&#39;remote_module&#39;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a (loaded) module from a url.</span>
+
+<span class="sd">    Note: The url has to be one whose text is the code of the module.</span>
+<span class="sd">    This means, for example, if you&#39;re using github, that a normal github url won&#39;t work,</span>
+<span class="sd">    your need to specify the raw url for the module.</span>
+
+<span class="sd">    WARNING: This is a dangerous function, as it executes code from the url.</span>
+<span class="sd">    Only use this if you trust the source of the url.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="c1"># Create a module and define the __file__ attribute before execution</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="vm">__file__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">module</span><span class="o">.</span><span class="vm">__file__</span> <span class="o">=</span> <span class="vm">__file__</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">module</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cosmograph_widget_class</span><span class="p">(</span>
+    <span class="n">cosmograph_widget_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">cosmograph_widget_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># if no source is give, take the current (locally installed) cosmograph class</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph_widget</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmograph</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cosmograph_widget_source</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="n">Cosmograph</span> <span class="o">=</span> <span class="n">cosmograph_widget_source</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">cosmograph_widget_source</span><span class="p">,</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="ow">and</span> <span class="n">cosmograph_widget_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">cosmograph_widget_source</span>
+        <span class="n">module_behind_url</span> <span class="o">=</span> <span class="n">get_module_from_url</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="vm">__file__</span><span class="o">=</span><span class="nb">__import__</span><span class="p">(</span><span class="s1">&#39;cosmograph_widget&#39;</span><span class="p">)</span><span class="o">.</span><span class="vm">__file__</span>
+        <span class="p">)</span>
+        <span class="n">Cosmograph</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module_behind_url</span><span class="p">,</span> <span class="s1">&#39;Cosmograph&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;cosmograph_widget_source must be a class or a url string, not </span><span class="si">{</span><span class="n">cosmograph_widget_source</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">Cosmograph</span>
+
+
+<div class="viewcode-block" id="ConfigsDacc">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.ConfigsDacc">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigsDacc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to manage the various sources of Cosmograph configuration information.</span>
+
+<span class="sd">    The class has methods to acquire the configuration information from various sources,</span>
+<span class="sd">    parse these raw sources into dictionaries, diagnose and compare these, and finally</span>
+<span class="sd">    generate a specification of the python cosmograph interfaces, including</span>
+<span class="sd">    parameter/argument names, types, defaults, and descriptions.</span>
+
+<span class="sd">    Note that many of these datas are cached into json files.</span>
+<span class="sd">    That is, once they are calculated, they are saved into local json files, and</span>
+<span class="sd">    the data is taken from there. To recompute these files, you can simply delete</span>
+<span class="sd">    the json files in the `config_files_dir` or `prep_dir` directory and they</span>
+<span class="sd">    will be recomputed as soon as they are accessed.</span>
+
+<span class="sd">    Main methods and properties:</span>
+
+<span class="sd">    - `matched_info_df`: A dataframe that shows the comparison of the defaults,</span>
+<span class="sd">        descriptions, and types of the various sources.</span>
+<span class="sd">    - `source_strings`: The raw source strings from the various sources.</span>
+<span class="sd">    - `parsed_*`: The parsed versions of the raw sources.</span>
+
+<span class="sd">    - `diagnosis_items`: A generator of diagnosis items, which are dataframes of</span>
+<span class="sd">        duplicates or other issues found in the sources.</span>
+<span class="sd">    - `print_diagnosis`: Print the diagnosis items.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># A few configuration options</span>
+    <span class="n">exclude_params_in_sig</span> <span class="o">=</span> <span class="n">EXCLUDE_PARAMS</span>
+    <span class="n">rm_default_if_nan_in_sig</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">set_default_to_none_if_nan</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">rm_param_if_no_description_in_sig</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">take_name_of_types_in_docs</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_files_dir</span><span class="o">=</span><span class="n">DFLT_CONFIG_FILES_DIR</span><span class="p">,</span>
+        <span class="n">prep_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">cosmograph_widget_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_files_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">config_files_dir</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep_dir</span> <span class="o">=</span> <span class="n">prep_dir</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_files_dir</span><span class="p">,</span> <span class="s1">&#39;config_prep&#39;</span><span class="p">)</span>
+        <span class="n">ensure_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prep_dir</span><span class="p">,</span> <span class="n">max_dirs_to_make</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_jsons</span> <span class="o">=</span> <span class="n">JsonFiles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_files_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep_jsons</span> <span class="o">=</span> <span class="n">JsonFiles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prep_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cosmograph_widget_source</span> <span class="o">=</span> <span class="n">cosmograph_widget_source</span>
+
+    <span class="nd">@cache_to_prep_jsons</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">source_strings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">hubcap</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">github_file_contents</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># requires pip install hubcap (and set GITHUB_TOKEN env var)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">github_file_contents</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">source_urls</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="nd">@cache_to_prep_jsons</span>
+    <span class="nd">@postprocess</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parsed_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">jy</span><span class="w"> </span><span class="kn">import</span> <span class="n">variable_declarations_pairs</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">source_url_groups</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]:</span>
+            <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">variable_declarations_pairs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_strings</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+
+    <span class="nd">@cache_to_prep_jsons</span>
+    <span class="nd">@postprocess</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parsed_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">source_url_groups</span><span class="p">[</span><span class="s1">&#39;descriptions&#39;</span><span class="p">]:</span>
+            <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">ai_md_parser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_strings</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="nd">@cache_to_prep_jsons</span>
+    <span class="nd">@postprocess</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parsed_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">source_url_groups</span><span class="p">[</span><span class="s1">&#39;types&#39;</span><span class="p">]:</span>
+            <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">ai_ts_parser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_strings</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">traitlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph_widget</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmograph</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">traitlets.traitlets</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDescriptor</span>
+
+        <span class="n">Cosmograph</span> <span class="o">=</span> <span class="n">get_cosmograph_widget_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cosmograph_widget_source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">Cosmograph</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseDescriptor</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_defaults</span><span class="p">[</span><span class="s1">&#39;cosmos/variables.ts&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_descriptions</span><span class="p">[</span><span class="s1">&#39;cosmograph/configuration.mdx&#39;</span><span class="p">][</span><span class="s1">&#39;interfaces&#39;</span><span class="p">][</span>
+            <span class="mi">0</span>
+        <span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">assert_expected_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">assert_expected_keys</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_types</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+                <span class="s1">&#39;cosmograph/config.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cosmograph/data.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cosmograph/labels.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cosmograph/simulation.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cosmos/config.ts&#39;</span><span class="p">,</span>
+            <span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Not the keys I expected! If you want to ignore this, set assert_expected_keys=False&quot;</span>
+
+        <span class="k">for</span> <span class="n">widget_config_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_types</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">widget_config_value</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;interfaces&#39;</span><span class="p">}</span>
+            <span class="n">interfaces</span> <span class="o">=</span> <span class="n">widget_config_value</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]:</span>
+                    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span>
+                        <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">}</span>
+                    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;missing fields: </span><span class="si">{</span><span class="nb">set</span><span class="p">([</span><span class="s1">&#39;description&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="si">=}</span><span class="s2">)&quot;</span>
+                    <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;py_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">camel_to_snake</span><span class="p">(</span><span class="n">prop</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                    <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;origin_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="k">yield</span> <span class="n">prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        First, flattens the defaults dictionary, then transforms the keys to match</span>
+<span class="sd">        traitlets keys.</span>
+
+<span class="sd">        Steps:</span>
+<span class="sd">        - Converts camelCase to snake_case.</span>
+<span class="sd">        - Removes prefixes like &#39;default_&#39;.</span>
+<span class="sd">        - Maps specific terms (e.g., &#39;node&#39; -&gt; &#39;point&#39;, &#39;link&#39; -&gt; &#39;link&#39;).</span>
+<span class="sd">        - Collapses nested structures by combining components.</span>
+<span class="sd">        - takes care of edge cases</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flat_defaults (dict): The flat dictionary of defaults.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A new dictionary with transformed keys.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flat_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">camel_to_snake</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">transform_defaults_keys</span><span class="p">(</span><span class="n">flat_defaults</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_md_descriptions_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dataframe of descriptions from the (&quot;documentation&quot;) md file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_descriptions</span><span class="p">[</span><span class="s1">&#39;cosmograph/configuration.mdx&#39;</span><span class="p">][</span><span class="s1">&#39;interfaces&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+            <span class="s1">&#39;properties&#39;</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_traitlets_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataframe of traitlets properties (only signature attributes)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sig_to_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traitlets_sig</span><span class="p">)</span>  <span class="c1"># .set_index(&#39;name&#39;, drop=True)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ts_types_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">assert_expected_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dataframe containing various features of properties extracted from the TS files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># widget_config = json_files[&#39;_widget_config.json&#39;]</span>
+
+        <span class="n">interfaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">(</span><span class="n">assert_expected_keys</span><span class="o">=</span><span class="n">assert_expected_keys</span><span class="p">))</span>
+        <span class="c1"># print(f&quot;{len(interfaces)=}&quot;)</span>
+
+        <span class="c1"># Solve all duplicates taking the CosmographConfig orgin_name</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">dedupper</span><span class="p">(</span><span class="n">name_group</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name_group</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name_group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="n">cosmo_config</span> <span class="o">:=</span> <span class="nb">next</span><span class="p">(</span>
+                    <span class="nb">filter</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;origin_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;CosmographConfig&#39;</span><span class="p">,</span> <span class="n">name_group</span>
+                    <span class="p">),</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">cosmo_config</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Unresolved duplicate, I&#39;ll just take the first mention: </span><span class="si">{</span><span class="n">name_group</span><span class="si">=}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">return</span> <span class="n">name_group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># dedupped_interfaces = list(map(dedupper, interfaces))</span>
+
+        <span class="n">props_grouped_by_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">find_duplicates</span><span class="p">(</span>
+                <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">),</span> <span class="n">val_filt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dedupped_interfaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">dedupper</span><span class="p">,</span> <span class="n">props_grouped_by_name</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+        <span class="n">widget_config_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span><span class="n">dedupped_interfaces</span><span class="p">,</span> <span class="s1">&#39;py_name&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">widget_config_properties</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dedupped_interfaces</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;widget_config had some duplicate properties&quot;</span>
+            <span class="n">first</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="n">first_and_last_dups</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dedupped_interfaces</span><span class="p">),</span> <span class="s1">&#39;py_name&#39;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;First and last instances of duplicates:</span><span class="se">\n</span><span class="si">{</span><span class="n">first</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">last</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1"># TODO: Establish and enfore better SSOT strategy in JS. Ignore for now</span>
+            <span class="c1"># raise ValueError(msg)</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING:</span><span class="se">\n</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">widget_config_properties</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">params_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;defaults&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="s1">&#39;descriptions&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_md_descriptions</span><span class="p">,</span>
+            <span class="s1">&#39;types&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_types</span><span class="p">,</span>
+            <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_traitlets_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flat_keys_to_original_default_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">leaf_paths</span>
+
+        <span class="n">original_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_defaults</span><span class="p">[</span><span class="s1">&#39;cosmos/variables.ts&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">camel_to_snake</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">leaf_paths</span><span class="p">(</span><span class="n">original_defaults</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ConfigsDacc.info_dfs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.ConfigsDacc.info_dfs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A dictionary of dataframes of the various sources of configuration information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_traitlets_df</span><span class="p">[[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;annotation&#39;</span><span class="p">]]</span>
+        <span class="c1"># rename all columns to have a &quot;traitlet_&quot; prefix</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;traitlet_</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">})</span>
+        <span class="k">yield</span> <span class="s1">&#39;traitlets&#39;</span><span class="p">,</span> <span class="n">df</span>
+
+        <span class="c1"># defaults</span>
+        <span class="k">yield</span> <span class="s1">&#39;defaults&#39;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;defaults_default&#39;</span><span class="p">)</span>
+
+        <span class="c1"># descriptions</span>
+        <span class="n">descriptions_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_md_descriptions_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># change &quot;NO_DEFAULT&quot; values of &quot;default&quot; column to NaNs</span>
+        <span class="n">descriptions_df</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">descriptions_df</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">&#39;NO_DEFAULT&#39;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">NA</span>
+        <span class="p">)</span>
+
+        <span class="c1"># rename all columns to have a &quot;md_descriptions&quot; prefix</span>
+        <span class="n">descriptions_df</span> <span class="o">=</span> <span class="n">descriptions_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;md_descriptions_</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">descriptions_df</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="s1">&#39;descriptions&#39;</span><span class="p">,</span> <span class="n">descriptions_df</span>
+
+        <span class="c1"># types</span>
+        <span class="n">types_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts_types_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># rename all columns to have a &quot;ts_types_&quot; prefix</span>
+        <span class="n">types_df</span> <span class="o">=</span> <span class="n">types_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;ts_types_</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">types_df</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="s1">&#39;types&#39;</span><span class="p">,</span> <span class="n">types_df</span></div>
+
+
+<div class="viewcode-block" id="ConfigsDacc.cosmograph_base_params">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.ConfigsDacc.cosmograph_base_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the params information for the cosmograph base class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">param_names</span> <span class="o">=</span> <span class="n">param_names</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traitlets</span><span class="p">)</span>
+        <span class="n">param_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">param_names</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_params_in_sig</span>
+        <span class="p">]</span>  <span class="c1"># keeps order</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_info_df</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">defaults_default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;annotation&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">traitlet_annotation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">md_descriptions_description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">kind</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kind</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rm_param_if_no_description_in_sig</span>
+                <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">pd</span><span class="o">.</span><span class="n">NA</span>
+                <span class="ow">or</span> <span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>  <span class="c1"># without yielding d</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_default_to_none_if_nan</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">rm_default_if_nan_in_sig</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="n">d</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_params_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotation_to_str</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cosmograph_base_params</span><span class="p">()))</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">annotation_to_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigsDacc.cosmograph_base_docs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.ConfigsDacc.cosmograph_base_docs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_docs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the params information part of a docstring&quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosmograph_base_params</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params_to_docstring</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span> <span class="n">take_name_of_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">take_name_of_types_in_docs</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosmograph_base_params</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">prep_for_param</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;annotation&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">d</span>
+
+        <span class="k">return</span> <span class="n">Sig</span><span class="p">([</span><span class="n">Param</span><span class="p">(</span><span class="o">**</span><span class="n">prep_for_param</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_info_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">move_to_front</span>
+
+        <span class="n">front_cols</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;traitlet_annotation&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;defaults_default&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ts_types_default&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;md_descriptions_default&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;md_descriptions_description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ts_types_description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ts_types_type&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">info_dfs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info_dfs</span><span class="p">())</span>
+
+        <span class="n">merge_dfs</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">info_dfs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;traitlets&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">info_dfs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">merge_dfs</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">move_to_front</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">front_cols</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_info_df_prepared_for_export</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matched_info_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">[</span><span class="s1">&#39;traitlet_annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;traitlet_annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+        <span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span>
+
+        <span class="c1"># # traitlets data</span>
+
+        <span class="c1"># df = self._traitlets_df[[&#39;default&#39;, &#39;annotation&#39;]]</span>
+        <span class="c1"># # rename all columns to have a &quot;traitlet_&quot; prefix</span>
+        <span class="c1"># df = df.rename(columns={col: f&quot;traitlet_{col}&quot; for col in df.columns})</span>
+
+        <span class="c1"># # merge in defaults (but keep all traitlets)</span>
+        <span class="c1"># df = df.merge(</span>
+        <span class="c1">#     pd.Series(self.defaults, name=&#39;defaults_default&#39;),</span>
+        <span class="c1">#     left_index=True,</span>
+        <span class="c1">#     right_index=True,</span>
+        <span class="c1">#     how=&#39;left&#39;,</span>
+        <span class="c1"># )</span>
+
+        <span class="c1"># # md descriptions source</span>
+        <span class="c1"># descriptions_df = self._md_descriptions_df.copy()</span>
+        <span class="c1"># # rename all columns to have a &quot;md_descriptions&quot; prefix</span>
+        <span class="c1"># descriptions_df = descriptions_df.rename(</span>
+        <span class="c1">#     columns={col: f&quot;md_descriptions_{col}&quot; for col in descriptions_df.columns}</span>
+        <span class="c1"># )</span>
+        <span class="c1"># df = df.merge(</span>
+        <span class="c1">#     descriptions_df,</span>
+        <span class="c1">#     left_index=True,</span>
+        <span class="c1">#     right_index=True,</span>
+        <span class="c1">#     how=&#39;left&#39;,</span>
+        <span class="c1"># )</span>
+
+        <span class="c1"># # ts types source</span>
+        <span class="c1"># types_df = self._ts_types_df.copy()</span>
+        <span class="c1"># # rename all columns to have a &quot;ts_types_&quot; prefix</span>
+        <span class="c1"># types_df = types_df.rename(</span>
+        <span class="c1">#     columns={col: f&quot;ts_types_{col}&quot; for col in types_df.columns}</span>
+        <span class="c1"># )</span>
+        <span class="c1"># # merge (but keep all traitlets)</span>
+        <span class="c1"># df = df.merge(</span>
+        <span class="c1">#     types_df,</span>
+        <span class="c1">#     left_index=True,</span>
+        <span class="c1">#     right_index=True,</span>
+        <span class="c1">#     how=&#39;left&#39;,</span>
+        <span class="c1"># )</span>
+
+        <span class="c1"># return move_to_front(df, front_cols)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">traitlets_sig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">py_annotations</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">trait_to_py</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traitlets</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">py_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;default_value&#39;</span><span class="p">,</span> <span class="n">Undefined</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traitlets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">param_dicts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                <span class="s1">&#39;annotation&#39;</span><span class="p">:</span> <span class="n">py_annotations</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">py_defaults</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traitlets</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Sig</span><span class="p">([</span><span class="n">Param</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">param_dicts</span><span class="p">])</span>
+
+
+    <span class="c1"># TODO: Might be an old one. Consider deleting! No widget_config_from_ts attr</span>
+    <span class="c1">#    Find its definition in ConfigSourceDicts class</span>
+    <span class="c1"># @cached_property</span>
+    <span class="c1"># def sig_dfs(self):</span>
+    <span class="c1">#     from traitlets import Undefined</span>
+    <span class="c1">#     from i2 import Sig, Param</span>
+
+    <span class="c1">#     widget_config_from_ts_sig = config_dict_to_sig(self.widget_config_from_ts)</span>
+    <span class="c1">#     widget_config_from_md_sig = config_dict_to_sig(self.widget_config_from_md)</span>
+
+    <span class="c1">#     return {</span>
+    <span class="c1">#         &#39;traitlets&#39;: sig_to_df(self.traitlets_sig),</span>
+    <span class="c1">#         &#39;widget_config_from_ts&#39;: sig_to_df(widget_config_from_ts_sig),</span>
+    <span class="c1">#         &#39;widget_config_from_md&#39;: sig_to_df(widget_config_from_md_sig),</span>
+    <span class="c1">#     }</span>
+
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
+    <span class="c1"># DIAGNOSIS</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_traitlet_and_ts_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">print_traitlet_and_ts_diffs</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_traitlet_and_md_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">print_traitlet_and_md_diffs</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">diagnosis_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duplicates_of_types_group</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;origin_name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">yield</span> <span class="s2">&quot;Duplicates of types group&quot;</span><span class="p">,</span> <span class="n">t</span>
+        <span class="c1"># TODO: add more (e.g. source differences defaults, descriptions, etc.)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_diagnosis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnosis_items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_duplicates_of_types_group</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key_field</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">assert_expected_keys</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+        <span class="n">name_and_value_pairs</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">key_field</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">find_duplicates</span><span class="p">(</span><span class="n">name_and_value_pairs</span><span class="p">,</span> <span class="n">val_filt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<span class="n">configs_dacc</span> <span class="o">=</span> <span class="n">ConfigsDacc</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+
+<span class="n">extra_default_key_to_traitlet_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;greyout_point_opacity&#39;</span><span class="p">:</span> <span class="s1">&#39;point_greyout_opacity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hovered_point_ring_opacity&#39;</span><span class="p">:</span> <span class="s1">&#39;render_hovered_point_ring&#39;</span><span class="p">,</span>  <span class="c1"># Or add &#39;hovered_point_ring_opacity&#39; if missing</span>
+    <span class="s1">&#39;greyout_link_opacity&#39;</span><span class="p">:</span> <span class="s1">&#39;link_greyout_opacity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;focused_point_ring_opacity&#39;</span><span class="p">:</span> <span class="s1">&#39;focused_point_ring_color&#39;</span><span class="p">,</span>  <span class="c1"># Or add &#39;focused_point_ring_opacity&#39; if missing</span>
+    <span class="s1">&#39;scale_to_zoom&#39;</span><span class="p">:</span> <span class="s1">&#39;initial_zoom_level&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;arrow_links&#39;</span><span class="p">:</span> <span class="s1">&#39;default_link_arrows&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;arrow_size_scale&#39;</span><span class="p">:</span> <span class="s1">&#39;link_arrows_size_scale&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="transform_defaults_keys">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.transform_defaults_keys">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_defaults_keys</span><span class="p">(</span><span class="n">flat_defaults</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms the keys of the flat defaults dictionary to match traitlets keys.</span>
+
+<span class="sd">    Steps:</span>
+<span class="sd">    - Converts camelCase to snake_case.</span>
+<span class="sd">    - Removes prefixes like &#39;default_&#39;.</span>
+<span class="sd">    - Maps specific terms (e.g., &#39;node&#39; -&gt; &#39;point&#39;, &#39;link&#39; -&gt; &#39;link&#39;).</span>
+<span class="sd">    - Collapses nested structures by combining components.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        flat_defaults (dict): The flat dictionary of defaults.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A new dictionary with transformed keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">transformed</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">flat_defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Step 1: Convert camelCase to snake_case</span>
+        <span class="n">key_snake</span> <span class="o">=</span> <span class="n">camel_to_snake</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="c1"># Step 2: Remove &quot;default_&quot; prefix if present</span>
+        <span class="k">if</span> <span class="n">key_snake</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;default_&quot;</span><span class="p">):</span>
+            <span class="n">key_snake</span> <span class="o">=</span> <span class="n">key_snake</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;default_&quot;</span><span class="p">)</span> <span class="p">:]</span>
+
+        <span class="c1"># Step 3: Handle nested prefixes</span>
+        <span class="n">key_snake</span> <span class="o">=</span> <span class="n">key_snake</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;config_values_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 4: Map specific terms to align with traitlets keys</span>
+        <span class="n">key_snake</span> <span class="o">=</span> <span class="n">key_snake</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="s2">&quot;point&quot;</span><span class="p">)</span>  <span class="c1"># Map &#39;node&#39; to &#39;point&#39;</span>
+        <span class="n">key_snake</span> <span class="o">=</span> <span class="n">key_snake</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s2">&quot;link_visibility_&quot;</span><span class="p">,</span> <span class="s2">&quot;link_visibility_&quot;</span>
+        <span class="p">)</span>  <span class="c1"># Ensure key clarity</span>
+
+        <span class="c1"># Handle FPS capitalization edge case</span>
+        <span class="n">key_snake</span> <span class="o">=</span> <span class="n">key_snake</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;show_fps_monitor&quot;</span><span class="p">,</span> <span class="s2">&quot;show_FPS_monitor&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key_snake</span> <span class="ow">in</span> <span class="n">extra_default_key_to_traitlet_mapping</span><span class="p">:</span>
+            <span class="n">key_snake</span> <span class="o">=</span> <span class="n">extra_default_key_to_traitlet_mapping</span><span class="p">[</span><span class="n">key_snake</span><span class="p">]</span>
+
+        <span class="c1"># Step 5: Store the transformed key and its corresponding value</span>
+        <span class="n">transformed</span><span class="p">[</span><span class="n">key_snake</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">return</span> <span class="n">transformed</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="c1"># Compiled regex to handle camel case to snake case conversions, including acronyms</span>
+<span class="n">_camel_to_snake_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((?&lt;=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="camel_to_snake">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.camel_to_snake">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">camel_to_snake</span><span class="p">(</span><span class="n">camel_string</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a CamelCase string to snake_case. Useful for converting class</span>
+<span class="sd">    names to variable names.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        camel_string (str): The CamelCase string to convert.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The converted snake_case string.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; camel_to_snake(&#39;BasicParseTest&#39;)</span>
+<span class="sd">        &#39;basic_parse_test&#39;</span>
+<span class="sd">        &gt;&gt;&gt; camel_to_snake(&#39;HTMLParser&#39;)</span>
+<span class="sd">        &#39;html_parser&#39;</span>
+<span class="sd">        &gt;&gt;&gt; camel_to_snake(&#39;CamelCaseExample&#39;)</span>
+<span class="sd">        &#39;camel_case_example&#39;</span>
+
+<span class="sd">        Note that acronyms are handled correctly:</span>
+
+<span class="sd">        &gt;&gt;&gt; camel_to_snake(&#39;XMLHttpRequestTest&#39;)</span>
+<span class="sd">        &#39;xml_http_request_test&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_camel_to_snake_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;_\1&#39;</span><span class="p">,</span> <span class="n">camel_string</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="first_and_last_dups">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.first_and_last_dups">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">first_and_last_dups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">key_col</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the first and last instances of duplicates in a dataframe.&quot;&quot;&quot;</span>
+    <span class="n">key_col</span> <span class="o">=</span> <span class="s1">&#39;py_name&#39;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">key_col</span><span class="p">,</span> <span class="s1">&#39;first&#39;</span><span class="p">)],</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">key_col</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">)]</span></div>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Parsing Typescript (with AI)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipe</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_ts_with_oa</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">jy.ts_parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_ts_with_oa</span> <span class="k">as</span> <span class="n">_parse_ts_with_oa</span>
+
+    <span class="k">return</span> <span class="n">_parse_ts_with_oa</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="grammar_ts_parser">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.grammar_ts_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grammar_ts_parser</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ts parser based on grammar.</span>
+<span class="sd">    I&#39;d prefer to use this one, but it&#39;s not complete enough for our purposes (yet).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">jy.ts_parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_ts</span> <span class="k">as</span> <span class="n">_parse_ts</span>
+
+    <span class="k">return</span> <span class="n">_parse_ts</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="n">_extra_contexts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;very_verbose_on_defaults&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;</span>
+
+<span class="s2">    It is imparative that for each property, you try to see if you can find a default </span>
+<span class="s2">    value, and include it as a &quot;default&quot; field in the json schema of that property.</span>
+
+<span class="s2">    For example, the following typescript code:</span>
+
+<span class="s2">    export interface MyInterface {</span>
+<span class="s2">    /**</span>
+<span class="s2">    * Callback function that will be called when dragging ends.</span>
+<span class="s2">    * First argument is a D3 Drag Event:</span>
+<span class="s2">    * `(event: D3DragEvent) =&gt; void`.</span>
+<span class="s2">    * Default value: `undefined`</span>
+<span class="s2">    */</span>
+<span class="s2">    onDragEnd?: (e: D3DragEvent&lt;HTMLCanvasElement, undefined, Hovered&gt;) =&gt; void;</span>
+<span class="s2">    /**</span>
+<span class="s2">    * Decay coefficient. Use smaller values if you want the simulation to &quot;cool down&quot; slower.</span>
+<span class="s2">    * Default value: `5000`</span>
+<span class="s2">    */</span>
+<span class="s2">    decay?: number;</span>
+<span class="s2">    /**</span>
+<span class="s2">    * Gravity force coefficient.</span>
+<span class="s2">    * Default value: `0.25`</span>
+<span class="s2">    */</span>
+<span class="s2">    gravity?: number;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    Will lead to onDragEnd having a default value of &quot;undefined&quot;, </span>
+<span class="s2">    decay having a default value of 5000, and gravity having a default value of 0.25.</span>
+
+<span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;verbose_on_defaults&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;</span>
+
+<span class="s2">    It is imparative that for each property, you try to see if you can find a default </span>
+<span class="s2">    value, and include it as a &quot;default&quot; field in the json schema of that property.</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;empty&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">_use_extra_context_key</span> <span class="o">=</span> <span class="s2">&quot;empty&quot;</span>
+<span class="n">_extra_context</span> <span class="o">=</span> <span class="n">_extra_contexts</span><span class="p">[</span><span class="n">_use_extra_context_key</span><span class="p">]</span>
+
+
+<span class="n">ai_ts_parser</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">parse_ts_with_oa</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">_extra_context</span><span class="p">)</span>
+<span class="n">my_ts_parser</span> <span class="o">=</span> <span class="n">ai_ts_parser</span>  <span class="c1"># backcompatibility alias</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ai_md_parser</span><span class="p">(</span><span class="n">md_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">oa</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">oa</span><span class="o">.</span><span class="n">prompt_json_function</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse through the following markdown contents and extract information </span>
+<span class="sd">        about the objects in them, returning a json that fits the json_schema.</span>
+<span class="sd">        The &quot;group&quot; field is supposed to denote the section where you found the property;</span>
+<span class="sd">        i.e. &quot;Minimal Configuration for Points&quot;, &quot;Additional Points Configuration&quot;, etc.</span>
+
+<span class="sd">        You must always include a default field in the properties. </span>
+<span class="sd">        It is usually in the descriptions as &quot;Default value: ...&quot;. </span>
+<span class="sd">        If you can&#39;t find a default, please just set it to &quot;NO_DEFAULT&quot;, but still include the field.</span>
+
+<span class="sd">        {md_string}</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="n">json_schema</span><span class="o">=</span><span class="n">parse_md_schema</span><span class="p">,</span>  <span class="c1"># note: definition of parse_md_schema at end of module</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">md_string</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="print_interfaces">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.print_interfaces">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_interfaces</span><span class="p">(</span>
+    <span class="n">interfaces</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent_str</span><span class="o">=</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">smart_preproc</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Print the interfaces properties in a nice format.</span>
+
+<span class="sd">    ```python</span>
+
+<span class="sd">    import requests</span>
+<span class="sd">    from cosmograph.wip.config_properties import my_ts_parse, print_json_schema</span>
+
+<span class="sd">    src_url = &#39;https://raw.githubusercontent.com/cosmograph-org/cosmograph/80721d1631a90b42f0797ea22332764a4bcd4356/packages/cosmograph/src/modules/cosmograph/config/config.ts?token=GHSAT0AAAAAACSGWAOWME7Q5ZTEZMKWSVX6Z2IGOPA&#39;</span>
+<span class="sd">    ts_code = requests.get(src_url).text</span>
+<span class="sd">    json_schema = my_ts_parse(ts_code)</span>
+
+<span class="sd">    interfaces = json_schema[&#39;interfaces&#39;]</span>
+<span class="sd">    print_json_schema(interfaces, verify=True)</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">smart_preproc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;interfaces&#39;</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+            <span class="n">interfaces</span> <span class="o">=</span> <span class="n">interfaces</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">**&quot;</span><span class="p">)</span>
+    <span class="c1"># print(f&quot;{k}:\t{[x[&#39;name&#39;] for x in v]}&quot;)</span>
+    <span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verify</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;properties&#39;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span> <span class="s2">&quot;Use verify=False to skip this check&quot;</span>
+        <span class="n">property_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent_str</span><span class="si">}</span><span class="s2">* **</span><span class="si">{</span><span class="n">interface</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">**: (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">property_names</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">lkj</span>
+
+        <span class="n">lkj</span><span class="o">.</span><span class="n">wrapped_print</span><span class="p">(</span><span class="n">property_names</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">line_prefix</span><span class="o">=</span><span class="n">indent_str</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_schema_object</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Unnamed&#39;</span><span class="p">)</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">json_schema_to_dataframe</span><span class="p">(</span><span class="n">schema</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;properties&#39;</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="c1"># Single object with properties</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">process_schema_object</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Dict with keys like &#39;interfaces&#39;, &#39;types&#39;, etc.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">obj_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">process_schema_object</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                        <span class="n">obj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj_dict</span>
+            <span class="k">return</span> <span class="n">result</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># List of objects</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">process_schema_object</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid schema format&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">dataframes_to_markdown</span><span class="p">(</span>
+    <span class="n">dataframes</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">to_markdown_kwargs</span><span class="o">=</span><span class="p">()</span>
+<span class="p">):</span>
+    <span class="k">for</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;## </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">columns</span><span class="p">:</span>
+                <span class="c1"># Filter columns that exist in the dataframe</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]]</span>
+            <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;### </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="k">yield</span> <span class="n">df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">to_markdown_kwargs</span><span class="p">))</span>
+            <span class="k">yield</span> <span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">&quot;</span>
+
+
+<span class="c1"># -------------------------------------------------------------------------------------</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipe</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">json_files</span>
+
+
+<div class="viewcode-block" id="gather_items">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.gather_items">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gather_items</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">val_filt</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group (k, v) items by k and filter the resulting grouped list of values</span>
+
+<span class="sd">    &gt;&gt;&gt; gather_items([(&#39;a&#39;, 1), (&#39;b&#39;, 2), (&#39;a&#39;, 3)], val_filt=lambda x: len(x) &gt; 1)</span>
+<span class="sd">    {&#39;a&#39;: [1, 3]}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val_filt</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span></div>
+
+
+
+<span class="n">find_duplicates</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">gather_items</span><span class="p">,</span> <span class="n">val_filt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="to_dict">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.to_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key_field</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an iterable of dictionaries to a dictionary of dictionaries</span>
+
+<span class="sd">    &gt;&gt;&gt; to_dict([{&#39;a&#39;: 1, &#39;b&#39;: 2}, {&#39;a&#39;: 3, &#39;b&#39;: 4}], &#39;a&#39;)</span>
+<span class="sd">    {1: {&#39;a&#39;: 1, &#39;b&#39;: 2}, 3: {&#39;a&#39;: 3, &#39;b&#39;: 4}}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">extract_key</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">(</span><span class="n">key_field</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">extract_key</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_empty_defaults</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">no_default_sentinel</span><span class="o">=</span><span class="s1">&#39;NO_DEFAULT&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">no_default_sentinel</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">d</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">setdiff</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncReader</span><span class="p">,</span> <span class="n">redirect_getattr_to_getitem</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigSourceDicts</span><span class="p">:</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">old_config_info</span><span class="p">():</span>
+        <span class="c1"># config_info</span>
+        <span class="n">_config_info</span> <span class="o">=</span> <span class="n">json_files</span><span class="p">[</span><span class="s1">&#39;config_info.json&#39;</span><span class="p">]</span>
+        <span class="n">config_info_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span>
+            <span class="n">_config_info</span><span class="p">,</span> <span class="s1">&#39;Property&#39;</span>
+        <span class="p">)</span>  <span class="c1"># {x[&#39;Property&#39;]: x for x in config_info}</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">config_info_properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">_config_info</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;config_info had some duplicate properties&quot;</span>
+        <span class="k">return</span> <span class="n">_config_info</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">old_cosmos_config</span><span class="p">():</span>
+        <span class="n">_cosmos_config</span> <span class="o">=</span> <span class="n">json_files</span><span class="p">[</span><span class="s1">&#39;cosmos_config.json&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">_cosmos_config</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+        <span class="n">_cosmos_config</span> <span class="o">=</span> <span class="n">_cosmos_config</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+        <span class="n">cosmo_config_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span><span class="n">_cosmos_config</span><span class="p">,</span> <span class="s1">&#39;Property&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cosmo_config_properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">_cosmos_config</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;cosmos_config had some duplicate properties&quot;</span>
+        <span class="k">return</span> <span class="n">_cosmos_config</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">widget_config_from_md</span><span class="p">():</span>
+        <span class="n">widget_config</span> <span class="o">=</span> <span class="n">json_files</span><span class="p">[</span><span class="s1">&#39;_widget_config_from_md.json&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">widget_config</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;interfaces&#39;</span><span class="p">}</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">widget_config</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">widget_config</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;properties&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">remove_empty_defaults</span><span class="p">(</span><span class="n">widget_config</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+        <span class="n">widget_config_from_md_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">widget_config_from_md_properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">widget_config</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;widget_config_from_md had some duplicate properties&quot;</span>
+        <span class="k">return</span> <span class="n">widget_config_from_md_properties</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">widget_config_from_ts</span><span class="p">():</span>
+        <span class="n">widget_config</span> <span class="o">=</span> <span class="n">json_files</span><span class="p">[</span><span class="s1">&#39;_widget_config.json&#39;</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_widget_config_properties</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">widget_config</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+                <span class="s1">&#39;config.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cosmos/config.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;data.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;labels.ts&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;simulation.ts&#39;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">widget_config_value</span> <span class="ow">in</span> <span class="n">widget_config</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">widget_config_value</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;interfaces&#39;</span><span class="p">}</span>
+                <span class="n">interfaces</span> <span class="o">=</span> <span class="n">widget_config_value</span><span class="p">[</span><span class="s1">&#39;interfaces&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]:</span>
+                        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span>
+                            <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">}</span>
+                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;missing fields: </span><span class="si">{</span><span class="nb">set</span><span class="p">([</span><span class="s1">&#39;description&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="si">=}</span><span class="s2">)&quot;</span>
+                        <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;py_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">camel_to_snake</span><span class="p">(</span><span class="n">prop</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                        <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;origin_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                        <span class="k">yield</span> <span class="n">prop</span>
+
+        <span class="n">interfaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_widget_config_properties</span><span class="p">())</span>
+        <span class="c1"># print(f&quot;{len(interfaces)=}&quot;)</span>
+
+        <span class="n">widget_config_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span><span class="n">interfaces</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="c1"># assert len(widget_config_properties) == len(interfaces), f&quot;widget_config had some duplicate properties&quot;</span>
+
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="n">find_duplicates</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+            <span class="s1">&#39;disableSimulation&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;showTopLabelsLimit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;showHoveredPointLabel&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;staticLabelWeight&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dynamicLabelWeight&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;labelMargin&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;labelPadding&#39;</span><span class="p">,</span>
+        <span class="p">},</span> <span class="s2">&quot;Not the same duplicate widget_config_properties as before (comment out this assertion if not a problem)&quot;</span>
+
+        <span class="c1"># Solve all duplicates taking the CosmographConfig orgin_name</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">dedupper</span><span class="p">(</span><span class="n">dups</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">next</span><span class="p">(</span>
+                    <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;origin_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;CosmographConfig&#39;</span><span class="p">,</span> <span class="n">dups</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="n">dedupped_interfaces</span> <span class="o">=</span> <span class="n">find_duplicates</span><span class="p">(</span>
+            <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">),</span> <span class="n">val_filt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">dedupped_interfaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">dedupper</span><span class="p">,</span> <span class="n">dedupped_interfaces</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+        <span class="n">widget_config_properties</span> <span class="o">=</span> <span class="n">to_dict</span><span class="p">(</span><span class="n">dedupped_interfaces</span><span class="p">,</span> <span class="s1">&#39;py_name&#39;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">widget_config_properties</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">dedupped_interfaces</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;widget_config had some duplicate properties&quot;</span>
+        <span class="c1"># print(f&quot;{len(widget_config_properties)=}&quot;)</span>
+        <span class="k">return</span> <span class="n">widget_config_properties</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">traitlets</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph_widget</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmograph</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">traitlets.traitlets</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDescriptor</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">Cosmograph</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseDescriptor</span><span class="p">)</span>
+        <span class="p">}</span>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># TODO: might want to deprecate much of the below</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_various_configs</span><span class="p">():</span>
+    <span class="n">_callable_attrs</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="nb">callable</span><span class="p">,</span> <span class="nb">vars</span><span class="p">(</span><span class="n">ConfigSourceDicts</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">redirect_getattr_to_getitem</span><span class="p">(</span><span class="n">FuncReader</span><span class="p">)(</span><span class="n">_callable_attrs</span><span class="p">)</span>
+
+
+<span class="n">config_srcs</span> <span class="o">=</span> <span class="n">get_various_configs</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigAnalysisDacc</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">config_srcs</span>
+
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
+    <span class="c1"># Make the SoT for py_cosmograph</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sig_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># sorted common keys of traitlets and TS</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">traitlets</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">widget_config_from_ts</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sig_and_doc_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># get annotations from traitlets</span>
+        <span class="n">annotations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;traitlets&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_args</span><span class="p">][</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span>
+        <span class="c1"># get defaults from ts</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;widget_config_from_ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_args</span><span class="p">][</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edit_defaults</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
+
+        <span class="c1"># get property descriptions from md</span>
+        <span class="n">descriptions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]}</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">widget_config_from_md</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_args</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">annotations</span><span class="p">,</span> <span class="n">defaults</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># edits</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_edit_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">defaults</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">Pipe</span><span class="p">(</span><span class="n">to_int_or_float</span><span class="p">,</span> <span class="n">none_if_null</span><span class="p">,</span> <span class="n">tuple_if_list</span><span class="p">))</span>
+
+    <span class="c1"># def save_sots(self):</span>
+    <span class="c1">#     from cosmograph.util import json_files</span>
+
+    <span class="c1">#     save_sots(self.sig_and_doc_info)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
+    <span class="c1"># Diagnosis and analysis</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">traitlets_sig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="n">py_annotations</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">trait_to_py</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">traitlets</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">py_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;default_value&#39;</span><span class="p">,</span> <span class="n">Undefined</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">traitlets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">param_dicts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                <span class="s1">&#39;annotation&#39;</span><span class="p">:</span> <span class="n">py_annotations</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">py_defaults</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">traitlets</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Sig</span><span class="p">([</span><span class="n">Param</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">param_dicts</span><span class="p">])</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sig_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">traitlets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Undefined</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">i2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">Param</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+
+        <span class="n">traitlet_sig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traitlets_sig</span>
+        <span class="n">widget_config_from_ts_sig</span> <span class="o">=</span> <span class="n">config_dict_to_sig</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">widget_config_from_ts</span><span class="p">)</span>
+        <span class="n">widget_config_from_md_sig</span> <span class="o">=</span> <span class="n">config_dict_to_sig</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">widget_config_from_md</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;traitlets&#39;</span><span class="p">:</span> <span class="n">sig_to_df</span><span class="p">(</span><span class="n">traitlet_sig</span><span class="p">),</span>
+            <span class="s1">&#39;widget_config_from_ts&#39;</span><span class="p">:</span> <span class="n">sig_to_df</span><span class="p">(</span><span class="n">widget_config_from_ts_sig</span><span class="p">),</span>
+            <span class="s1">&#39;widget_config_from_md&#39;</span><span class="p">:</span> <span class="n">sig_to_df</span><span class="p">(</span><span class="n">widget_config_from_md_sig</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_traitlet_and_ts_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">print_signature_diffs</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_traitlet_and_md_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">print_traitlet_and_md_diffs</span><span class="p">()</span>
+
+
+<span class="n">dacc</span> <span class="o">=</span> <span class="n">ConfigAnalysisDacc</span><span class="p">()</span>
+
+<span class="n">get_traitlet_sig</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">dacc</span><span class="o">.</span><span class="n">traitlets_sig</span>
+<span class="n">get_sig_dfs</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">dacc</span><span class="o">.</span><span class="n">sig_dfs</span>
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Diagnosis</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2.signatures</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameter_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipe</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">config_dict_to_sig</span><span class="p">(</span><span class="n">config_dict</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ju</span>
+
+    <span class="k">return</span> <span class="n">ju</span><span class="o">.</span><span class="n">json_schema_to_signature</span><span class="p">({</span><span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">config_dict</span><span class="p">})</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sig_to_df</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">parameter_to_dict</span><span class="p">,</span> <span class="n">sig</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;kind&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">max_rows</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="c1"># print(df.to_string(max_rows=max_rows))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+
+
+<span class="n">config_dict_to_dfs</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">config_dict_to_sig</span><span class="p">,</span> <span class="n">sig_to_df</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_change_type_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">traitlets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Undefined</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">Param</span>
+
+
+<div class="viewcode-block" id="signature_diffs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.signature_diffs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">signature_diffs</span><span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sig1_name</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">sig2_name</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    ```python</span>
+
+<span class="sd">    from cosmograph.wip.config_properties import get_various_configs</span>
+<span class="sd">    c = get_various_configs()</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tabled</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataframe_diffs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_df</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sig</span>
+        <span class="k">return</span> <span class="n">sig_to_df</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+
+    <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">_ensure_df</span><span class="p">,</span> <span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">))</span>
+
+    <span class="n">diffs</span> <span class="o">=</span> <span class="n">dataframe_diffs</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;index_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;columns_value_diff&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="s1">&#39;index_diff&#39;</span> <span class="ow">in</span> <span class="n">diffs</span><span class="p">:</span>
+        <span class="n">index_diff</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="s1">&#39;index_diff&#39;</span><span class="p">]</span>
+
+        <span class="c1"># rename left_right and right_left keys to sig1_name and sig2_name respectively</span>
+        <span class="c1"># index_diff is a dict</span>
+        <span class="k">if</span> <span class="s1">&#39;left_right&#39;</span> <span class="ow">in</span> <span class="n">index_diff</span><span class="p">:</span>
+            <span class="n">index_diff</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;in_</span><span class="si">{</span><span class="n">sig1_name</span><span class="si">}</span><span class="s2">__but_not_in_</span><span class="si">{</span><span class="n">sig2_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index_diff</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="s1">&#39;left_right&#39;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;right_left&#39;</span> <span class="ow">in</span> <span class="n">index_diff</span><span class="p">:</span>
+            <span class="n">index_diff</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;in_</span><span class="si">{</span><span class="n">sig2_name</span><span class="si">}</span><span class="s2">__but_not_in_</span><span class="si">{</span><span class="n">sig1_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index_diff</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="s1">&#39;right_left&#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;columns_value_diff&#39;</span> <span class="ow">in</span> <span class="n">diffs</span><span class="p">:</span>
+        <span class="n">columns_value_diff</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="s1">&#39;columns_value_diff&#39;</span><span class="p">]</span>
+        <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sig1_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sig2_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sig1_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sig2_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="c1"># apply _change_type_to_str to all values of the annotation column</span>
+        <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns_value_diff</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="n">_change_type_to_str</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">diffs</span></div>
+
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+
+
+<div class="viewcode-block" id="print_signature_diffs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.print_signature_diffs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_signature_diffs</span><span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sig1_name</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">sig2_name</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    ```python</span>
+
+<span class="sd">    from cosmograph.wip.config_properties import get_various_configs, get_sig_dfs, print_signature_diffs</span>
+
+<span class="sd">    c = get_various_configs()</span>
+<span class="sd">    sigs = get_sig_dfs(c)</span>
+<span class="sd">    list(sigs)</span>
+<span class="sd">    print_signature_diffs(sigs[&#39;traitlets&#39;], sigs[&#39;widget_config_from_md&#39;], sig1_name=&#39;traitlets&#39;, sig2_name=&#39;widget_config_from_md&#39;)</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="n">signature_diffs</span><span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="n">sig1_name</span><span class="o">=</span><span class="n">sig1_name</span><span class="p">,</span> <span class="n">sig2_name</span><span class="o">=</span><span class="n">sig2_name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">diffs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;### </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;columns_value_diff&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;#### default</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">print_df</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;#### annotation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">print_df</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;index_diff&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#### </span><span class="si">{</span><span class="n">kk</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">pprint</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="n">print_df</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pprint</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-----------------------------------------------------------------</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
+<span class="n">print_traitlet_and_ts_diffs</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">print_signature_diffs</span><span class="p">,</span>
+    <span class="n">dacc</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;traitlets&#39;</span><span class="p">],</span>
+    <span class="n">dacc</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;widget_config_from_ts&#39;</span><span class="p">],</span>
+    <span class="n">sig1_name</span><span class="o">=</span><span class="s1">&#39;traitlets&#39;</span><span class="p">,</span>
+    <span class="n">sig2_name</span><span class="o">=</span><span class="s1">&#39;widget_config_from_ts&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">print_traitlet_and_md_diffs</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">print_signature_diffs</span><span class="p">,</span>
+    <span class="n">dacc</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;traitlets&#39;</span><span class="p">],</span>
+    <span class="n">dacc</span><span class="o">.</span><span class="n">sig_dfs</span><span class="p">[</span><span class="s1">&#39;widget_config_from_md&#39;</span><span class="p">],</span>
+    <span class="n">sig1_name</span><span class="o">=</span><span class="s1">&#39;traitlets&#39;</span><span class="p">,</span>
+    <span class="n">sig2_name</span><span class="o">=</span><span class="s1">&#39;widget_config_from_md&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># A few utils</span>
+
+
+<div class="viewcode-block" id="to_int_or_float">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.to_int_or_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_int_or_float</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="s2">&quot;change strings that can be ints or floats, to ints or floats&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="none_if_null">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.none_if_null">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">none_if_null</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="s2">&quot;change &#39;null&#39; strings to None (that&#39;s how json serialization will work)&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="tuple_if_list">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_resources.html#cosmograph._resources.tuple_if_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tuple_if_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="s2">&quot;change lists and sets to tuples, because want immutable defaults&quot;</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># data objects required by some functions</span>
+
+
+<span class="n">parse_md_schema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;whatevs&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;strict&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;interfaces&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The name of the interface.&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A brief description of the interface (if available).&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The name of the property within the interface.&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The type of the property.&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A brief description of the property (if available).&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="s1">&#39;null&#39;</span><span class="p">],</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The default value for the property (if available).&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                    <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">],</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The group to which the property belongs.&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                    <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Indicates whether the property is optional.&#39;</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                <span class="p">},</span>
+                                <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">],</span>
+                            <span class="p">},</span>
+                        <span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">],</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+cosmograph.scrap
+================
+.. automodule:: cosmograph.scrap
+   :members:

@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph._code_sync &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cosmograph._resources" href="_resources.html" />
+    <link rel="prev" title="cosmograph" href="../cosmograph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cosmograph._code_sync</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.build_data_extraction_line"><code class="docutils literal notranslate"><span class="pre">build_data_extraction_line()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.build_multiline_signature"><code class="docutils literal notranslate"><span class="pre">build_multiline_signature()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.code_str_with_signature"><code class="docutils literal notranslate"><span class="pre">code_str_with_signature()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.diagnose_parameter_default"><code class="docutils literal notranslate"><span class="pre">diagnose_parameter_default()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.execute_and_get_function"><code class="docutils literal notranslate"><span class="pre">execute_and_get_function()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.extract_func_name_from_code"><code class="docutils literal notranslate"><span class="pre">extract_func_name_from_code()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.extract_function_source"><code class="docutils literal notranslate"><span class="pre">extract_function_source()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.gather_function_code"><code class="docutils literal notranslate"><span class="pre">gather_function_code()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.parse_docstring_and_body"><code class="docutils literal notranslate"><span class="pre">parse_docstring_and_body()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph._code_sync.replace_function_definition_in_module"><code class="docutils literal notranslate"><span class="pre">replace_function_definition_in_module()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cosmograph._code_sync</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/cosmograph/_code_sync.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cosmograph._code_sync">
+<span id="cosmograph-code-sync"></span><h1>cosmograph._code_sync<a class="headerlink" href="#module-cosmograph._code_sync" title="Link to this heading"></a></h1>
+<p>Synching code to the SSOT.</p>
+<p>Note: The <cite>_resources</cite> module has the utilities to extract, diagnose, and produce
+the SSOT from the JS codebase.</p>
+<p>This _code_sync module is meant to contain the code that is used to inject this SSOT
+into the python code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.build_data_extraction_line">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">build_data_extraction_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#build_data_extraction_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.build_data_extraction_line" title="Link to this definition"></a></dt>
+<dd><p>Builds a line that unpacks locals().values() into parameter names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_names</strong> (<em>list</em><em> of </em><em>str</em>) – The names of the parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A line of code that unpacks the parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">build_data_extraction_line</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+<span class="go">&#39;    a, b, args, kwargs = locals().values()&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.build_multiline_signature">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">build_multiline_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#build_multiline_signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.build_multiline_signature" title="Link to this definition"></a></dt>
+<dd><p>Builds a multiline function signature and extracts parameter names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sig_obj</strong> (<em>str</em><em> or </em><em>inspect.Signature</em>) – The function signature as a string or Signature object.</p></li>
+<li><p><strong>func_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the function, used if <cite>sig_obj</cite> is an inspect.Signature.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of (signature_lines, param_names). <cite>signature_lines</cite> is a list
+containing the multiline signature, and <cite>param_names</cite> is a list of
+parameter names for locals unpacking.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">example_func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">example_func</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lines</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">build_multiline_signature</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="s2">&quot;new_func&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lines</span>
+<span class="go">[&#39;def new_func(&#39;, &#39;    a,&#39;, &#39;    b=2,&#39;, &#39;    *args,&#39;, &#39;    **kwargs&#39;, &#39;):&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span>
+<span class="go">[&#39;a&#39;, &#39;b&#39;, &#39;args&#39;, &#39;kwargs&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.code_str_with_signature">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">code_str_with_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_with_new_sig'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#code_str_with_signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.code_str_with_signature" title="Link to this definition"></a></dt>
+<dd><p>Main function to construct a new function definition string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.diagnose_parameter_default">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">diagnose_parameter_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Parameter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#diagnose_parameter_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.diagnose_parameter_default" title="Link to this definition"></a></dt>
+<dd><p>Examines the alignment between an inspect.Parameter object’s default value
+and its type annotation. Returns a dictionary with various diagnostic flags
+that may be of interest when analyzing function signatures.</p>
+<dl class="simple">
+<dt>Example fields:</dt><dd><ul class="simple">
+<li><p>“missing_annotation”: True if there is no type annotation.</p></li>
+<li><p>“missing_default”: True if there is no default value.</p></li>
+<li><p>“none_without_optional”: True if the default is None but the annotation does not allow None.</p></li>
+<li><p>“default_not_in_type”: True if the default is not None and is not an instance of the annotated type.</p></li>
+<li><p>“suspected_type_mismatch”: True if the type annotation suggests a container or union and
+the default fails rudimentary consistency checks.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Uses only standard library for type inspection. If a more robust approach
+is needed, especially for containers (e.g., List[int] or Dict[str, str]) or
+deeper type checks, third-party libraries like ‘typeguard’ could be considered.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.execute_and_get_function">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">execute_and_get_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#execute_and_get_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.execute_and_get_function" title="Link to this definition"></a></dt>
+<dd><p>Executes a Python code string and returns the function object defined within it.
+If <cite>func_name</cite> is not provided, it extracts the function name from the code string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code_str</strong> (<em>str</em>) – The Python code string to execute.</p></li>
+<li><p><strong>func_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the function to retrieve from the executed code. If None,
+the function name is extracted from the code string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The function object defined by <cite>code_str</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>func_name</cite> is not provided and no function definition is found in the code string.</p></li>
+<li><p><strong>KeyError</strong> – If the function <cite>func_name</cite> is not found in the executed code.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">def my_function(a, b):</span>
+<span class="gp">... </span><span class="s1">    return a + b</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">func</span> <span class="o">=</span> <span class="n">execute_and_get_function</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">func</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">7</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">def greet(name):</span>
+<span class="gp">... </span><span class="s1">    return f&quot;Hello, </span><span class="si">{name}</span><span class="s1">!&quot;</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">func</span> <span class="o">=</span> <span class="n">execute_and_get_function</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">func</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">)</span>
+<span class="go">&#39;Hello, Alice!&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;x = 42&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_and_get_function</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">No function definition found in the provided code string.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.extract_func_name_from_code">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">extract_func_name_from_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#extract_func_name_from_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.extract_func_name_from_code" title="Link to this definition"></a></dt>
+<dd><p>Extracts the name of the first function defined in a Python code string using <cite>ast</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code_str</strong> (<em>str</em>) – The Python code string to analyze.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The name of the first function defined in the code string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If no function definition is found in the provided code string.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">def my_function(a, b):</span>
+<span class="gp">... </span><span class="s1">    return a + b</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extract_func_name_from_code</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<span class="go">&#39;my_function&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">async def another_function():</span>
+<span class="gp">... </span><span class="s1">    pass</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extract_func_name_from_code</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<span class="go">&#39;another_function&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extract_func_name_from_code</span><span class="p">(</span><span class="s2">&quot;x = 42&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">No function definition found in the provided code string.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.extract_function_source">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">extract_function_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#extract_function_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.extract_function_source" title="Link to this definition"></a></dt>
+<dd><p>Extracts the source code of a function and removes leading indentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>callable</em>) – The function from which to extract the source.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The de-indented source code of the function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">example_func</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extract_function_source</span><span class="p">(</span><span class="n">example_func</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="go">&#39;def example_func():\n    pass&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.gather_function_code">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">gather_function_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signature_lines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docstring_lines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_extraction_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_lines</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#gather_function_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.gather_function_code" title="Link to this definition"></a></dt>
+<dd><p>Combines all components of a function into a single string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signature_lines</strong> (<em>list</em><em> of </em><em>str</em>) – The lines of the function signature.</p></li>
+<li><p><strong>docstring_lines</strong> (<em>list</em><em> of </em><em>str</em>) – The lines of the function docstring.</p></li>
+<li><p><strong>data_extraction_line</strong> (<em>str</em>) – The line of code for unpacking locals.</p></li>
+<li><p><strong>body_lines</strong> (<em>list</em><em> of </em><em>str</em>) – The lines of the function body.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The complete function code as a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sig_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;def func(&#39;</span><span class="p">,</span> <span class="s1">&#39;    a,&#39;</span><span class="p">,</span> <span class="s1">&#39;    b=2,&#39;</span><span class="p">,</span> <span class="s1">&#39;):&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&quot;A docstring.&quot;&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extraction_line</span> <span class="o">=</span> <span class="s1">&#39;    a, b = locals().values()&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">body_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;    return a + b&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">gather_function_code</span><span class="p">(</span><span class="n">sig_lines</span><span class="p">,</span> <span class="n">doc_lines</span><span class="p">,</span> <span class="n">extraction_line</span><span class="p">,</span> <span class="n">body_lines</span><span class="p">))</span>
+<span class="go">def func(</span>
+<span class="go">    a,</span>
+<span class="go">    b=2,</span>
+<span class="go">):</span>
+<span class="go">    &quot;A docstring.&quot;</span>
+<span class="go">    a, b = locals().values()</span>
+<span class="go">    return a + b</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.parse_docstring_and_body">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">parse_docstring_and_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#parse_docstring_and_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.parse_docstring_and_body" title="Link to this definition"></a></dt>
+<dd><p>Parses the source code of a function to extract its docstring and body lines.
+The docstring is determined via the AST (so single, double, or triple quotes
+are all recognized correctly), then recast as a triple-quoted string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source_code</strong> (<em>str</em>) – The source code of the function.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of (docstring_lines, body_lines). The first element is a list of lines
+with exactly one element: the triple-quoted docstring (if any); otherwise, an empty list.
+The second element is a list of the remaining lines that constitute the function’s body.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>By default, Python captures multi-line docstrings exactly as typed, including indentation
+within the docstring. If you want to remove such indentation, you can call <cite>textwrap.dedent</cite>
+on the docstring before re-inserting it into triple quotes.</p></li>
+<li><p>For Python 3.8 and above, the AST nodes carry <cite>end_lineno</cite>, which lets us find exactly
+where the docstring statement ends in the source. For older versions, one might need
+a more heuristic approach to identify docstring lines.</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<p># &gt;&gt;&gt; code = ‘’’
+# … def example_func():
+# …     “This is a docstring.”
+# …     pass
+# … ‘’’
+# &gt;&gt;&gt; docstring, body = parse_docstring_and_body(code)
+# &gt;&gt;&gt; docstring == [’&quot;&quot;&quot;This is a docstring.&quot;&quot;&quot;’]
+# &gt;&gt;&gt; body
+# [’    pass’]</p>
+<p># &gt;&gt;&gt; code = ‘’’
+# … def another_example():
+# …     ‘’’
+# …     Multi-line
+# …     docstring
+# …     ‘’’
+# …     x = 42
+# …     return x
+# … ‘’’
+# &gt;&gt;&gt; docstring, body = parse_docstring_and_body(code)
+# &gt;&gt;&gt; docstring
+# [’&quot;&quot;&quot;\n    Multi-line\n    docstring\n    &quot;&quot;&quot;’]
+# &gt;&gt;&gt; body
+# [’    x = 42’, ‘    return x’]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph._code_sync.replace_function_definition_in_module">
+<span class="sig-prename descclassname"><span class="pre">cosmograph._code_sync.</span></span><span class="sig-name descname"><span class="pre">replace_function_definition_in_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_function_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/_code_sync.html#replace_function_definition_in_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph._code_sync.replace_function_definition_in_module" title="Link to this definition"></a></dt>
+<dd><p>Replaces the definition of a specified function in a module with a new code string,
+returning the updated module as a single string. If the function is not found,
+the original module string is returned unchanged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> (<em>str</em><em> or </em><em>module</em>) – Either a string containing the code of a Python module, or an actual Python module
+object (e.g. a loaded module).</p></li>
+<li><p><strong>function_name</strong> (<em>str</em>) – The name of the function to replace.</p></li>
+<li><p><strong>new_function_code</strong> (<em>str</em>) – <p>A string containing the replacement code for the function. This should be a complete
+function definition, e.g.:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>def my_func(…):</dt><dd><p>…</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>or including decorators, etc.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string of the entire module code, with the specified function replaced by the
+provided code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SyntaxError</strong> – If the provided module string is not valid Python syntax and cannot be parsed.</p></li>
+<li><p><strong>ValueError</strong> – If the function cannot be found in the provided module code.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Replace a function ‘foo’ in a module code string:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">original_code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">import math</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="s1">def foo(x):</span>
+<span class="gp">... </span><span class="s1">    return x + 1</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="s1">def bar(y):</span>
+<span class="gp">... </span><span class="s1">    return y * 2</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_foo_code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">def foo(x, y=10):</span>
+<span class="gp">... </span><span class="s1">    return x + y</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated</span> <span class="o">=</span> <span class="n">replace_function_definition_in_module</span><span class="p">(</span><span class="n">original_code</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">new_foo_code</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span>
+
+<span class="go">import math</span>
+
+
+<span class="go">def foo(x, y=10):</span>
+<span class="go">    return x + y</span>
+
+<span class="go">def bar(y):</span>
+<span class="go">    return y * 2</span>
+</pre></div>
+</div>
+<p>Or replace a function in an actual imported module:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Suppose we have a module object &#39;some_module&#39; loaded.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># new_bar_code = &#39;&#39;&#39;def bar(a, b): return a - b&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># updated_code = replace_function_definition_in_module(some_module, &#39;bar&#39;, new_bar_code)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># # &#39;updated_code&#39; now contains the entire source for &#39;some_module&#39;, with &#39;bar&#39; replaced.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../cosmograph.html" class="btn btn-neutral float-left" title="cosmograph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="_resources.html" class="btn btn-neutral float-right" title="cosmograph._resources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

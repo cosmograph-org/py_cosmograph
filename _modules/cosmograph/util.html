@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph.util &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cosmograph.util</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cosmograph.util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utils to prepare data for cosmos</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span><span class="p">,</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">count</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Javascript</span><span class="p">,</span> <span class="n">display</span> <span class="k">as</span> <span class="n">ipython_display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TextFiles</span><span class="p">,</span>
+    <span class="n">Files</span><span class="p">,</span>
+    <span class="n">JsonFiles</span><span class="p">,</span>
+    <span class="n">wrap_kvs</span><span class="p">,</span>
+    <span class="n">filt_iter</span><span class="p">,</span>
+    <span class="n">invertible_maps</span><span class="p">,</span>
+    <span class="n">add_ipython_key_completions</span><span class="p">,</span>
+    <span class="n">Pipe</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol.sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrContainer</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Constants and data access</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
+
+    <span class="n">_files</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">files</span>  <span class="c1"># only valid in 3.9+</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib_resources</span>  <span class="c1"># needs pip install</span>
+
+    <span class="n">_files</span> <span class="o">=</span> <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="n">_files</span><span class="p">(</span><span class="s2">&quot;cosmograph&quot;</span><span class="p">)</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="n">files</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">data_dir_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+<span class="n">js_dir</span> <span class="o">=</span> <span class="n">files</span> <span class="o">/</span> <span class="s2">&quot;js&quot;</span>
+<span class="n">js_dir_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">js_dir</span><span class="p">)</span>
+
+<span class="n">data_files</span> <span class="o">=</span> <span class="n">Files</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">)</span>
+<span class="n">json_files</span> <span class="o">=</span> <span class="n">filt_iter</span><span class="o">.</span><span class="n">suffixes</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)(</span><span class="n">JsonFiles</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">))</span>
+
+
+<span class="c1"># color_names_set = set(json_files[&#39;color_names.json&#39;])  # removed because problematic on windows</span>
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Extracting the interface from the data</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">i2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">Param</span><span class="p">,</span> <span class="n">params_to_docstring</span>
+
+<span class="n">PARAMS_SSOT_PATH</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;params_ssot.json&quot;</span>
+
+<span class="c1"># TODO: add ssot validation</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_params_ssot</span><span class="p">(</span><span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">params_ssot</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">PARAMS_SSOT_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">param_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_ssot</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params_ssot</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">params_ssot</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_signature</span><span class="p">(</span><span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">params_ssot</span> <span class="o">=</span> <span class="n">_params_ssot</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params_ssot</span><span class="p">:</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># delete description if any</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">annotation</span><span class="o">=</span><span class="n">str_to_annotation</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;annotation&quot;</span><span class="p">])</span>
+        <span class="p">)</span>  <span class="c1"># convert annotation to type</span>
+        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
+
+    <span class="k">return</span> <span class="n">Sig</span><span class="p">([</span><span class="n">Param</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params_ssot</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="validate_signature">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.validate_signature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_signature</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a signature. </span>
+<span class="sd">    Namely, check that all non-None default types are &quot;subclasses&quot; of the annotation type.</span>
+
+<span class="sd">    TODO: Implement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="cosmograph_base_docs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.cosmograph_base_docs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_docs</span><span class="p">(</span><span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">take_name_of_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the params information part of a docstring&quot;&quot;&quot;</span>
+    <span class="n">params_ssot</span> <span class="o">=</span> <span class="n">_params_ssot</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">params_to_docstring</span><span class="p">(</span><span class="n">params_ssot</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_parameterized_type">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.is_parameterized_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_parameterized_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines if an object is a parameterized type (e.g., list[int]) or not.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj: The object to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if it&#39;s a parameterized type, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_origin</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="annotation_to_str">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.annotation_to_str">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">annotation_to_str</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encodes Python type annotations as strings for JSON serialization.</span>
+
+<span class="sd">    This is part of a specialized Python-to-string codec designed to encode and decode</span>
+<span class="sd">    Python type annotations in a way that allows them to be serialized and deserialized</span>
+<span class="sd">    in JSON-compatible formats.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        annotation: The type annotation to encode.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A string representation of the annotation.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the annotation type is unknown.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">    &gt;&gt;&gt; original = [</span>
+<span class="sd">    ...     bool,</span>
+<span class="sd">    ...     float,</span>
+<span class="sd">    ...     list[Any],</span>
+<span class="sd">    ...     typing.Union[str, list[float]],</span>
+<span class="sd">    ...     int,</span>
+<span class="sd">    ...     str,</span>
+<span class="sd">    ...     list[float],</span>
+<span class="sd">    ...     list[list[float]],</span>
+<span class="sd">    ...     typing.Union[int, str],</span>
+<span class="sd">    ...     list[str],</span>
+<span class="sd">    ...     object,</span>
+<span class="sd">    ...     list[int],</span>
+<span class="sd">    ...     typing.Callable[[typing.Dict[str, Any]], Any]</span>
+<span class="sd">    ... ]</span>
+<span class="sd">    &gt;&gt;&gt; encoded = list(map(annotation_to_str, original))</span>
+<span class="sd">    &gt;&gt;&gt; encoded</span>
+<span class="sd">    [&#39;bool&#39;, &#39;float&#39;, &#39;list[typing.Any]&#39;, &#39;typing.Union[str, list[float]]&#39;, &#39;int&#39;, &#39;str&#39;, \</span>
+<span class="sd">&#39;list[float]&#39;, &#39;list[list[float]]&#39;, &#39;typing.Union[int, str]&#39;, &#39;list[str]&#39;, &#39;object&#39;, &#39;list[int]&#39;, \</span>
+<span class="sd">&#39;typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">annotation</span>
+    <span class="k">elif</span> <span class="n">is_parameterized_type</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown annotation type: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="default_is_safe">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.default_is_safe">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_is_safe</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a string is safe to evaluate as a type annotation.</span>
+
+<span class="sd">    The string is considered safe if:</span>
+<span class="sd">    - It contains only alphanumericals, spaces, dots, commas, and brackets.</span>
+<span class="sd">    - It starts with one of a predefined list of allowed prefixes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        string: The string to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if the string is safe, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">allowed_prefixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;typing&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">]</span>
+    <span class="n">allowed_chars</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[\w\s.,\[\]()]+$&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">allowed_chars</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">allowed_prefixes</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="str_to_annotation">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.str_to_annotation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">str_to_annotation</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">is_safe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_is_safe</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decodes a string representation of a Python type annotation back into the annotation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        string: The string representation of the annotation.</span>
+<span class="sd">        is_safe: A function that determines if the string is safe to evaluate.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The decoded Python type annotation.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the string is not safe to evaluate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_safe</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The string &#39;</span><span class="si">{</span><span class="n">string</span><span class="si">}</span><span class="s2">&#39; is not considered safe for evaluation.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">string</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># General/Misc utils</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<div class="viewcode-block" id="move_to_front">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.move_to_front">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">move_to_front</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Move the columns in `cols` to the front of the DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span> <span class="o">+</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ordered_unique</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iterable</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">or</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IpythonObjects</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">objs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objs</span> <span class="o">=</span> <span class="n">objs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ipython_display</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="c1"># def __repr__(self):</span>
+    <span class="c1">#     return self.display()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_attributes</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">camel_to_snake_case</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="c1"># Replace any non-word character with an underscore</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="c1"># Insert an underscore before any capital letter (except the first one)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([a-z])([A-Z])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1_\2&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">name</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">snake_to_camel_case</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">first_char_trans</span><span class="o">=</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">):</span>
+    <span class="c1"># Split the string into words separated by underscores</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="c1"># Convert each word to title case (i.e., with the first letter capitalized)</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+    <span class="c1"># Join the words together into a single string</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+    <span class="c1"># process the first character (possibly)</span>
+    <span class="k">if</span> <span class="n">first_char_trans</span> <span class="ow">and</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">first_char_trans</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_camel_and_snake_sanity</span><span class="p">(</span><span class="n">camel_cases</span><span class="p">,</span> <span class="n">snake_cases</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make sure that our camel to snake functions can actually fall back on their feet.</span>
+<span class="sd">    (So we don&#39;t have to keep the mapping around)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># For now, they don&#39;t (need to discuss) so muting this function</span>
+
+
+<span class="c1">#     agree_1 = [</span>
+<span class="c1">#         x == y for x, y in zip(</span>
+<span class="c1">#             map(camel_to_snake_case, camel_cases),</span>
+<span class="c1">#             list(snake_cases)</span>
+<span class="c1">#         )</span>
+<span class="c1">#     ]</span>
+<span class="c1">#     agree_2 = [</span>
+<span class="c1">#         x == y for x, y in zip(</span>
+<span class="c1">#             list(camel_cases),</span>
+<span class="c1">#             map(snake_to_camel_case, snake_cases),</span>
+<span class="c1">#         )</span>
+<span class="c1">#     ]</span>
+<span class="c1">#     agree = [x and y for x, y in zip(agree_1, agree_2)]</span>
+<span class="c1">#     if not all(agree):</span>
+<span class="c1">#         i = agree.index(False)</span>
+<span class="c1">#         raise AssertionError(</span>
+<span class="c1">#             f&quot;{list(camel_cases)[i]} and {list(snake_cases)[i]} do not agree&quot;</span>
+<span class="c1">#         )</span>
+
+<span class="c1"># _cosmos_config_info = cosmos_config_info()</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Old stuff (TODO: Deprecate and remove)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_postprocess</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">egress</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">egress</span><span class="p">)</span>
+
+
+<span class="n">postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">egress</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">_postprocess</span><span class="p">,</span> <span class="n">egress</span><span class="o">=</span><span class="n">egress</span><span class="p">)</span>
+<span class="n">display_output</span> <span class="o">=</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">ipython_display</span><span class="p">)</span>
+<span class="n">to_html_obj</span> <span class="o">=</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">HTML</span><span class="p">)</span>
+<span class="n">to_js_obj</span> <span class="o">=</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">Javascript</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JsFiles">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.JsFiles">[docs]</a>
+<span class="nd">@add_ipython_key_completions</span>
+<span class="nd">@wrap_kvs</span><span class="p">(</span><span class="n">key_of_id</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;.js&quot;</span><span class="p">)],</span> <span class="n">id_of_key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="s2">&quot;.js&quot;</span><span class="p">)</span>
+<span class="nd">@filt_iter</span><span class="p">(</span><span class="n">filt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.js&quot;</span><span class="p">))</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JsFiles</span><span class="p">(</span><span class="n">TextFiles</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A store of js files&quot;&quot;&quot;</span></div>
+
+
+
+<span class="n">_replace_non_alphanumerics_by_underscore</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Note: js_files_as_attrs is not used in the module, but can be useful when working</span>
+<span class="c1"># in a notebook, or console, where we might want the convenience of tab-completion of</span>
+<span class="c1"># attributes</span>
+<div class="viewcode-block" id="js_files_as_attrs">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.js_files_as_attrs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">js_files_as_attrs</span><span class="p">(</span><span class="n">rootdir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will make a JsFiles, but where the keys are available as attributes.</span>
+<span class="sd">    To do so, any non alphanumerics of file name are replaced with underscore,</span>
+<span class="sd">    and there can be no two files that collide with that key transformation!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">JsFiles</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+    <span class="n">key_for_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">id_</span><span class="p">:</span> <span class="n">_replace_non_alphanumerics_by_underscore</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span> <span class="k">for</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">s</span><span class="p">}</span>
+    <span class="n">key_for_id</span><span class="p">,</span> <span class="n">id_for_key</span> <span class="o">=</span> <span class="n">invertible_maps</span><span class="p">(</span><span class="n">key_for_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AttrContainer</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">wrap_kvs</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">key_of_id</span><span class="o">=</span><span class="n">key_for_id</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">id_of_key</span><span class="o">=</span><span class="n">id_for_key</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_nodes_from_links</span><span class="p">(</span><span class="n">links</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_yield_nodes_from_links</span><span class="p">(</span><span class="n">links</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">link</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="n">link</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ordered_unique</span><span class="p">(</span><span class="n">_yield_nodes_from_links</span><span class="p">(</span><span class="n">links</span><span class="p">))]</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_links</span><span class="p">,</span> <span class="n">is_graph_json</span><span class="p">,</span> <span class="n">is_nodes</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

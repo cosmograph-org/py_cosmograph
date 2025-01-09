@@ -1,0 +1,1089 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph._code_sync &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/util.html">cosmograph.util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cosmograph._code_sync</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cosmograph._code_sync</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Synching code to the SSOT.</span>
+
+<span class="sd">Note: The `_resources` module has the utilities to extract, diagnose, and produce </span>
+<span class="sd">the SSOT from the JS codebase.</span>
+
+<span class="sd">This _code_sync module is meant to contain the code that is used to inject this SSOT </span>
+<span class="sd">into the python code.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">Signature</span>
+
+
+<div class="viewcode-block" id="replace_function_definition_in_module">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.replace_function_definition_in_module">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">replace_function_definition_in_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">new_function_code</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replaces the definition of a specified function in a module with a new code string,</span>
+<span class="sd">    returning the updated module as a single string. If the function is not found,</span>
+<span class="sd">    the original module string is returned unchanged.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : str or module</span>
+<span class="sd">        Either a string containing the code of a Python module, or an actual Python module</span>
+<span class="sd">        object (e.g. a loaded module).</span>
+<span class="sd">    function_name : str</span>
+<span class="sd">        The name of the function to replace.</span>
+<span class="sd">    new_function_code : str</span>
+<span class="sd">        A string containing the replacement code for the function. This should be a complete</span>
+<span class="sd">        function definition, e.g.:</span>
+<span class="sd">            def my_func(...):</span>
+<span class="sd">                ...</span>
+<span class="sd">        or including decorators, etc.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A string of the entire module code, with the specified function replaced by the</span>
+<span class="sd">        provided code.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    SyntaxError</span>
+<span class="sd">        If the provided module string is not valid Python syntax and cannot be parsed.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the function cannot be found in the provided module code.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Replace a function &#39;foo&#39; in a module code string:</span>
+
+<span class="sd">    &gt;&gt;&gt; original_code = &#39;&#39;&#39;</span>
+<span class="sd">    ... import math</span>
+<span class="sd">    ...</span>
+<span class="sd">    ... def foo(x):</span>
+<span class="sd">    ...     return x + 1</span>
+<span class="sd">    ...</span>
+<span class="sd">    ... def bar(y):</span>
+<span class="sd">    ...     return y * 2</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; new_foo_code = &#39;&#39;&#39;</span>
+<span class="sd">    ... def foo(x, y=10):</span>
+<span class="sd">    ...     return x + y</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; updated = replace_function_definition_in_module(original_code, &#39;foo&#39;, new_foo_code)</span>
+<span class="sd">    &gt;&gt;&gt; print(updated)</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">    import math</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">    def foo(x, y=10):</span>
+<span class="sd">        return x + y</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">    def bar(y):</span>
+<span class="sd">        return y * 2</span>
+
+<span class="sd">    Or replace a function in an actual imported module:</span>
+
+<span class="sd">    &gt;&gt;&gt; # Suppose we have a module object &#39;some_module&#39; loaded.</span>
+<span class="sd">    &gt;&gt;&gt; # new_bar_code = &#39;&#39;&#39;def bar(a, b): return a - b&#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; # updated_code = replace_function_definition_in_module(some_module, &#39;bar&#39;, new_bar_code)</span>
+<span class="sd">    &gt;&gt;&gt; # # &#39;updated_code&#39; now contains the entire source for &#39;some_module&#39;, with &#39;bar&#39; replaced.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># 1. If `module` is a module object, retrieve its source via inspect.getsource</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">module_source</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not retrieve source from the provided module object.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">module_source</span> <span class="o">=</span> <span class="n">module</span>
+
+    <span class="c1"># Dedent the source so AST parsing will be consistent</span>
+    <span class="n">dedented_source</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">module_source</span><span class="p">)</span>
+
+    <span class="c1"># 2. Parse the code into an AST</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">mod_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">dedented_source</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid Python code for module: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 3. Find the function in the AST</span>
+    <span class="n">func_node</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">mod_ast</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">function_name</span>
+        <span class="p">):</span>
+            <span class="n">func_node</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">func_node</span><span class="p">:</span>
+        <span class="c1"># If function is not found, return the original code unchanged or raise an error</span>
+        <span class="c1"># Here we raise an error for clarity, but you could opt to just return original code.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Function &#39;</span><span class="si">{</span><span class="n">function_name</span><span class="si">}</span><span class="s2">&#39; not found in the module.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 4. Determine the region of lines to replace</span>
+    <span class="c1"># By default, the AST node&#39;s lineno points to the line where &#39;def &lt;function&gt;&#39; begins,</span>
+    <span class="c1"># and end_lineno points to the last line of the function. If the function has decorators,</span>
+    <span class="c1"># the line for the first decorator is in node.decorator_list, each having its own lineno.</span>
+    <span class="c1"># We&#39;ll replace from the topmost decorator (if any) through end_lineno.</span>
+
+    <span class="n">start_line</span> <span class="o">=</span> <span class="n">func_node</span><span class="o">.</span><span class="n">lineno</span>
+    <span class="k">if</span> <span class="n">func_node</span><span class="o">.</span><span class="n">decorator_list</span><span class="p">:</span>
+        <span class="c1"># The first decorator might appear above the function def line</span>
+        <span class="n">decorator_line_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">dec</span><span class="o">.</span><span class="n">lineno</span> <span class="k">for</span> <span class="n">dec</span> <span class="ow">in</span> <span class="n">func_node</span><span class="o">.</span><span class="n">decorator_list</span><span class="p">]</span>
+        <span class="n">start_line</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">start_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">decorator_line_numbers</span><span class="p">)</span>
+
+    <span class="n">end_line</span> <span class="o">=</span> <span class="n">func_node</span><span class="o">.</span><span class="n">end_lineno</span>
+
+    <span class="c1"># These line numbers are 1-based, so we need to adapt to 0-based indexing in the split lines</span>
+    <span class="n">original_lines</span> <span class="o">=</span> <span class="n">dedented_source</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="c1"># 5. Replace lines from start_line-1 to end_line with the new code</span>
+    <span class="c1">#    The new code may have different indentation or structure, so do not indent automatically.</span>
+    <span class="c1">#    Just insert it literally (assuming new_function_code is valid code).</span>
+    <span class="n">replaced_lines</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">original_lines</span><span class="p">[:</span> <span class="n">start_line</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">new_function_code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="o">+</span> <span class="n">original_lines</span><span class="p">[</span><span class="n">end_line</span><span class="p">:]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 6. Rebuild the updated module code</span>
+    <span class="n">updated_code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">replaced_lines</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">updated_code</span></div>
+
+
+
+<div class="viewcode-block" id="extract_function_source">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.extract_function_source">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_function_source</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the source code of a function and removes leading indentation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable</span>
+<span class="sd">        The function from which to extract the source.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The de-indented source code of the function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; def example_func():</span>
+<span class="sd">    ...     pass</span>
+<span class="sd">    &gt;&gt;&gt; extract_function_source(example_func).strip()</span>
+<span class="sd">    &#39;def example_func():\\n    pass&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">original_source</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">original_source</span><span class="p">)</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+
+
+<div class="viewcode-block" id="parse_docstring_and_body">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.parse_docstring_and_body">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_docstring_and_body</span><span class="p">(</span><span class="n">source_code</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses the source code of a function to extract its docstring and body lines.</span>
+<span class="sd">    The docstring is determined via the AST (so single, double, or triple quotes</span>
+<span class="sd">    are all recognized correctly), then recast as a triple-quoted string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source_code : str</span>
+<span class="sd">        The source code of the function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple of (docstring_lines, body_lines). The first element is a list of lines</span>
+<span class="sd">        with exactly one element: the triple-quoted docstring (if any); otherwise, an empty list.</span>
+<span class="sd">        The second element is a list of the remaining lines that constitute the function’s body.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    1) By default, Python captures multi-line docstrings exactly as typed, including indentation</span>
+<span class="sd">       within the docstring. If you want to remove such indentation, you can call `textwrap.dedent`</span>
+<span class="sd">       on the docstring before re-inserting it into triple quotes.</span>
+
+<span class="sd">    2) For Python 3.8 and above, the AST nodes carry `end_lineno`, which lets us find exactly</span>
+<span class="sd">       where the docstring statement ends in the source. For older versions, one might need</span>
+<span class="sd">       a more heuristic approach to identify docstring lines.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    # &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    # ... def example_func():</span>
+<span class="sd">    # ...     &quot;This is a docstring.&quot;</span>
+<span class="sd">    # ...     pass</span>
+<span class="sd">    # ... &#39;&#39;&#39;</span>
+<span class="sd">    # &gt;&gt;&gt; docstring, body = parse_docstring_and_body(code)</span>
+<span class="sd">    # &gt;&gt;&gt; docstring == [&#39;\&quot;\&quot;\&quot;This is a docstring.\&quot;\&quot;\&quot;&#39;]</span>
+<span class="sd">    # &gt;&gt;&gt; body</span>
+<span class="sd">    # [&#39;    pass&#39;]</span>
+
+<span class="sd">    # &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    # ... def another_example():</span>
+<span class="sd">    # ...     &#39;&#39;&#39;</span>
+<span class="sd">    # ...     Multi-line</span>
+<span class="sd">    # ...     docstring</span>
+<span class="sd">    # ...     &#39;&#39;&#39;</span>
+<span class="sd">    # ...     x = 42</span>
+<span class="sd">    # ...     return x</span>
+<span class="sd">    # ... &#39;&#39;&#39;</span>
+<span class="sd">    # &gt;&gt;&gt; docstring, body = parse_docstring_and_body(code)</span>
+<span class="sd">    # &gt;&gt;&gt; docstring</span>
+<span class="sd">    # [&#39;\&quot;\&quot;\&quot;\\n    Multi-line\\n    docstring\\n    \&quot;\&quot;\&quot;&#39;]</span>
+<span class="sd">    # &gt;&gt;&gt; body</span>
+<span class="sd">    # [&#39;    x = 42&#39;, &#39;    return x&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Parse the code into an AST</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_code</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+        <span class="c1"># If invalid Python code, return empty docstring and the entire code as the body</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="n">source_code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="c1"># Locate the first function (or async function) node</span>
+    <span class="n">func_node</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)):</span>
+            <span class="n">func_node</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="k">break</span>
+
+    <span class="c1"># If no function definition, everything is &quot;body&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">func_node</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="n">source_code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="c1"># Let the AST detect the docstring. This works for single quotes, double quotes,</span>
+    <span class="c1"># or triple quotes, including multi-line docstrings.</span>
+    <span class="n">original_docstring</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">get_docstring</span><span class="p">(</span><span class="n">func_node</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">original_docstring</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Optionally dedent the docstring (comment out if you want to preserve exact indentation)</span>
+        <span class="c1"># original_docstring = textwrap.dedent(original_docstring)</span>
+        <span class="c1"># Wrap in triple quotes for consistency</span>
+        <span class="n">docstring_lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;&quot;&quot;&quot;</span><span class="si">{</span><span class="n">original_docstring</span><span class="si">}</span><span class="s1">&quot;&quot;&quot;&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">docstring_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Convert the entire source to lines for reference</span>
+    <span class="n">all_lines</span> <span class="o">=</span> <span class="n">source_code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="c1"># Find the line index where the function definition starts</span>
+    <span class="n">def_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\s*(?:async\s+def|def)\s+&#39;</span>
+    <span class="n">def_line_idx</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">def_pattern</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+            <span class="n">def_line_idx</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">break</span>
+
+    <span class="c1"># If we never found &#39;def &#39; or &#39;async def &#39;, just treat everything as body</span>
+    <span class="k">if</span> <span class="n">def_line_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">docstring_lines</span><span class="p">,</span> <span class="n">all_lines</span>
+
+    <span class="c1"># Default guess: body starts right after the &quot;def&quot; line</span>
+    <span class="n">start_body_idx</span> <span class="o">=</span> <span class="n">def_line_idx</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># If there&#39;s a docstring, refine start_body_idx by checking the end_lineno of</span>
+    <span class="c1"># the first statement (Python 3.8+). This ensures we skip all lines belonging</span>
+    <span class="c1"># to the docstring literal.</span>
+    <span class="k">if</span> <span class="n">original_docstring</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">func_node</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+        <span class="n">first_stmt</span> <span class="o">=</span> <span class="n">func_node</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># If the docstring is recognized as an Expr node with a literal (Constant/Str),</span>
+        <span class="c1"># we can read .end_lineno to see exactly where it ends</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_stmt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">first_stmt</span><span class="p">,</span> <span class="s2">&quot;end_lineno&quot;</span><span class="p">):</span>
+            <span class="c1"># Note: lineno/end_lineno are 1-based, but our list is 0-based</span>
+            <span class="n">start_body_idx</span> <span class="o">=</span> <span class="n">first_stmt</span><span class="o">.</span><span class="n">end_lineno</span>
+
+    <span class="c1"># The body is whatever remains after the docstring</span>
+    <span class="n">body_lines</span> <span class="o">=</span> <span class="n">all_lines</span><span class="p">[</span><span class="n">start_body_idx</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">docstring_lines</span><span class="p">,</span> <span class="n">body_lines</span></div>
+
+
+
+<div class="viewcode-block" id="build_multiline_signature">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.build_multiline_signature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_multiline_signature</span><span class="p">(</span><span class="n">sig_obj</span><span class="p">,</span> <span class="n">func_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a multiline function signature and extracts parameter names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sig_obj : str or inspect.Signature</span>
+<span class="sd">        The function signature as a string or Signature object.</span>
+<span class="sd">    func_name : str, optional</span>
+<span class="sd">        The name of the function, used if `sig_obj` is an inspect.Signature.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple of (signature_lines, param_names). `signature_lines` is a list</span>
+<span class="sd">        containing the multiline signature, and `param_names` is a list of</span>
+<span class="sd">        parameter names for locals unpacking.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from inspect import signature</span>
+<span class="sd">    &gt;&gt;&gt; def example_func(a, b=2, *args, **kwargs): pass</span>
+<span class="sd">    &gt;&gt;&gt; sig = signature(example_func)</span>
+<span class="sd">    &gt;&gt;&gt; lines, params = build_multiline_signature(sig, &quot;new_func&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; lines</span>
+<span class="sd">    [&#39;def new_func(&#39;, &#39;    a,&#39;, &#39;    b=2,&#39;, &#39;    *args,&#39;, &#39;    **kwargs&#39;, &#39;):&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; params</span>
+<span class="sd">    [&#39;a&#39;, &#39;b&#39;, &#39;args&#39;, &#39;kwargs&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sig_obj</span><span class="p">,</span> <span class="n">Signature</span><span class="p">):</span>
+        <span class="n">params_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sig_obj</span><span class="p">)</span>
+        <span class="n">signature_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;def </span><span class="si">{</span><span class="n">func_name</span><span class="si">}{</span><span class="n">params_str</span><span class="si">}</span><span class="s2">:&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">signature_text</span> <span class="o">=</span> <span class="n">sig_obj</span>
+
+    <span class="n">def_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\s*(?:async\s+def|def)\s+([a-zA-Z_]\w*)\s*\((.*)\)\s*:&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">def_pattern</span><span class="p">,</span> <span class="n">signature_text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">signature_text</span><span class="p">],</span> <span class="p">[]</span>
+
+    <span class="n">func_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">inner_args</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="n">arg_parts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bracket_level</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">current_part</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">inner_args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="s2">&quot;([{&quot;</span><span class="p">:</span>
+            <span class="n">bracket_level</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">ch</span> <span class="ow">in</span> <span class="s2">&quot;)]}&quot;</span><span class="p">:</span>
+            <span class="n">bracket_level</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">&quot;,&quot;</span> <span class="ow">and</span> <span class="n">bracket_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">arg_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_part</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">current_part</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">continue</span>
+        <span class="n">current_part</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">current_part</span><span class="p">:</span>
+        <span class="n">arg_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_part</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="n">sig_lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;def </span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">(&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arg_parts</span><span class="p">):</span>
+        <span class="n">comma</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg_parts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">sig_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">part</span><span class="si">}{</span><span class="n">comma</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">sig_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;):&quot;</span><span class="p">)</span>
+
+    <span class="n">param_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">arg_parts</span><span class="p">:</span>
+        <span class="n">part</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">):</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">sig_lines</span><span class="p">,</span> <span class="n">param_names</span></div>
+
+
+
+<div class="viewcode-block" id="build_data_extraction_line">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.build_data_extraction_line">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_data_extraction_line</span><span class="p">(</span><span class="n">param_names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a line that unpacks locals().values() into parameter names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_names : list of str</span>
+<span class="sd">        The names of the parameters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A line of code that unpacks the parameters.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; build_data_extraction_line([&#39;a&#39;, &#39;b&#39;, &#39;args&#39;, &#39;kwargs&#39;])</span>
+<span class="sd">    &#39;    a, b, args, kwargs = locals().values()&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param_names</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;    # No parameters found&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> = locals().values()&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="gather_function_code">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.gather_function_code">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gather_function_code</span><span class="p">(</span>
+    <span class="n">signature_lines</span><span class="p">,</span> <span class="n">docstring_lines</span><span class="p">,</span> <span class="n">data_extraction_line</span><span class="p">,</span> <span class="n">body_lines</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combines all components of a function into a single string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signature_lines : list of str</span>
+<span class="sd">        The lines of the function signature.</span>
+<span class="sd">    docstring_lines : list of str</span>
+<span class="sd">        The lines of the function docstring.</span>
+<span class="sd">    data_extraction_line : str</span>
+<span class="sd">        The line of code for unpacking locals.</span>
+<span class="sd">    body_lines : list of str</span>
+<span class="sd">        The lines of the function body.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The complete function code as a string.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; sig_lines = [&#39;def func(&#39;, &#39;    a,&#39;, &#39;    b=2,&#39;, &#39;):&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; doc_lines = [&#39;&quot;A docstring.&quot;&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; extraction_line = &#39;    a, b = locals().values()&#39;</span>
+<span class="sd">    &gt;&gt;&gt; body_lines = [&#39;    return a + b&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; print(gather_function_code(sig_lines, doc_lines, extraction_line, body_lines))</span>
+<span class="sd">    def func(</span>
+<span class="sd">        a,</span>
+<span class="sd">        b=2,</span>
+<span class="sd">    ):</span>
+<span class="sd">        &quot;A docstring.&quot;</span>
+<span class="sd">        a, b = locals().values()</span>
+<span class="sd">        return a + b</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">line_generator</span><span class="p">():</span>
+        <span class="k">yield from</span> <span class="n">signature_lines</span>
+        <span class="k">if</span> <span class="n">docstring_lines</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">dl</span> <span class="ow">in</span> <span class="n">docstring_lines</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="n">dl</span>
+        <span class="k">yield</span> <span class="n">data_extraction_line</span>
+        <span class="k">yield from</span> <span class="n">body_lines</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line_generator</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="code_str_with_signature">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.code_str_with_signature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">code_str_with_signature</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;_with_new_sig&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function to construct a new function definition string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">original_source</span> <span class="o">=</span> <span class="n">extract_function_source</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="n">docstring_lines</span><span class="p">,</span> <span class="n">body_lines</span> <span class="o">=</span> <span class="n">parse_docstring_and_body</span><span class="p">(</span><span class="n">original_source</span><span class="p">)</span>
+    <span class="n">signature_lines</span><span class="p">,</span> <span class="n">param_names</span> <span class="o">=</span> <span class="n">build_multiline_signature</span><span class="p">(</span>
+        <span class="n">sig</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="n">suffix</span>
+    <span class="p">)</span>
+    <span class="n">data_extraction_line</span> <span class="o">=</span> <span class="n">build_data_extraction_line</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gather_function_code</span><span class="p">(</span>
+        <span class="n">signature_lines</span><span class="o">=</span><span class="n">signature_lines</span><span class="p">,</span>
+        <span class="n">docstring_lines</span><span class="o">=</span><span class="n">docstring_lines</span><span class="p">,</span>
+        <span class="n">data_extraction_line</span><span class="o">=</span><span class="n">data_extraction_line</span><span class="p">,</span>
+        <span class="n">body_lines</span><span class="o">=</span><span class="n">body_lines</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+
+
+<div class="viewcode-block" id="extract_func_name_from_code">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.extract_func_name_from_code">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_func_name_from_code</span><span class="p">(</span><span class="n">code_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the name of the first function defined in a Python code string using `ast`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    code_str : str</span>
+<span class="sd">        The Python code string to analyze.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The name of the first function defined in the code string.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If no function definition is found in the provided code string.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    ... def my_function(a, b):</span>
+<span class="sd">    ...     return a + b</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; extract_func_name_from_code(code)</span>
+<span class="sd">    &#39;my_function&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    ... async def another_function():</span>
+<span class="sd">    ...     pass</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; extract_func_name_from_code(code)</span>
+<span class="sd">    &#39;another_function&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_func_name_from_code(&quot;x = 42&quot;)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    ValueError: No function definition found in the provided code string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">code_str</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid Python code provided: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No function definition found in the provided code string.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="execute_and_get_function">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.execute_and_get_function">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">execute_and_get_function</span><span class="p">(</span><span class="n">code_str</span><span class="p">,</span> <span class="n">func_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes a Python code string and returns the function object defined within it.</span>
+<span class="sd">    If `func_name` is not provided, it extracts the function name from the code string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    code_str : str</span>
+<span class="sd">        The Python code string to execute.</span>
+<span class="sd">    func_name : str, optional</span>
+<span class="sd">        The name of the function to retrieve from the executed code. If None,</span>
+<span class="sd">        the function name is extracted from the code string.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    callable</span>
+<span class="sd">        The function object defined by `code_str`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `func_name` is not provided and no function definition is found in the code string.</span>
+<span class="sd">    KeyError</span>
+<span class="sd">        If the function `func_name` is not found in the executed code.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    ... def my_function(a, b):</span>
+<span class="sd">    ...     return a + b</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; func = execute_and_get_function(code)</span>
+<span class="sd">    &gt;&gt;&gt; func(3, 4)</span>
+<span class="sd">    7</span>
+
+<span class="sd">    &gt;&gt;&gt; code = &#39;&#39;&#39;</span>
+<span class="sd">    ... def greet(name):</span>
+<span class="sd">    ...     return f&quot;Hello, {name}!&quot;</span>
+<span class="sd">    ... &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; func = execute_and_get_function(code)</span>
+<span class="sd">    &gt;&gt;&gt; func(&quot;Alice&quot;)</span>
+<span class="sd">    &#39;Hello, Alice!&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; code = &#39;x = 42&#39;</span>
+<span class="sd">    &gt;&gt;&gt; execute_and_get_function(code)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    ValueError: No function definition found in the provided code string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">func_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">func_name</span> <span class="o">=</span> <span class="n">extract_func_name_from_code</span><span class="p">(</span><span class="n">code_str</span><span class="p">)</span>
+
+    <span class="n">namespace</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code_str</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Function &#39;</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">&#39; not found in the executed code.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">namespace</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span></div>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_origin</span><span class="p">,</span> <span class="n">get_args</span>
+
+
+<div class="viewcode-block" id="diagnose_parameter_default">
+<a class="viewcode-back" href="../../module_docs/cosmograph/_code_sync.html#cosmograph._code_sync.diagnose_parameter_default">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diagnose_parameter_default</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Examines the alignment between an inspect.Parameter object&#39;s default value</span>
+<span class="sd">    and its type annotation. Returns a dictionary with various diagnostic flags</span>
+<span class="sd">    that may be of interest when analyzing function signatures.</span>
+
+<span class="sd">    Example fields:</span>
+<span class="sd">      - &quot;missing_annotation&quot;: True if there is no type annotation.</span>
+<span class="sd">      - &quot;missing_default&quot;: True if there is no default value.</span>
+<span class="sd">      - &quot;none_without_optional&quot;: True if the default is None but the annotation does not allow None.</span>
+<span class="sd">      - &quot;default_not_in_type&quot;: True if the default is not None and is not an instance of the annotated type.</span>
+<span class="sd">      - &quot;suspected_type_mismatch&quot;: True if the type annotation suggests a container or union and</span>
+<span class="sd">        the default fails rudimentary consistency checks.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      - Uses only standard library for type inspection. If a more robust approach</span>
+<span class="sd">        is needed, especially for containers (e.g., List[int] or Dict[str, str]) or</span>
+<span class="sd">        deeper type checks, third-party libraries like &#39;typeguard&#39; could be considered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># 1. Check if annotation is missing.</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span><span class="p">:</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;missing_annotation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">diagnosis</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;missing_annotation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># 2. Check if default is missing.</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span><span class="p">:</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;missing_default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Still return partial results, no reason to proceed with default-based checks</span>
+        <span class="k">return</span> <span class="n">diagnosis</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;missing_default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Helper to detect if an annotation is an optional type (including Union[..., NoneType]).</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_annotation_optional</span><span class="p">(</span><span class="n">anno</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># Detect Optional[X] which is a Union[X, type(None)]</span>
+        <span class="c1"># or some Union that includes None.</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">anno</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">anno</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Helper to check if val matches the annotated type. This is a limited check:</span>
+    <span class="c1"># - If annotation is a Union, check if val is instance of any type in the union</span>
+    <span class="c1"># - If annotation is a generic container, this won&#39;t fully check subtype correctness</span>
+    <span class="c1">#   but it will check the container type itself (e.g., list vs. dict).</span>
+    <span class="c1"># For deeper checks, a library like &#39;typeguard&#39; is more suitable.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_value_instance_of_annotation</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">anno</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">anno</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+            <span class="c1"># For Union types, check membership in any possibility</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">anno</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">is_value_instance_of_annotation</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Not a Union or a generic type; just do regular isinstance check</span>
+            <span class="k">if</span> <span class="n">anno</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">anno</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># A generic type like list, dict, etc. We&#39;ll just compare the origin type</span>
+            <span class="c1"># with the type of the object (e.g., &#39;list&#39; if it&#39;s List[int], etc.).</span>
+            <span class="c1"># This won&#39;t validate item subtypes (e.g., List[int] vs List[str]).</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># 3. Check if the default is None without being optional.</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_annotation_optional</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">annotation</span><span class="p">):</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;none_without_optional&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;none_without_optional&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># 4. Check if the default value is out of alignment with the annotation.</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_value_instance_of_annotation</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">annotation</span><span class="p">):</span>
+            <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;default_not_in_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;default_not_in_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If default is None, it&#39;s either allowed or not, and that&#39;s covered above</span>
+        <span class="n">diagnosis</span><span class="p">[</span><span class="s2">&quot;default_not_in_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Optionally, add more granular checks here for container or union complexity.</span>
+    <span class="c1"># For instance, we could identify if the annotation is a container type</span>
+    <span class="c1"># (List, Set, Dict, etc.) and attempt deeper checks. That is beyond this</span>
+    <span class="c1"># minimal demonstration.</span>
+
+    <span class="k">return</span> <span class="n">diagnosis</span></div>
+
+
+
+<span class="c1"># import inspect</span>
+<span class="c1"># import textwrap</span>
+<span class="c1"># import ast</span>
+<span class="c1"># import re</span>
+<span class="c1"># from functools import partial</span>
+<span class="c1"># from inspect import Signature</span>
+
+
+<span class="c1"># def code_str_with_signature(func, sig, suffix=&quot;_with_new_sig&quot;):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Constructs a string that defines a new function with the following properties:</span>
+
+<span class="c1">#     1. The signature is taken from &#39;sig&#39;:</span>
+<span class="c1">#        - If &#39;sig&#39; is a string (e.g. &#39;def new_func(a, b=2, *args, **kwargs):&#39;),</span>
+<span class="c1">#          then it is used as-is (after splitting out parameters onto multiple lines).</span>
+<span class="c1">#        - If &#39;sig&#39; is an inspect.Signature object, a function definition string is built:</span>
+<span class="c1">#              def &lt;func.__name__&gt;&lt;suffix&gt;(&lt;signature&gt;):</span>
+<span class="c1">#     2. The docstring is exactly that of &#39;func&#39; (preserved in triple quotes).</span>
+<span class="c1">#     3. The body is exactly that of &#39;func&#39;, except for a first line that rebinds parameters</span>
+<span class="c1">#        by unpacking &#39;locals().values()&#39; into the signature’s parameter names.</span>
+<span class="c1">#     4. The returned value is the complete function code (a Python source string).</span>
+
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     func : callable</span>
+<span class="c1">#         The original function (from which to extract body and docstring).</span>
+<span class="c1">#     sig : str or inspect.Signature</span>
+<span class="c1">#         Either a string of the form:</span>
+<span class="c1">#             def new_func(a, b=2, *args, **kwargs):</span>
+<span class="c1">#         or an inspect.Signature object (e.g. from &#39;signature(func_to_copy)&#39;).</span>
+<span class="c1">#     suffix : str, optional</span>
+<span class="c1">#         Suffix to append to the function name when building from an inspect.Signature object.</span>
+<span class="c1">#         Only used if &#39;sig&#39; is a Signature (not a string). Defaults to &#39;_with_new_sig&#39;.</span>
+
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     str</span>
+<span class="c1">#         A string containing valid Python code defining the new function.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     # 1. Extract original function source (de-indented)</span>
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     def extract_function_source(f):</span>
+<span class="c1">#         original_source = inspect.getsource(f)</span>
+<span class="c1">#         return textwrap.dedent(original_source)</span>
+
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     # 2. Parse out docstring and body using AST</span>
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     def parse_docstring_and_body(source_code):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         Parses the source code of a function to extract:</span>
+<span class="c1">#           - The docstring (as triple-quoted lines)</span>
+<span class="c1">#           - The lines of the body after the docstring</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         mod = ast.parse(source_code)</span>
+<span class="c1">#         func_node = None</span>
+<span class="c1">#         for node in mod.body:</span>
+<span class="c1">#             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):</span>
+<span class="c1">#                 func_node = node</span>
+<span class="c1">#                 break</span>
+<span class="c1">#         if not func_node:</span>
+<span class="c1">#             # If we can&#39;t find any function node, return the entire source as body</span>
+<span class="c1">#             return None, source_code.splitlines()</span>
+
+<span class="c1">#         # Extract docstring</span>
+<span class="c1">#         original_docstring = ast.get_docstring(func_node)</span>
+<span class="c1">#         docstring_lines = []</span>
+<span class="c1">#         if original_docstring:</span>
+<span class="c1">#             docstring_lines = [f&#39;&quot;&quot;&quot;{original_docstring}&quot;&quot;&quot;&#39;]</span>
+
+<span class="c1">#         # Convert source code to lines</span>
+<span class="c1">#         all_lines = source_code.splitlines()</span>
+
+<span class="c1">#         # Find index of &quot;def &quot; or &quot;async def&quot;</span>
+<span class="c1">#         def_pattern = r&#39;^\s*(?:async\s+def|def)\s+&#39;</span>
+<span class="c1">#         def_line_idx = None</span>
+<span class="c1">#         for i, line in enumerate(all_lines):</span>
+<span class="c1">#             if re.search(def_pattern, line):</span>
+<span class="c1">#                 def_line_idx = i</span>
+<span class="c1">#                 break</span>
+
+<span class="c1">#         # If no function def line found, fallback</span>
+<span class="c1">#         if def_line_idx is None:</span>
+<span class="c1">#             return docstring_lines, all_lines</span>
+
+<span class="c1">#         # Next, figure out where the body actually begins</span>
+<span class="c1">#         start_body_idx = def_line_idx + 1</span>
+
+<span class="c1">#         # If we detected a docstring, find where it ends</span>
+<span class="c1">#         if original_docstring:</span>
+<span class="c1">#             triple_quote_pattern = r&#39;(&quot;&quot;&quot;|\&#39;\&#39;\&#39;)&#39;</span>
+<span class="c1">#             doc_open = None</span>
+<span class="c1">#             for j in range(def_line_idx + 1, len(all_lines)):</span>
+<span class="c1">#                 if doc_open is None:</span>
+<span class="c1">#                     match = re.search(triple_quote_pattern, all_lines[j])</span>
+<span class="c1">#                     if match:</span>
+<span class="c1">#                         doc_open = match.group(1)</span>
+<span class="c1">#                 else:</span>
+<span class="c1">#                     # Keep searching until we find that closing triple quote</span>
+<span class="c1">#                     if re.search(doc_open, all_lines[j]):</span>
+<span class="c1">#                         start_body_idx = j + 1</span>
+<span class="c1">#                         break</span>
+
+<span class="c1">#         body_lines = all_lines[start_body_idx:]</span>
+<span class="c1">#         return docstring_lines, body_lines</span>
+
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     # 3. Turn a signature (string or Signature object) into:</span>
+<span class="c1">#     #       (list_of_def_lines, list_of_parameter_names)</span>
+<span class="c1">#     #    where list_of_def_lines is the multiline def lines, and</span>
+<span class="c1">#     #    list_of_parameter_names is for the locals().values() unpack.</span>
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     def build_multiline_signature(sig_obj):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         If &#39;sig_obj&#39; is a string:</span>
+<span class="c1">#             &#39;def new_func(a, b=2, *args, **kwargs):&#39;</span>
+<span class="c1">#           Then parse it to produce a multiline version and the param names.</span>
+
+<span class="c1">#         If &#39;sig_obj&#39; is an inspect.Signature:</span>
+<span class="c1">#           Then build: &#39;def &lt;func.__name__&gt;&lt;suffix&gt;(&lt;parameters&gt;):&#39;</span>
+<span class="c1">#           from the signature, also parse multiline, etc.</span>
+
+<span class="c1">#         Returns</span>
+<span class="c1">#         -------</span>
+<span class="c1">#         (signature_lines, param_names)</span>
+<span class="c1">#           signature_lines: list[str]  e.g. [&quot;def new_func(&quot;, &quot;    a,&quot;, &quot;    b=2,&quot;, &quot;    *args,&quot;, &quot;    **kwargs&quot;, &quot;):&quot;]</span>
+<span class="c1">#           param_names: list[str]   e.g. [&quot;a&quot;, &quot;b&quot;, &quot;args&quot;, &quot;kwargs&quot;]</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         # If the signature is an inspect.Signature, convert it to a &quot;def name(...) :&quot; string</span>
+<span class="c1">#         if isinstance(sig_obj, Signature):</span>
+<span class="c1">#             # Build &quot;def &lt;func_name&gt;&lt;suffix&gt;(params):&quot;</span>
+<span class="c1">#             params_str = str(sig_obj)  # e.g. (data=None, *, points=None, links=None)</span>
+<span class="c1">#             function_name = func.__name__ + suffix</span>
+<span class="c1">#             signature_text = f&quot;def {function_name}{params_str}:&quot;</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             # Assume it&#39;s a str</span>
+<span class="c1">#             signature_text = sig_obj</span>
+
+<span class="c1">#         # Regex to extract the function name and the parentheses content</span>
+<span class="c1">#         def_pattern = r&#39;^\s*(?:async\s+def|def)\s+([a-zA-Z_]\w*)\s*\((.*)\)\s*:&#39;</span>
+<span class="c1">#         match = re.match(def_pattern, signature_text)</span>
+<span class="c1">#         if not match:</span>
+<span class="c1">#             # If it doesn&#39;t match, just return the entire text as a single line</span>
+<span class="c1">#             return [signature_text], []</span>
+
+<span class="c1">#         func_name = match.group(1)</span>
+<span class="c1">#         inner_args = match.group(2).strip()</span>
+
+<span class="c1">#         # Split arguments by commas at top-level</span>
+<span class="c1">#         arg_parts = []</span>
+<span class="c1">#         bracket_level = 0</span>
+<span class="c1">#         current_part = []</span>
+<span class="c1">#         for ch in inner_args:</span>
+<span class="c1">#             if ch in &quot;([{&quot;:</span>
+<span class="c1">#                 bracket_level += 1</span>
+<span class="c1">#                 current_part.append(ch)</span>
+<span class="c1">#             elif ch in &quot;)]}&quot;:</span>
+<span class="c1">#                 bracket_level -= 1</span>
+<span class="c1">#                 current_part.append(ch)</span>
+<span class="c1">#             elif ch == &#39;,&#39; and bracket_level == 0:</span>
+<span class="c1">#                 arg_parts.append(&quot;&quot;.join(current_part).strip())</span>
+<span class="c1">#                 current_part = []</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 current_part.append(ch)</span>
+<span class="c1">#         if current_part:</span>
+<span class="c1">#             arg_parts.append(&quot;&quot;.join(current_part).strip())</span>
+
+<span class="c1">#         # Build the multiline signature lines</span>
+<span class="c1">#         sig_lines = [f&quot;def {func_name}(&quot;]</span>
+<span class="c1">#         for i, part in enumerate(arg_parts):</span>
+<span class="c1">#             comma = &quot;,&quot; if i &lt; len(arg_parts) - 1 else &quot;&quot;</span>
+<span class="c1">#             sig_lines.append(f&quot;    {part}{comma}&quot;)</span>
+<span class="c1">#         sig_lines.append(&quot;):&quot;)</span>
+
+<span class="c1">#         # We also want the param names (for locals().values())</span>
+<span class="c1">#         # e.g. &quot;data=None&quot; -&gt; &quot;data&quot;, &quot;*args&quot; -&gt; &quot;args&quot;, etc.</span>
+<span class="c1">#         param_names = []</span>
+<span class="c1">#         for part in arg_parts:</span>
+<span class="c1">#             part_stripped = part.strip()</span>
+<span class="c1">#             if part_stripped.startswith(&quot;**&quot;):</span>
+<span class="c1">#                 param_names.append(part_stripped.replace(&quot;**&quot;, &quot;&quot;, 1).strip())</span>
+<span class="c1">#             elif part_stripped.startswith(&quot;*&quot;):</span>
+<span class="c1">#                 param_names.append(part_stripped.replace(&quot;*&quot;, &quot;&quot;, 1).strip())</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 # If it has an &quot;=&quot;, split out the left side</span>
+<span class="c1">#                 eq_idx = part_stripped.find(&quot;=&quot;)</span>
+<span class="c1">#                 if eq_idx != -1:</span>
+<span class="c1">#                     param_names.append(part_stripped[:eq_idx].strip())</span>
+<span class="c1">#                 else:</span>
+<span class="c1">#                     param_names.append(part_stripped)</span>
+
+<span class="c1">#         return sig_lines, param_names</span>
+
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     # 4. Build the locals().values() unpack line</span>
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     def build_data_extraction_line(param_names):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         E.g., for param_names=[&#39;data&#39;,&#39;points&#39;,&#39;links&#39;],</span>
+<span class="c1">#         returns: &#39;    data, points, links = locals().values()&#39;</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         if not param_names:</span>
+<span class="c1">#             return &quot;    # No parameters found&quot;</span>
+<span class="c1">#         unpack_str = &quot;, &quot;.join(param_names)</span>
+<span class="c1">#         return f&quot;    {unpack_str} = locals().values()&quot;</span>
+
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     # 5. Assemble all the code lines into a single string</span>
+<span class="c1">#     # ----------------------------------------------------------------</span>
+<span class="c1">#     def gather_function_code(</span>
+<span class="c1">#         signature_lines, docstring_lines, data_extraction_line, body_lines</span>
+<span class="c1">#     ):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         Returns the final function definition by concatenating:</span>
+<span class="c1">#           - multiline signature</span>
+<span class="c1">#           - docstring (indented)</span>
+<span class="c1">#           - data extraction line</span>
+<span class="c1">#           - original body</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         def line_generator():</span>
+<span class="c1">#             # Multiline signature</span>
+<span class="c1">#             yield from signature_lines</span>
+
+<span class="c1">#             # Original docstring (indented by 4 spaces)</span>
+<span class="c1">#             if docstring_lines:</span>
+<span class="c1">#                 for dl in docstring_lines:</span>
+<span class="c1">#                     yield &quot;    &quot; + dl</span>
+
+<span class="c1">#             # Unpacking line</span>
+<span class="c1">#             yield data_extraction_line</span>
+
+<span class="c1">#             # The rest of the body (already has indentation from the original function)</span>
+<span class="c1">#             yield from body_lines</span>
+
+<span class="c1">#         # Gather all lines at once</span>
+<span class="c1">#         return &quot;\n&quot;.join(line_generator())</span>
+
+<span class="c1">#     # ----------------------------</span>
+<span class="c1">#     # Main flow of code_str_with_signature</span>
+<span class="c1">#     # ----------------------------</span>
+<span class="c1">#     original_source = extract_function_source(func)</span>
+<span class="c1">#     docstring_lines, body_lines = parse_docstring_and_body(original_source)</span>
+
+<span class="c1">#     signature_lines, param_names = build_multiline_signature(sig)</span>
+<span class="c1">#     data_extraction_line = build_data_extraction_line(param_names)</span>
+
+<span class="c1">#     return gather_function_code(</span>
+<span class="c1">#         signature_lines=signature_lines,</span>
+<span class="c1">#         docstring_lines=docstring_lines,</span>
+<span class="c1">#         data_extraction_line=data_extraction_line,</span>
+<span class="c1">#         body_lines=body_lines,</span>
+<span class="c1">#     )</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

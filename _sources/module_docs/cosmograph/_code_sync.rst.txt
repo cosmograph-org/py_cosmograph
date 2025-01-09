@@ -1,0 +1,4 @@
+cosmograph._code_sync
+=====================
+.. automodule:: cosmograph._code_sync
+   :members:

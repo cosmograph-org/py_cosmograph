@@ -1,0 +1,260 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cosmograph.util &mdash; cosmograph 0.0.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="cosmograph.validation" href="validation.html" />
+    <link rel="prev" title="cosmograph.tests.datagen" href="tests/datagen.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cosmograph
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cosmograph.html">cosmograph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_code_sync.html">cosmograph._code_sync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_resources.html">cosmograph._resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_traitlets_util.html">cosmograph._traitlets_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">cosmograph.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap.html">cosmograph.scrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">cosmograph.tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/base_test.html">cosmograph.tests.base_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/datagen.html">cosmograph.tests.datagen</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cosmograph.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.JsFiles"><code class="docutils literal notranslate"><span class="pre">JsFiles</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.annotation_to_str"><code class="docutils literal notranslate"><span class="pre">annotation_to_str()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.cosmograph_base_docs"><code class="docutils literal notranslate"><span class="pre">cosmograph_base_docs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.default_is_safe"><code class="docutils literal notranslate"><span class="pre">default_is_safe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.is_parameterized_type"><code class="docutils literal notranslate"><span class="pre">is_parameterized_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.js_files_as_attrs"><code class="docutils literal notranslate"><span class="pre">js_files_as_attrs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.move_to_front"><code class="docutils literal notranslate"><span class="pre">move_to_front()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.str_to_annotation"><code class="docutils literal notranslate"><span class="pre">str_to_annotation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.validate_signature"><code class="docutils literal notranslate"><span class="pre">validate_signature()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="validation.html">cosmograph.validation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cosmograph</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cosmograph.util</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/cosmograph/util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cosmograph.util">
+<span id="cosmograph-util"></span><h1>cosmograph.util<a class="headerlink" href="#module-cosmograph.util" title="Link to this heading"></a></h1>
+<p>Utils to prepare data for cosmos</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cosmograph.util.JsFiles">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">JsFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rootdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_for_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_hidden</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assert_rootdir_existence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#JsFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.JsFiles" title="Link to this definition"></a></dt>
+<dd><p>A store of js files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.annotation_to_str">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">annotation_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#annotation_to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.annotation_to_str" title="Link to this definition"></a></dt>
+<dd><p>Encodes Python type annotations as strings for JSON serialization.</p>
+<p>This is part of a specialized Python-to-string codec designed to encode and decode
+Python type annotations in a way that allows them to be serialized and deserialized
+in JSON-compatible formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annotation</strong> – The type annotation to encode.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string representation of the annotation.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the annotation type is unknown.</p>
+</dd>
+</dl>
+<p>Examples:
+&gt;&gt;&gt; original = [
+…     bool,
+…     float,
+…     list[Any],
+…     typing.Union[str, list[float]],
+…     int,
+…     str,
+…     list[float],
+…     list[list[float]],
+…     typing.Union[int, str],
+…     list[str],
+…     object,
+…     list[int],
+…     typing.Callable[[typing.Dict[str, Any]], Any]
+… ]
+&gt;&gt;&gt; encoded = list(map(annotation_to_str, original))
+&gt;&gt;&gt; encoded
+[‘bool’, ‘float’, ‘list[typing.Any]’, ‘typing.Union[str, list[float]]’, ‘int’, ‘str’, ‘list[float]’, ‘list[list[float]]’, ‘typing.Union[int, str]’, ‘list[str]’, ‘object’, ‘list[int]’, ‘typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]’]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.cosmograph_base_docs">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">cosmograph_base_docs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_name_of_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#cosmograph_base_docs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.cosmograph_base_docs" title="Link to this definition"></a></dt>
+<dd><p>Get the params information part of a docstring</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.default_is_safe">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">default_is_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/cosmograph/util.html#default_is_safe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.default_is_safe" title="Link to this definition"></a></dt>
+<dd><p>Checks if a string is safe to evaluate as a type annotation.</p>
+<p>The string is considered safe if:
+- It contains only alphanumericals, spaces, dots, commas, and brackets.
+- It starts with one of a predefined list of allowed prefixes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> – The string to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the string is safe, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.is_parameterized_type">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">is_parameterized_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#is_parameterized_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.is_parameterized_type" title="Link to this definition"></a></dt>
+<dd><p>Determines if an object is a parameterized type (e.g., list[int]) or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – The object to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if it’s a parameterized type, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.js_files_as_attrs">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">js_files_as_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rootdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#js_files_as_attrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.js_files_as_attrs" title="Link to this definition"></a></dt>
+<dd><p>Will make a JsFiles, but where the keys are available as attributes.
+To do so, any non alphanumerics of file name are replaced with underscore,
+and there can be no two files that collide with that key transformation!</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.move_to_front">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">move_to_front</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/cosmograph/util.html#move_to_front"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.move_to_front" title="Link to this definition"></a></dt>
+<dd><p>Move the columns in <cite>cols</cite> to the front of the DataFrame</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.str_to_annotation">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">str_to_annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">string,</span> <span class="pre">is_safe:</span> <span class="pre">~typing.Callable[[str],</span> <span class="pre">bool]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">default_is_safe&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#str_to_annotation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.str_to_annotation" title="Link to this definition"></a></dt>
+<dd><p>Decodes a string representation of a Python type annotation back into the annotation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – The string representation of the annotation.</p></li>
+<li><p><strong>is_safe</strong> – A function that determines if the string is safe to evaluate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decoded Python type annotation.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the string is not safe to evaluate.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cosmograph.util.validate_signature">
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">validate_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#validate_signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.validate_signature" title="Link to this definition"></a></dt>
+<dd><p>Validate a signature.
+Namely, check that all non-None default types are “subclasses” of the annotation type.</p>
+<p>TODO: Implement</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests/datagen.html" class="btn btn-neutral float-left" title="cosmograph.tests.datagen" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="validation.html" class="btn btn-neutral float-right" title="cosmograph.validation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
