@@ -9,9 +9,10 @@
 REM ------------------------------------------------------------------------------
 REM Step 1: Always install Python 3.10
 REM ------------------------------------------------------------------------------
-echo Installing Python 3.10...
+echo Downloading Python 3.10...
 powershell -Command "Invoke-WebRequest -UseBasicParsing https://www.python.org/ftp/python/3.12.8/python-3.12.8.exe -OutFile python-3.10.0-amd64.exe"
-start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
+echo Installing Python 3.10...
+start /wait python-3.10.0-amd64.exe InstallAllUsers=1 PrependPath=1
 del python-3.10.0-amd64.exe
 
 REM ------------------------------------------------------------------------------
