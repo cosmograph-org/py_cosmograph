@@ -45,7 +45,7 @@ data_files = Files(data_dir_path)
 json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 
 
-color_names_set = set(json_files['color_names.json'])
+# color_names_set = set(json_files['color_names.json'])  # removed because problematic on windows
 
 # --------------------------------------------------------------------------------------
 # Extracting the interface from the data
