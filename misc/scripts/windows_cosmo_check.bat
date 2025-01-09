@@ -1,5 +1,11 @@
 @echo off
 
+: Tip: To run this script on a virgin windows server (e.g. terminator.aeza.net/), where you don't have copy/paste abilities, you can do the following
+: (check that the bit.ly url still points here, to https://raw.githubusercontent.com/cosmograph-org/py_cosmograph/refs/heads/main/misc/scripts/windows_cosmo_check.bat)
+: curl -L -o check_cosmo.bat https://bit.ly/3Pvu3ii
+: check_cosmo.bat
+
+
 REM ------------------------------------------------------------------------------
 REM Step 1: Always install Python 3.10
 REM ------------------------------------------------------------------------------
