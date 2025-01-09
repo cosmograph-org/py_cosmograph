@@ -19,20 +19,20 @@ REM ----------------------------------------------------------------------------
 REM Step 2: Ensure pip is installed and upgraded
 REM ------------------------------------------------------------------------------
 echo Ensuring pip is installed and up to date...
-python -m ensurepip --upgrade
-python -m pip install --upgrade pip
+py -m ensurepip --upgrade
+py -m pip install --upgrade pip
 
 REM ------------------------------------------------------------------------------
 REM Step 3: Install cosmograph
 REM ------------------------------------------------------------------------------
 echo Installing cosmograph...
-python -m pip install cosmograph
+py -m pip install cosmograph
 
 REM ------------------------------------------------------------------------------
 REM Step 4: Test importing cosmograph
 REM ------------------------------------------------------------------------------
 echo Testing cosmograph import...
-python -c "from cosmograph import cosmo"
+py -c "from cosmograph import cosmo"
 
 echo All steps completed.
 pause
