@@ -10,20 +10,27 @@ if "%PYTHON_PATH%"=="" (
     start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
     del python-3.10.0-amd64.exe
 ) else (
-    for /f "delims=." %%V in ('python --version 2^>^&1') do set MAJOR_VERSION=%%V
-    for /f "delims=. tokens=2" %%V in ('python --version 2^>^&1') do set MINOR_VERSION=%%V
+    for /f "tokens=2 delims= " %%V in ('python --version 2^>^&1') do set VERSION=%%V
+    for /f "tokens=1,2 delims=." %%A in ("%VERSION%") do (
+        set MAJOR_VERSION=%%A
+        set MINOR_VERSION=%%B
+    )
     if %MAJOR_VERSION% LSS 3 (
         echo Detected Python version less than 3. Installing Python 3.10...
         curl -O https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe
         start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
         del python-3.10.0-amd64.exe
-    ) else if %MAJOR_VERSION%==3 if %MINOR_VERSION% LSS 10 (
-        echo Detected Python version less than 3.10. Installing Python 3.10...
-        curl -O https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe
-        start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
-        del python-3.10.0-amd64.exe
     ) else (
-        echo Python version is sufficient.
+        if %MAJOR_VERSION%==3 (
+            if %MINOR_VERSION% LSS 10 (
+                echo Detected Python version less than 3.10. Installing Python 3.10...
+                curl -O https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe
+                start /wait python-3.10.0-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
+                del python-3.10.0-amd64.exe
+            ) else (
+                echo Python version is sufficient.
+            )
+        )
     )
 )
 
