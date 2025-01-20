@@ -59,6 +59,7 @@ PARAMS_SSOT_PATH = data_dir / "params_ssot.json"
 
 # TODO: add ssot validation
 
+
 def _params_ssot(param_names=None):
     params_ssot = json.loads(PARAMS_SSOT_PATH.read_text())
     if param_names is not None:
@@ -79,12 +80,13 @@ def cosmograph_base_signature(param_names=None):
 
 
 def validate_signature(sig):
-    """Validate a signature. 
+    """Validate a signature.
     Namely, check that all non-None default types are "subclasses" of the annotation type.
 
     TODO: Implement
     """
     pass
+
 
 def cosmograph_base_docs(param_names=None, take_name_of_types=True):
     """Get the params information part of a docstring"""
@@ -105,7 +107,7 @@ def is_parameterized_type(obj):
     return typing.get_origin(obj) is not None
 
 
-def annotation_to_str(annotation):
+def annotation_to_str(annotation, *, remove_typing_prefix=True):
     """
     Encodes Python type annotations as strings for JSON serialization.
 
@@ -139,19 +141,27 @@ def annotation_to_str(annotation):
     ...     typing.Callable[[typing.Dict[str, Any]], Any]
     ... ]
     >>> encoded = list(map(annotation_to_str, original))
-    >>> encoded
-    ['bool', 'float', 'list[typing.Any]', 'typing.Union[str, list[float]]', 'int', 'str', \
-'list[float]', 'list[list[float]]', 'typing.Union[int, str]', 'list[str]', 'object', 'list[int]', \
-'typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]']
+    >>> encoded  # doctest: +NORMALIZE_WHITESPACE
+    ['bool', 'float', 'list[Any]', 'Union[str, list[float]]', 'int', 'str', \
+    'list[float]', 'list[list[float]]', 'Union[int, str]', 'list[str]', 'object', 'list[int]', \
+    'Callable[[Dict[str, Any]], Any]']
     """
     if isinstance(annotation, str):
-        return annotation
+        annotation_str = annotation
+    elif annotation == Sig.empty:
+        annotation_str = "Any"
     elif is_parameterized_type(annotation):
-        return str(annotation)
+        annotation_str = str(annotation)
     elif isinstance(annotation, type):
-        return annotation.__name__
+        annotation_str = annotation.__name__
     else:
         raise ValueError(f"Unknown annotation type: {annotation}")
+
+    if remove_typing_prefix:
+        typing_module_pattern = r'(?:(?<=\W)|^)typing\.'
+        annotation_str = re.sub(typing_module_pattern, '', annotation_str)
+
+    return annotation_str
 
 
 def default_is_safe(string: str) -> bool:

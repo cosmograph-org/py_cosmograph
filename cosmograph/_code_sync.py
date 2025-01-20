@@ -14,6 +14,76 @@ import ast
 import re
 from functools import partial
 from inspect import Signature
+from i2 import Sig
+
+
+def order_cosmo_params(old_sig: Sig):
+    """
+    Takes a signature and orders the parameters in a specific way, returning a new signature.
+
+    """
+    if not isinstance(old_sig, Sig):
+        if callable(old_sig):
+            old_sig = Sig(old_sig)
+        else:
+            raise TypeError("old_sig must be a Sig object.")
+        
+    first_args = [
+        'data',
+        'points',
+        'links',
+        'point_x_by',
+        'point_y_by',
+        'point_size_by',
+        'point_color_by',
+        'point_label_by',
+    ]
+    by_args = list(filter(lambda x: x.endswith('_by'), old_sig.names))
+    point_args = list(filter(lambda x: x.startswith('point_'), old_sig.names))
+    link_args = list(filter(lambda x: x.startswith('link_'), old_sig.names))
+
+    arg_order = []
+    arg_order.extend(first_args)
+    arg_order.extend([x for x in point_args if x not in arg_order])
+    arg_order.extend([x for x in link_args if x not in arg_order])
+    arg_order.extend([x for x in old_sig.names if x not in arg_order])
+
+    ordered_params = [old_sig.parameters[p] for p in arg_order]
+
+    return Sig(
+        ordered_params, name=old_sig.name, return_annotation=old_sig.return_annotation
+    )
+
+
+def param_spec_code_lines(sig: Sig):
+    from cosmograph.util import annotation_to_str
+
+    previous_param_was_keyword_only = False
+
+    for param in sig.params:
+        if param.kind == Sig.KEYWORD_ONLY and not previous_param_was_keyword_only:
+            yield "*"
+            previous_param_was_keyword_only = True
+        param_spec = f"{param.name}"
+        if param.annotation is not param.empty:
+            param_spec += f" : {annotation_to_str(param.annotation)}"
+        if param.default is not param.empty:
+            if param.annotation is not param.empty:
+                param_spec += f" = {param.default}"
+            else:
+                param_spec += f"={param.default}"
+        yield param_spec
+
+
+def string_of_param_spec_code_lines(sig: Sig, tab='\t'):
+    """Prints lines of code for each parameter in a signature."""
+
+    return tab + f',\n{tab}'.join(param_spec_code_lines(sig))
+
+
+def print_param_spec_code_lines(sig: Sig, tab='\t'):
+    """Prints lines of code for each parameter in a signature."""
+    print(string_of_param_spec_code_lines(sig, tab))
 
 
 def replace_function_definition_in_module(module, function_name, new_function_code):
