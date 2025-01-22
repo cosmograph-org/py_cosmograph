@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.tests.base_test &mdash; cosmograph 0.0.35 documentation</title>
+  <title>cosmograph.tests.base_test &mdash; cosmograph 0.0.37 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=39aadc1c"></script>
+      <script src="../../../_static/documentation_options.js?v=aa2ad26f"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -95,6 +95,44 @@
 
     <span class="k">assert</span> <span class="n">cosmo</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_cosmo_graph_01_quests</span><span class="p">():</span>
+    <span class="c1"># Specify some data</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Quest_Title&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Dragon Hunt&#39;</span><span class="p">,</span> <span class="s1">&#39;Mystic Voyage&#39;</span><span class="p">,</span> <span class="s1">&#39;Treasure Seekers&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;Map_X&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">120</span><span class="p">,</span> <span class="mi">450</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+        <span class="s1">&#39;Map_Y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">210</span><span class="p">],</span>
+        <span class="s1">&#39;Aura_Color&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Crimson&#39;</span><span class="p">,</span> <span class="s1">&#39;Azure&#39;</span><span class="p">,</span> <span class="s1">&#39;Emerald&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;Gear_Size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Create a DataFrame containing the data</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Make the graph</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph</span><span class="w"> </span><span class="kn">import</span> <span class="n">cosmo</span>
+
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">cosmo</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">point_x_by</span><span class="o">=</span><span class="s1">&#39;Map_X&#39;</span><span class="p">,</span>
+        <span class="n">point_y_by</span><span class="o">=</span><span class="s1">&#39;Map_Y&#39;</span><span class="p">,</span>
+        <span class="n">point_color_by</span><span class="o">=</span><span class="s1">&#39;Aura_Color&#39;</span><span class="p">,</span>
+        <span class="n">point_size_by</span><span class="o">=</span><span class="s1">&#39;Gear_Size&#39;</span><span class="p">,</span>
+        <span class="n">point_size_scale</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+        <span class="n">point_label_by</span><span class="o">=</span><span class="s1">&#39;Quest_Title&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Check that the graph is a widget</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">anywidget</span>
+
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">,</span> <span class="n">anywidget</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">AnyWidget</span>
+    <span class="p">),</span> <span class="s2">&quot;&#39;quest&#39; graph wasn&#39;t an anywidget widget instance&quot;</span>
 </pre></div>
 
            </div>

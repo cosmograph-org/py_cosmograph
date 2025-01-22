@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.util &mdash; cosmograph 0.0.35 documentation</title>
+  <title>cosmograph.util &mdash; cosmograph 0.0.37 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=39aadc1c"></script>
+      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
 <span class="n">js_dir_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">js_dir</span><span class="p">)</span>
 
 <span class="n">data_files</span> <span class="o">=</span> <span class="n">Files</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">)</span>
-<span class="n">json_files</span> <span class="o">=</span> <span class="n">filt_iter</span><span class="o">.</span><span class="n">suffixes</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)(</span><span class="n">JsonFiles</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">))</span>
+<span class="n">json_files</span> <span class="o">=</span> <span class="n">filt_iter</span><span class="o">.</span><span class="n">suffixes</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)(</span><span class="n">JsonFiles</span><span class="p">(</span><span class="n">data_dir_path</span><span class="p">))</span>
 
 
 <span class="c1"># color_names_set = set(json_files[&#39;color_names.json&#39;])  # removed because problematic on windows</span>
@@ -145,6 +145,7 @@
 
 <span class="c1"># TODO: add ssot validation</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_params_ssot</span><span class="p">(</span><span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">params_ssot</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">PARAMS_SSOT_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">param_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -155,11 +156,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">cosmograph_base_signature</span><span class="p">(</span><span class="n">param_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">params_ssot</span> <span class="o">=</span> <span class="n">_params_ssot</span><span class="p">(</span><span class="n">param_names</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params_ssot</span><span class="p">:</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># delete description if any</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># delete description if any</span>
         <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">str_to_annotation</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;annotation&quot;</span><span class="p">])</span>
         <span class="p">)</span>  <span class="c1"># convert annotation to type</span>
-        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;kind&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sig</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
 
     <span class="k">return</span> <span class="n">Sig</span><span class="p">([</span><span class="n">Param</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">params_ssot</span><span class="p">])</span>
 
@@ -167,12 +168,13 @@
 <div class="viewcode-block" id="validate_signature">
 <a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.validate_signature">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">validate_signature</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a signature. </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a signature.</span>
 <span class="sd">    Namely, check that all non-None default types are &quot;subclasses&quot; of the annotation type.</span>
 
 <span class="sd">    TODO: Implement</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
+
 
 
 <div class="viewcode-block" id="cosmograph_base_docs">

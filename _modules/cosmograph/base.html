@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.base &mdash; cosmograph 0.0.35 documentation</title>
+  <title>cosmograph.base &mdash; cosmograph 0.0.37 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=39aadc1c"></script>
+      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -125,57 +125,57 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">disable_simulation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
-    <span class="n">simulation_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1000,</span>
-    <span class="n">simulation_gravity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0,</span>
-    <span class="n">simulation_center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0,</span>
-    <span class="n">simulation_repulsion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
-    <span class="n">simulation_repulsion_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1.7,</span>
-    <span class="n">simulation_repulsion_quadtree_levels</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#12,</span>
-    <span class="n">simulation_link_spring</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
-    <span class="n">simulation_link_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
-    <span class="n">simulation_link_dist_random_variation_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#[1, 1.2],</span>
-    <span class="n">simulation_repulsion_from_mouse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
-    <span class="n">simulation_friction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.85,</span>
+    <span class="n">disable_simulation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># False,</span>
+    <span class="n">simulation_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1000,</span>
+    <span class="n">simulation_gravity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0,</span>
+    <span class="n">simulation_center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0,</span>
+    <span class="n">simulation_repulsion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.1,</span>
+    <span class="n">simulation_repulsion_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1.7,</span>
+    <span class="n">simulation_repulsion_quadtree_levels</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 12,</span>
+    <span class="n">simulation_link_spring</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1,</span>
+    <span class="n">simulation_link_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 2,</span>
+    <span class="n">simulation_link_dist_random_variation_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># [1, 1.2],</span>
+    <span class="n">simulation_repulsion_from_mouse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 2,</span>
+    <span class="n">simulation_friction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.85,</span>
     <span class="n">simulation_cluster</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">background_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#222222&#39;,</span>
-    <span class="n">space_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#4096,</span>
-    <span class="n">point_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#b3b3b3&#39;,</span>
-    <span class="n">point_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
-    <span class="n">point_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#4,</span>
-    <span class="n">point_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
+    <span class="n">background_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1">#&#39;#222222&#39;,</span>
+    <span class="n">space_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 4096,</span>
+    <span class="n">point_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1">#&#39;#b3b3b3&#39;,</span>
+    <span class="n">point_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.1,</span>
+    <span class="n">point_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 4,</span>
+    <span class="n">point_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1,</span>
     <span class="n">hovered_point_cursor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">render_hovered_point_ring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
-    <span class="n">hovered_point_ring_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;white&#39;,</span>
+    <span class="n">render_hovered_point_ring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># False,</span>
+    <span class="n">hovered_point_ring_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1">#&#39;white&#39;,</span>
     <span class="n">focused_point_ring_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">focused_point_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">render_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#True,</span>
-    <span class="n">link_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#&#39;#666666&#39;,</span>
-    <span class="n">link_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.1,</span>
-    <span class="n">link_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
-    <span class="n">link_width_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
-    <span class="n">curved_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
-    <span class="n">curved_link_segments</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#19,</span>
-    <span class="n">curved_link_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.8,</span>
-    <span class="n">curved_link_control_point_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.5,</span>
+    <span class="n">render_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># True,</span>
+    <span class="n">link_color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1">#&#39;#666666&#39;,</span>
+    <span class="n">link_greyout_opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.1,</span>
+    <span class="n">link_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1,</span>
+    <span class="n">link_width_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1,</span>
+    <span class="n">curved_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># False,</span>
+    <span class="n">curved_link_segments</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 19,</span>
+    <span class="n">curved_link_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.8,</span>
+    <span class="n">curved_link_control_point_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.5,</span>
     <span class="n">link_arrows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">link_arrows_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#1,</span>
-    <span class="n">link_visibility_distance_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#[50, 150],</span>
-    <span class="n">link_visibility_min_transparency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#0.25,</span>
-    <span class="n">use_quadtree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
-    <span class="n">show_FPS_monitor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#False,</span>
-    <span class="n">pixel_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#2,</span>
-    <span class="n">scale_points_on_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #True,</span>
-    <span class="n">initial_zoom_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #3,</span>
-    <span class="n">disable_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#None, #False,</span>
+    <span class="n">link_arrows_size_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 1,</span>
+    <span class="n">link_visibility_distance_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># [50, 150],</span>
+    <span class="n">link_visibility_min_transparency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 0.25,</span>
+    <span class="n">use_quadtree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># False,</span>
+    <span class="n">show_FPS_monitor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># False,</span>
+    <span class="n">pixel_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 2,</span>
+    <span class="n">scale_points_on_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># None, #True,</span>
+    <span class="n">initial_zoom_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># None, #3,</span>
+    <span class="n">disable_zoom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># None, #False,</span>
     <span class="n">enable_drag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fit_view_on_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#True,</span>
-    <span class="n">fit_view_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#250,</span>
+    <span class="n">fit_view_on_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># True,</span>
+    <span class="n">fit_view_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 250,</span>
     <span class="n">fit_view_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fit_view_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fit_view_by_points_in_rect</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">random_seed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">point_sampling_distance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#150,</span>
+    <span class="n">point_sampling_distance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 150,</span>
     <span class="n">point_id_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">point_index_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">point_color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -229,7 +229,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="n">process_cosmo_input</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
-    <span class="k">if</span> <span class="s1">&#39;points&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;links&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;points&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s2">&quot;links&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="c1"># If no data is given, just return a partial function with the kwargs filled in</span>
         <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">cosmo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Cosmograph</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -237,7 +237,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">process_cosmo_input</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CosmoArguments</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_kwargs</span><span class="p">()</span>
 
 
@@ -274,7 +274,7 @@
             <span class="k">if</span> <span class="n">invalid_kws_that_are_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">argument_aliases</span><span class="p">):</span>
                 <span class="c1"># make a message for the aliases, mentioning the keyword they are aliases for</span>
                 <span class="c1"># and should be replaced by</span>
-                <span class="n">error_msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;You said `</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">`: Did you mean `</span><span class="si">{</span><span class="n">argument_aliases</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span><span class="si">}</span><span class="s2">`?&quot;</span>
                     <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">invalid_kws_that_are_aliases</span>
                 <span class="p">)</span>
@@ -282,7 +282,7 @@
             <span class="k">if</span> <span class="n">invalid_kws_that_are_not_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
                 <span class="n">argument_aliases</span>
             <span class="p">):</span>
-                <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_kws_that_are_not_aliases</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_kws_that_are_not_aliases</span><span class="p">)</span>
                 <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;And these I have no idea about: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
@@ -302,7 +302,7 @@
 <span class="sd">            - If both `points` and `links` are given, raise an error.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;links&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="s2">&quot;links&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -342,8 +342,8 @@
 
 <span class="c1"># Make aliases for the arguments</span>
 <span class="n">argument_aliases</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="s1">&#39;points&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;edges&#39;</span><span class="p">:</span> <span class="s1">&#39;links&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="s2">&quot;points&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="s2">&quot;links&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="c1"># camel case aliases</span>
 <span class="n">argument_aliases</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -397,19 +397,19 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_json_string</span>
 
 
-<span class="n">html_code_data_def_template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">&lt;div&gt;</span>
-<span class="s1">    &lt;canvas&gt;&lt;/canvas&gt;</span>
-<span class="s1">&lt;/div&gt;</span>
+<span class="n">html_code_data_def_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;div&gt;</span>
+<span class="s2">    &lt;canvas&gt;&lt;/canvas&gt;</span>
+<span class="s2">&lt;/div&gt;</span>
 
-<span class="s1">&lt;script&gt;</span>
-<span class="s1">    const data = </span><span class="si">{json_data_str}</span>
-<span class="s1">    const canvas = document.querySelector(&quot;canvas&quot;);</span>
-<span class="s1">    const graph = new cosmos.Graph(canvas);</span>
-<span class="s1">    graph.setData(data.nodes, data.links);</span>
-<span class="s1">    graph.fitView();</span>
-<span class="s1">&lt;/script&gt;</span>
-<span class="s1">&#39;&#39;&#39;</span>
+<span class="s2">&lt;script&gt;</span>
+<span class="s2">    const data = </span><span class="si">{json_data_str}</span>
+<span class="s2">    const canvas = document.querySelector(&quot;canvas&quot;);</span>
+<span class="s2">    const graph = new cosmos.Graph(canvas);</span>
+<span class="s2">    graph.setData(data.nodes, data.links);</span>
+<span class="s2">    graph.fitView();</span>
+<span class="s2">&lt;/script&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="c1"># TODO: Function should be moved to a better place</span>
