@@ -168,6 +168,7 @@ Try out the Cosmograph widget in Google Colab with these example notebooks:
 
 Submit issues to https://github.com/cosmograph-org/py_cosmograph/issues.
 
+
 ## 👩🏻‍🚀 Contact and More Info
 
 🌎 [Website](https://cosmograph.app)
