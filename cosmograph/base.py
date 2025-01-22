@@ -6,6 +6,7 @@ from i2.doc_mint import inject_docstring_content
 from cosmograph_widget import Cosmograph
 
 from cosmograph.util import (
+    CosmoKwargs,
     snake_to_camel_case,
     cosmograph_base_docs,
     cosmograph_base_signature,
@@ -28,12 +29,22 @@ def base_cosmo(**kwargs):
     return Cosmograph(**kwargs)
 
 
+def process_cosmo_input(kwargs: CosmoKwargs) -> CosmoKwargs:
+    data = kwargs.pop('data', None)
+    return CosmoArguments(data, kwargs).prepare_kwargs()
+
+
+def remove_none_values(d):
+    return {k: v for k, v in d.items() if v is not None}
+
+
 # @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
 # @cosmo_base_sig.inject_into_keyword_variadic
 @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
 def cosmo(
     data=None,
     *,
+    ingress: Callable[[CosmoKwargs], CosmoKwargs] = process_cosmo_input,
     points: object = None,
     links: object = None,
     point_x_by: str = None,
@@ -137,20 +148,13 @@ def cosmo(
     etc.
 
     """
-    kwargs = process_cosmo_input(locals())
+    kwargs = locals()
+    ingress = kwargs.pop('ingress', lambda x: x)
+    kwargs = ingress(kwargs)
     if 'points' not in kwargs and 'links' not in kwargs:
         # If no data is given, just return a partial function with the kwargs filled in
         return partial(cosmo, **kwargs)
     return Cosmograph(**kwargs)
-
-
-def process_cosmo_input(kwargs):
-    data = kwargs.pop('data', None)
-    return CosmoArguments(data, kwargs).prepare_kwargs()
-
-
-def remove_none_values(d):
-    return {k: v for k, v in d.items() if v is not None}
 
 
 class CosmoArguments:

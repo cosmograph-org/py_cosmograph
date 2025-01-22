@@ -3,6 +3,7 @@ Utils to prepare data for cosmos
 """
 
 import json
+from typing import Dict, Any
 from functools import lru_cache, partial
 from itertools import count
 import re
@@ -22,6 +23,10 @@ from dol.sources import AttrContainer
 
 import pandas as pd
 
+# --------------------------------------------------------------------------------------
+# type annotations
+
+CosmoKwargs = Dict[str, Any]
 
 # --------------------------------------------------------------------------------------
 # Constants and data access
