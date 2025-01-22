@@ -23,6 +23,10 @@ def test_cosmo_graph_01_quests():
 
     df = pd.DataFrame(data)
 
+    # Make the graph
+
+    from cosmograph import cosmo
+
     graph = cosmo(
         df,
         point_x_by='Map_X',
@@ -37,6 +41,6 @@ def test_cosmo_graph_01_quests():
 
     import anywidget
 
-    assert isinstance(graph, anywidget.widget.AnyWidget), (
-        "'quest' graph wasn't an anywidget widget instance"
-    )
+    assert isinstance(
+        graph, anywidget.widget.AnyWidget
+    ), "'quest' graph wasn't an anywidget widget instance"
