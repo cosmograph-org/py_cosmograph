@@ -34,57 +34,57 @@ def base_cosmo(**kwargs):
 def cosmo(
     data=None,
     *,
-    disable_simulation: bool = None, #False,
-    simulation_decay: float = None, #1000,
-    simulation_gravity: float = None, #0,
-    simulation_center: float = None, #0,
-    simulation_repulsion: float = None, #0.1,
-    simulation_repulsion_theta: float = None, #1.7,
-    simulation_repulsion_quadtree_levels: float = None, #12,
-    simulation_link_spring: float = None, #1,
-    simulation_link_distance: float = None, #2,
-    simulation_link_dist_random_variation_range: list[Any] = None, #[1, 1.2],
-    simulation_repulsion_from_mouse: float = None, #2,
-    simulation_friction: float = None, #0.85,
+    disable_simulation: bool = None,  # False,
+    simulation_decay: float = None,  # 1000,
+    simulation_gravity: float = None,  # 0,
+    simulation_center: float = None,  # 0,
+    simulation_repulsion: float = None,  # 0.1,
+    simulation_repulsion_theta: float = None,  # 1.7,
+    simulation_repulsion_quadtree_levels: float = None,  # 12,
+    simulation_link_spring: float = None,  # 1,
+    simulation_link_distance: float = None,  # 2,
+    simulation_link_dist_random_variation_range: list[Any] = None,  # [1, 1.2],
+    simulation_repulsion_from_mouse: float = None,  # 2,
+    simulation_friction: float = None,  # 0.85,
     simulation_cluster: float = None,
-    background_color: Union[str, list[float]] = None, #'#222222',
-    space_size: int = None, #4096,
-    point_color: Union[str, list[float]] = None, #'#b3b3b3',
-    point_greyout_opacity: float = None, #0.1,
-    point_size: float = None, #4,
-    point_size_scale: float = None, #1,
+    background_color: Union[str, list[float]] = None,  #'#222222',
+    space_size: int = None,  # 4096,
+    point_color: Union[str, list[float]] = None,  #'#b3b3b3',
+    point_greyout_opacity: float = None,  # 0.1,
+    point_size: float = None,  # 4,
+    point_size_scale: float = None,  # 1,
     hovered_point_cursor: str = None,
-    render_hovered_point_ring: bool = None, #False,
-    hovered_point_ring_color: Union[str, list[float]] = None, #'white',
+    render_hovered_point_ring: bool = None,  # False,
+    hovered_point_ring_color: Union[str, list[float]] = None,  #'white',
     focused_point_ring_color: Union[str, list[float]] = None,
     focused_point_index: int = None,
-    render_links: bool = None, #True,
-    link_color: Union[str, list[float]] = None, #'#666666',
-    link_greyout_opacity: float = None, #0.1,
-    link_width: float = None, #1,
-    link_width_scale: float = None, #1,
-    curved_links: bool = None, #False,
-    curved_link_segments: int = None, #19,
-    curved_link_weight: float = None, #0.8,
-    curved_link_control_point_distance: float = None, #0.5,
+    render_links: bool = None,  # True,
+    link_color: Union[str, list[float]] = None,  #'#666666',
+    link_greyout_opacity: float = None,  # 0.1,
+    link_width: float = None,  # 1,
+    link_width_scale: float = None,  # 1,
+    curved_links: bool = None,  # False,
+    curved_link_segments: int = None,  # 19,
+    curved_link_weight: float = None,  # 0.8,
+    curved_link_control_point_distance: float = None,  # 0.5,
     link_arrows: bool = None,
-    link_arrows_size_scale: float = None, #1,
-    link_visibility_distance_range: list[float] = None, #[50, 150],
-    link_visibility_min_transparency: float = None, #0.25,
-    use_quadtree: bool = None, #False,
-    show_FPS_monitor: bool = None, #False,
-    pixel_ratio: float = None, #2,
-    scale_points_on_zoom: bool = None, #None, #True,
-    initial_zoom_level: float = None, #None, #3,
-    disable_zoom: bool = None, #None, #False,
+    link_arrows_size_scale: float = None,  # 1,
+    link_visibility_distance_range: list[float] = None,  # [50, 150],
+    link_visibility_min_transparency: float = None,  # 0.25,
+    use_quadtree: bool = None,  # False,
+    show_FPS_monitor: bool = None,  # False,
+    pixel_ratio: float = None,  # 2,
+    scale_points_on_zoom: bool = None,  # None, #True,
+    initial_zoom_level: float = None,  # None, #3,
+    disable_zoom: bool = None,  # None, #False,
     enable_drag: bool = None,
-    fit_view_on_init: bool = None, #True,
-    fit_view_delay: float = None, #250,
+    fit_view_on_init: bool = None,  # True,
+    fit_view_delay: float = None,  # 250,
     fit_view_padding: float = None,
     fit_view_duration: float = None,
     fit_view_by_points_in_rect: list[list[float]] = None,
     random_seed: Union[int, str] = None,
-    point_sampling_distance: int = None, #150,
+    point_sampling_distance: int = None,  # 150,
     point_id_by: str = None,
     point_index_by: str = None,
     point_color_by: str = None,
@@ -138,14 +138,14 @@ def cosmo(
 
     """
     kwargs = process_cosmo_input(locals())
-    if 'points' not in kwargs and 'links' not in kwargs:
+    if "points" not in kwargs and "links" not in kwargs:
         # If no data is given, just return a partial function with the kwargs filled in
         return partial(cosmo, **kwargs)
     return Cosmograph(**kwargs)
 
 
 def process_cosmo_input(kwargs):
-    data = kwargs.pop('data', None)
+    data = kwargs.pop("data", None)
     return CosmoArguments(data, kwargs).prepare_kwargs()
 
 
@@ -180,7 +180,7 @@ class CosmoArguments:
             if invalid_kws_that_are_aliases := invalid_keywords & set(argument_aliases):
                 # make a message for the aliases, mentioning the keyword they are aliases for
                 # and should be replaced by
-                error_msg += '\n'.join(
+                error_msg += "\n".join(
                     f"You said `{kw}`: Did you mean `{argument_aliases[kw]}`?"
                     for kw in invalid_kws_that_are_aliases
                 )
@@ -188,7 +188,7 @@ class CosmoArguments:
             if invalid_kws_that_are_not_aliases := invalid_keywords - set(
                 argument_aliases
             ):
-                t = ', '.join(invalid_kws_that_are_not_aliases)
+                t = ", ".join(invalid_kws_that_are_not_aliases)
                 error_msg += f"And these I have no idea about: {t}"
 
             raise ValueError(error_msg)
@@ -206,7 +206,7 @@ class CosmoArguments:
             - If both `points` and `links` are given, raise an error.
         """
         data = self.data
-        points, links = self.get(['points', 'links'], default=None)
+        points, links = self.get(["points", "links"], default=None)
 
         if data is not None:
             if points is None:
@@ -244,8 +244,8 @@ class CosmoArguments:
 
 # Make aliases for the arguments
 argument_aliases = {
-    'nodes': 'points',
-    'edges': 'links',
+    "nodes": "points",
+    "edges": "links",
 }
 # camel case aliases
 argument_aliases = dict(
@@ -290,7 +290,7 @@ class GraphJson(BaseModel):
 from cosmograph.validation import ensure_json_string
 
 
-html_code_data_def_template = '''
+html_code_data_def_template = """
 <div>
     <canvas></canvas>
 </div>
@@ -302,7 +302,7 @@ html_code_data_def_template = '''
     graph.setData(data.nodes, data.links);
     graph.fitView();
 </script>
-'''
+"""
 
 
 # TODO: Function should be moved to a better place

@@ -12,7 +12,7 @@ from cosmograph._resources import resources_dacc
 html_color_names_set = resources_dacc.color_names_set
 
 # Regular expression to match hex color codes
-rgb_hex_color_re = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
+rgb_hex_color_re = re.compile(r"^#(?:[0-9a-fA-F]{3}){1,2}$")
 
 
 def is_hex_color_str(x: Any) -> bool:
@@ -56,12 +56,12 @@ def get_matplotlib_palette(
     import matplotlib.cm as cm
 
     if palette is None:
-        palette = 'tab10' if categorical else 'viridis'
+        palette = "tab10" if categorical else "viridis"
 
     if isinstance(palette, str):
         if categorical:
             cmap = plt.colormaps[palette]
-            if hasattr(cmap, 'colors') and len(cmap.colors) < 256:
+            if hasattr(cmap, "colors") and len(cmap.colors) < 256:
                 colors = [
                     tuple(c[:3]) for c in cmap.colors
                 ]  # Ensure colors are RGB tuples
@@ -135,7 +135,7 @@ def resolve_colors(
     *,
     color_spec_kind: str = None,
     palette: Union[str, Callable] = None,
-    default_color: Any = 'blue',
+    default_color: Any = "blue",
     get_palette_func: Callable = None,
     is_valid_color_func: Callable = None,
 ) -> Sequence[Any]:
@@ -347,14 +347,14 @@ def resolve_colors(
 
     # Validate color_spec_kind
     valid_kinds = {
-        'single_color',
-        'color_spec_array',
-        'color_categorical_array',
-        'color_numeric_array',
-        'color_spec_field',
-        'color_categorical_field',
-        'color_numeric_field',
-        'mixed_color_spec_array',
+        "single_color",
+        "color_spec_array",
+        "color_categorical_array",
+        "color_numeric_array",
+        "color_spec_field",
+        "color_categorical_field",
+        "color_numeric_field",
+        "mixed_color_spec_array",
     }
     if color_spec_kind not in valid_kinds:
         raise ValueError(
@@ -362,12 +362,12 @@ def resolve_colors(
         )
 
     # Process based on color_spec_kind
-    if color_spec_kind == 'single_color':
+    if color_spec_kind == "single_color":
         if not is_valid_color_func(color):
             raise ValueError("Invalid color specification for 'single_color'.")
         colors = [color] * num_data_points
 
-    elif color_spec_kind == 'color_spec_array':
+    elif color_spec_kind == "color_spec_array":
         color_values = pd.Series(color)
         if len(color_values) != num_data_points:
             raise ValueError("Length of 'color' array does not match length of data.")
@@ -377,33 +377,33 @@ def resolve_colors(
             )
         colors = color_values.tolist()
 
-    elif color_spec_kind == 'mixed_color_spec_array':
+    elif color_spec_kind == "mixed_color_spec_array":
         color_values = pd.Series(color)
         if len(color_values) != num_data_points:
             raise ValueError("Length of 'color' array does not match length of data.")
         colors = [c if is_valid_color_func(c) else default_color for c in color_values]
 
-    elif color_spec_kind in {'color_categorical_array', 'color_numeric_array'}:
+    elif color_spec_kind in {"color_categorical_array", "color_numeric_array"}:
         color_values = pd.Series(color)
         if len(color_values) != num_data_points:
             raise ValueError("Length of 'color' array does not match length of data.")
         colors = map_values_to_colors(color_values, palette, get_palette_func)
 
     elif color_spec_kind in {
-        'color_spec_field',
-        'color_categorical_field',
-        'color_numeric_field',
+        "color_spec_field",
+        "color_categorical_field",
+        "color_numeric_field",
     }:
         if not isinstance(color, str) or color not in data.columns:
             raise ValueError(f"'{color}' must be a column name in data.")
         color_values = data[color]
-        if color_spec_kind == 'color_spec_field':
+        if color_spec_kind == "color_spec_field":
             if not color_values.apply(is_valid_color_func).all():
                 raise ValueError(
                     "All elements in 'color' field must be valid color specifications."
                 )
             colors = color_values.tolist()
-        elif color_spec_kind == 'mixed_color_spec_array':
+        elif color_spec_kind == "mixed_color_spec_array":
             colors = [
                 c if is_valid_color_func(c) else default_color for c in color_values
             ]
@@ -430,28 +430,28 @@ def infer_color_spec_kind(color, data, is_valid_color_func):
     Infers the color_spec_kind based on the type and value of 'color'.
     """
     if is_valid_color_func(color):
-        return 'single_color'
+        return "single_color"
     elif isinstance(color, (list, tuple, np.ndarray, pd.Series)):
         color_values = pd.Series(color)
         valid_mask = color_values.apply(is_valid_color_func)
         if valid_mask.all():
-            return 'color_spec_array'
+            return "color_spec_array"
         elif valid_mask.any():
-            return 'mixed_color_spec_array'
+            return "mixed_color_spec_array"
         elif pd.api.types.is_numeric_dtype(color_values):
-            return 'color_numeric_array'
+            return "color_numeric_array"
         else:
-            return 'color_categorical_array'
+            return "color_categorical_array"
     elif isinstance(color, str) and color in data.columns:
         color_values = data[color]
         if color_values.apply(is_valid_color_func).all():
-            return 'color_spec_field'
+            return "color_spec_field"
         elif color_values.apply(is_valid_color_func).any():
-            return 'mixed_color_spec_array'
+            return "mixed_color_spec_array"
         elif pd.api.types.is_numeric_dtype(color_values):
-            return 'color_numeric_field'
+            return "color_numeric_field"
         else:
-            return 'color_categorical_field'
+            return "color_categorical_field"
     else:
         raise ValueError(
             "Unable to infer color_spec_kind. Please specify it explicitly."

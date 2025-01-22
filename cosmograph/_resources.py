@@ -29,11 +29,11 @@ from cosmograph.util import data_dir_path, json_files, data_files
 # General utils
 
 
-_json_wrap = mk_json_bytes_wrap(dumps_kwargs={'indent': 4})
+_json_wrap = mk_json_bytes_wrap(dumps_kwargs={"indent": 4})
 JsonFiles = _json_wrap(TextFiles)  # TODO: should we add json filter? change name?
 
-cache_to_json_files = partial(cache_this, cache=json_files, key=add_extension('json'))
-resources_jsons = filt_iter.suffixes(['.json'])(JsonFiles(data_dir_path))
+cache_to_json_files = partial(cache_this, cache=json_files, key=add_extension("json"))
+resources_jsons = filt_iter.suffixes([".json"])(JsonFiles(data_dir_path))
 
 
 parquet_codec = wrap_kvs(
@@ -41,9 +41,9 @@ parquet_codec = wrap_kvs(
     value_decoder=read_from_bytes(pd.read_parquet),
 )
 
-parquet_files = parquet_codec(filt_iter.suffixes('.parquet')(data_files))
+parquet_files = parquet_codec(filt_iter.suffixes(".parquet")(data_files))
 cache_to_parquet_files = partial(
-    cache_this, cache=parquet_files, key=add_extension('parquet')
+    cache_this, cache=parquet_files, key=add_extension("parquet")
 )
 
 
@@ -53,9 +53,9 @@ cache_to_parquet_files = partial(
 
 @lru_cache
 def _get_fresh_color_table():
-    url = 'https://www.w3.org/TR/css-color-4/#named-colors'
+    url = "https://www.w3.org/TR/css-color-4/#named-colors"
     all_tables_of_page = pd.read_html(url)
-    _color_table_columns = ['Color\xa0name', 'Hex\xa0rgb', 'Decimal']
+    _color_table_columns = ["Color\xa0name", "Hex\xa0rgb", "Decimal"]
     _is_color_table = lambda df: set(_color_table_columns).issubset(df.columns)
     if (color_table := next(filter(_is_color_table, all_tables_of_page), None)) is None:
         raise ValueError(
@@ -64,9 +64,9 @@ def _get_fresh_color_table():
     # clean up and normalize the column names
     color_table = color_table[_color_table_columns]
     color_table.columns = color_table.columns.map(
-        lambda x: x.replace('\xa0', '_').lower()
+        lambda x: x.replace("\xa0", "_").lower()
     )
-    assert color_table['color_name'].nunique() == len(
+    assert color_table["color_name"].nunique() == len(
         color_table
     ), "color names are not unique"
     return color_table
@@ -87,7 +87,7 @@ class ResourcesDacc:
 
     @cache_to_json_files
     def color_names(self):
-        return self._color_table['color_name'].str.lower().tolist()
+        return self._color_table["color_name"].str.lower().tolist()
 
     @cached_property
     def color_names_set(self):
@@ -124,28 +124,28 @@ In this module, we gather the tools needed to:
 # Creating the configs source files from various sources
 
 DFLT_CONFIG_FILES_DIR = data_dir_path
-DFLT_CONFIG_PREP_DIR = os.path.join(DFLT_CONFIG_FILES_DIR, 'config_prep')
+DFLT_CONFIG_PREP_DIR = os.path.join(DFLT_CONFIG_FILES_DIR, "config_prep")
 
 source_urls = {
-    'cosmos/variables.ts': 'https://github.com/cosmograph-org/cosmos/blob/main/src/variables.ts',
-    'cosmos/config.ts': 'https://github.com/cosmograph-org/cosmos/blob/next/src/config.ts',
-    'cosmograph/config.ts': 'https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/config.ts',
-    'cosmograph/data.ts': 'https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/data.ts',
-    'cosmograph/labels.ts': 'https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/labels.ts',
-    'cosmograph/simulation.ts': 'https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/simulation.ts',
-    'cosmograph/configuration.mdx': 'https://github.com/cosmograph-org/cosmograph/blob/8c868898f256a207e12085a17566943bea49c28a/packages/website/pages/docs/v2/widget/configuration.mdx',
+    "cosmos/variables.ts": "https://github.com/cosmograph-org/cosmos/blob/main/src/variables.ts",
+    "cosmos/config.ts": "https://github.com/cosmograph-org/cosmos/blob/next/src/config.ts",
+    "cosmograph/config.ts": "https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/config.ts",
+    "cosmograph/data.ts": "https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/data.ts",
+    "cosmograph/labels.ts": "https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/labels.ts",
+    "cosmograph/simulation.ts": "https://github.com/cosmograph-org/cosmograph/blob/dev/packages/cosmograph/src/cosmograph/config/simulation.ts",
+    "cosmograph/configuration.mdx": "https://github.com/cosmograph-org/cosmograph/blob/8c868898f256a207e12085a17566943bea49c28a/packages/website/pages/docs/v2/widget/configuration.mdx",
 }
 
 source_url_groups = {
-    'defaults': ['cosmos/variables.ts'],
-    'types': [
-        'cosmos/config.ts',
-        'cosmograph/config.ts',
-        'cosmograph/data.ts',
-        'cosmograph/labels.ts',
-        'cosmograph/simulation.ts',
+    "defaults": ["cosmos/variables.ts"],
+    "types": [
+        "cosmos/config.ts",
+        "cosmograph/config.ts",
+        "cosmograph/data.ts",
+        "cosmograph/labels.ts",
+        "cosmograph/simulation.ts",
     ],
-    'descriptions': ['cosmograph/configuration.mdx'],
+    "descriptions": ["cosmograph/configuration.mdx"],
 }
 
 # # Note:
@@ -155,9 +155,9 @@ source_url_groups = {
 # source_raw_urls = {k: raw_file_url(v) for k, v in source_urls.items()}
 
 cache_to_config_jsons = partial(
-    cache_this, cache='config_jsons', key=add_extension('json')
+    cache_this, cache="config_jsons", key=add_extension("json")
 )
-cache_to_prep_jsons = partial(cache_this, cache='prep_jsons', key=add_extension('json'))
+cache_to_prep_jsons = partial(cache_this, cache="prep_jsons", key=add_extension("json"))
 
 from dol import flatten_dict
 from i2.doc_mint import params_to_docstring
@@ -166,11 +166,11 @@ from i2 import Sig, Param
 # TODO: Note, we need ju for config_dict_to_sig and for trait_to_py. Consider vendorizing config_dict_to_sig
 from cosmograph._traitlets_util import trait_to_py  # vendorized from ju
 
-EXCLUDE_PARAMS = ('_ipc_points', '_ipc_links')
+EXCLUDE_PARAMS = ("_ipc_points", "_ipc_links")
 
 
 def get_module_from_url(
-    url, __file__: Optional[str] = None, module_name='remote_module'
+    url, __file__: Optional[str] = None, module_name="remote_module"
 ):
     """
     Get a (loaded) module from a url.
@@ -209,12 +209,12 @@ def get_cosmograph_widget_class(
         Cosmograph = cosmograph_widget_source
     elif isinstance(
         cosmograph_widget_source, str
-    ) and cosmograph_widget_source.startswith('http'):
+    ) and cosmograph_widget_source.startswith("http"):
         url = cosmograph_widget_source
         module_behind_url = get_module_from_url(
-            url, __file__=__import__('cosmograph_widget').__file__
+            url, __file__=__import__("cosmograph_widget").__file__
         )
-        Cosmograph = getattr(module_behind_url, 'Cosmograph')
+        Cosmograph = getattr(module_behind_url, "Cosmograph")
     else:
         raise ValueError(
             f"cosmograph_widget_source must be a class or a url string, not {cosmograph_widget_source}"
@@ -265,7 +265,7 @@ class ConfigsDacc:
         cosmograph_widget_source: Optional[Union[str, type]] = None,
     ) -> None:
         self.config_files_dir = os.path.abspath(os.path.expanduser(config_files_dir))
-        self.prep_dir = prep_dir or os.path.join(self.config_files_dir, 'config_prep')
+        self.prep_dir = prep_dir or os.path.join(self.config_files_dir, "config_prep")
         ensure_dir(self.prep_dir, max_dirs_to_make=1)
         self.config_jsons = JsonFiles(self.config_files_dir)
         self.prep_jsons = JsonFiles(self.prep_dir)
@@ -284,19 +284,19 @@ class ConfigsDacc:
     def parsed_defaults(self):
         from jy import variable_declarations_pairs
 
-        for k in source_url_groups['defaults']:
+        for k in source_url_groups["defaults"]:
             yield k, dict(variable_declarations_pairs(self.source_strings[k]))
 
     @cache_to_prep_jsons
     @postprocess(dict)
     def parsed_descriptions(self):
-        for k in source_url_groups['descriptions']:
+        for k in source_url_groups["descriptions"]:
             yield k, ai_md_parser(self.source_strings[k])
 
     @cache_to_prep_jsons
     @postprocess(dict)
     def parsed_types(self):
-        for k in source_url_groups['types']:
+        for k in source_url_groups["types"]:
             yield k, ai_ts_parser(self.source_strings[k])
 
     @cached_property
@@ -311,35 +311,35 @@ class ConfigsDacc:
 
     @property
     def _defaults(self):
-        return self.parsed_defaults['cosmos/variables.ts']
+        return self.parsed_defaults["cosmos/variables.ts"]
 
     @property
     def _descriptions(self):
-        return self.parsed_descriptions['cosmograph/configuration.mdx']['interfaces'][
+        return self.parsed_descriptions["cosmograph/configuration.mdx"]["interfaces"][
             0
-        ]['properties']
+        ]["properties"]
 
     def _interfaces(self, *, assert_expected_keys=True):
         if assert_expected_keys:
             assert sorted(self.parsed_types) == [
-                'cosmograph/config.ts',
-                'cosmograph/data.ts',
-                'cosmograph/labels.ts',
-                'cosmograph/simulation.ts',
-                'cosmos/config.ts',
+                "cosmograph/config.ts",
+                "cosmograph/data.ts",
+                "cosmograph/labels.ts",
+                "cosmograph/simulation.ts",
+                "cosmos/config.ts",
             ], f"Not the keys I expected! If you want to ignore this, set assert_expected_keys=False"
 
         for widget_config_value in self.parsed_types.values():
-            assert set(widget_config_value) == {'interfaces'}
-            interfaces = widget_config_value['interfaces']
+            assert set(widget_config_value) == {"interfaces"}
+            interfaces = widget_config_value["interfaces"]
             for interface in interfaces:
-                assert set(interface) == {'description', 'name', 'properties'}
-                for prop in interface['properties']:
+                assert set(interface) == {"description", "name", "properties"}
+                for prop in interface["properties"]:
                     assert set(prop).issuperset(
-                        {'description', 'name', 'type'}
+                        {"description", "name", "type"}
                     ), f"missing fields: {set(['description', 'name', 'type']) - set(prop)=})"
-                    prop['py_name'] = camel_to_snake(prop['name'])
-                    prop['origin_name'] = interface['name']
+                    prop["py_name"] = camel_to_snake(prop["name"])
+                    prop["origin_name"] = interface["name"]
                     yield prop
 
     @property
@@ -363,7 +363,7 @@ class ConfigsDacc:
         """
         flat_defaults = {
             camel_to_snake(k): v
-            for k, v in flatten_dict(self._defaults, sep='_').items()
+            for k, v in flatten_dict(self._defaults, sep="_").items()
         }
         return transform_defaults_keys(flat_defaults)
 
@@ -372,10 +372,10 @@ class ConfigsDacc:
         """
         Dataframe of descriptions from the ("documentation") md file.
         """
-        df = self.parsed_descriptions['cosmograph/configuration.mdx']['interfaces'][0][
-            'properties'
+        df = self.parsed_descriptions["cosmograph/configuration.mdx"]["interfaces"][0][
+            "properties"
         ]
-        return pd.DataFrame(df).set_index('name')
+        return pd.DataFrame(df).set_index("name")
 
     @property
     def _traitlets_df(self):
@@ -400,7 +400,7 @@ class ConfigsDacc:
             elif (
                 cosmo_config := next(
                     filter(
-                        lambda x: x['origin_name'] == 'CosmographConfig', name_group
+                        lambda x: x["origin_name"] == "CosmographConfig", name_group
                     ),
                     None,
                 )
@@ -418,20 +418,23 @@ class ConfigsDacc:
 
         props_grouped_by_name = dict(
             find_duplicates(
-                ((x['name'], x) for x in interfaces), val_filt=lambda x: True
+                ((x["name"], x) for x in interfaces), val_filt=lambda x: True
             )
         )
         dedupped_interfaces = list(map(dedupper, props_grouped_by_name.values()))
 
-        widget_config_properties = to_dict(dedupped_interfaces, 'py_name')
+        widget_config_properties = to_dict(dedupped_interfaces, "py_name")
 
         if len(widget_config_properties) != len(dedupped_interfaces):
             msg = "widget_config had some duplicate properties"
-            first, last = first_and_last_dups(pd.DataFrame(dedupped_interfaces), 'py_name')
+            first, last = first_and_last_dups(
+                pd.DataFrame(dedupped_interfaces), "py_name"
+            )
             msg += f"First and last instances of duplicates:\n{first}\n{last}"
             # TODO: Establish and enfore better SSOT strategy in JS. Ignore for now
             # raise ValueError(msg)
             from warnings import warn
+
             warn(f"WARNING:\n{msg}")
 
         return pd.DataFrame(widget_config_properties).T
@@ -439,45 +442,45 @@ class ConfigsDacc:
     @cached_property
     def params_info(self):
         return {
-            'defaults': self.defaults,
-            'descriptions': self._md_descriptions,
-            'types': self.parsed_types,
-            'names': list(self._traitlets_df.index.values),
+            "defaults": self.defaults,
+            "descriptions": self._md_descriptions,
+            "types": self.parsed_types,
+            "names": list(self._traitlets_df.index.values),
         }
 
     def _flat_keys_to_original_default_keys(self):
         from dol import leaf_paths
 
-        original_defaults = self.parsed_defaults['cosmos/variables.ts']
+        original_defaults = self.parsed_defaults["cosmos/variables.ts"]
         return {
             camel_to_snake(k): v
-            for k, v in flatten_dict(leaf_paths(original_defaults), sep='_').items()
+            for k, v in flatten_dict(leaf_paths(original_defaults), sep="_").items()
         }
 
     def info_dfs(self):
         """
         A dictionary of dataframes of the various sources of configuration information.
         """
-        df = self._traitlets_df[['default', 'annotation']]
+        df = self._traitlets_df[["default", "annotation"]]
         # rename all columns to have a "traitlet_" prefix
         df = df.rename(columns={col: f"traitlet_{col}" for col in df.columns})
-        yield 'traitlets', df
+        yield "traitlets", df
 
         # defaults
-        yield 'defaults', pd.Series(self.defaults, name='defaults_default')
+        yield "defaults", pd.Series(self.defaults, name="defaults_default")
 
         # descriptions
         descriptions_df = self._md_descriptions_df.copy()
         # change "NO_DEFAULT" values of "default" column to NaNs
-        descriptions_df['default'] = descriptions_df['default'].replace(
-            'NO_DEFAULT', pd.NA
+        descriptions_df["default"] = descriptions_df["default"].replace(
+            "NO_DEFAULT", pd.NA
         )
 
         # rename all columns to have a "md_descriptions" prefix
         descriptions_df = descriptions_df.rename(
             columns={col: f"md_descriptions_{col}" for col in descriptions_df.columns}
         )
-        yield 'descriptions', descriptions_df
+        yield "descriptions", descriptions_df
 
         # types
         types_df = self._ts_types_df.copy()
@@ -485,7 +488,7 @@ class ConfigsDacc:
         types_df = types_df.rename(
             columns={col: f"ts_types_{col}" for col in types_df.columns}
         )
-        yield 'types', types_df
+        yield "types", types_df
 
     def cosmograph_base_params(self, param_names=None, *, kind=None):
         """
@@ -500,33 +503,33 @@ class ConfigsDacc:
         df = self.matched_info_df
         for name in param_names:
             d = {
-                'name': name,
-                'default': df.defaults_default.get(name),
-                'annotation': df.traitlet_annotation.get(name),
-                'description': df.md_descriptions_description.get(name),
+                "name": name,
+                "default": df.defaults_default.get(name),
+                "annotation": df.traitlet_annotation.get(name),
+                "description": df.md_descriptions_description.get(name),
             }
             if kind:
-                d['kind'] = kind
+                d["kind"] = kind
             if (
                 self.rm_param_if_no_description_in_sig
-                and d['description'] is pd.NA
-                or not d['description']
+                and d["description"] is pd.NA
+                or not d["description"]
             ):
                 continue  # without yielding d
-            if isinstance(d['default'], float) and pd.isna(d['default']):
+            if isinstance(d["default"], float) and pd.isna(d["default"]):
                 if self.set_default_to_none_if_nan:
-                    d['default'] = None
+                    d["default"] = None
                 elif self.rm_default_if_nan_in_sig:
-                    del d['default']
+                    del d["default"]
             yield d
 
     def cosmograph_base_params_json(self):
         from cosmograph.util import annotation_to_str
 
         params = pd.DataFrame(list(self.cosmograph_base_params()))
-        params['description'] = params['description'].fillna('')
-        params['annotation'] = params['annotation'].apply(annotation_to_str)
-        return params.to_json(orient='records', indent=4)
+        params["description"] = params["description"].fillna("")
+        params["annotation"] = params["annotation"].apply(annotation_to_str)
+        return params.to_json(orient="records", indent=4)
 
     def cosmograph_base_docs(self, param_names=None):
         """Get the params information part of a docstring"""
@@ -540,9 +543,9 @@ class ConfigsDacc:
 
         def prep_for_param(d):
             d = d.copy()
-            if d.get('annotation') is None:
-                del d['annotation']
-            del d['description']
+            if d.get("annotation") is None:
+                del d["annotation"]
+            del d["description"]
             return d
 
         return Sig([Param(**prep_for_param(d)) for d in params])
@@ -552,18 +555,18 @@ class ConfigsDacc:
         from cosmograph.util import move_to_front
 
         front_cols = [
-            'traitlet_annotation',
-            'defaults_default',
-            'ts_types_default',
-            'md_descriptions_default',
-            'md_descriptions_description',
-            'ts_types_description',
-            'ts_types_type',
+            "traitlet_annotation",
+            "defaults_default",
+            "ts_types_default",
+            "md_descriptions_default",
+            "md_descriptions_description",
+            "ts_types_description",
+            "ts_types_type",
         ]
 
         info_dfs = dict(self.info_dfs())
 
-        merge_dfs = partial(pd.merge, left_index=True, right_index=True, how='left')
+        merge_dfs = partial(pd.merge, left_index=True, right_index=True, how="left")
 
         df = info_dfs.pop("traitlets")
 
@@ -574,10 +577,10 @@ class ConfigsDacc:
 
     def matched_info_df_prepared_for_export(self):
         t = self.matched_info_df.fillna("")
-        t['traitlet_annotation'] = t['traitlet_annotation'].apply(
+        t["traitlet_annotation"] = t["traitlet_annotation"].apply(
             lambda x: x.__name__ if isinstance(x, type) else x
         )
-        t.columns = t.columns.str.replace('_', ' ')
+        t.columns = t.columns.str.replace("_", " ")
         return t
 
         # # traitlets data
@@ -627,20 +630,19 @@ class ConfigsDacc:
     def traitlets_sig(self):
         py_annotations = {k: trait_to_py(v) for k, v in self.traitlets.items()}
         py_defaults = {
-            k: getattr(v, 'default_value', Undefined) for k, v in self.traitlets.items()
+            k: getattr(v, "default_value", Undefined) for k, v in self.traitlets.items()
         }
         param_dicts = [
             {
-                'name': name,
-                'kind': Sig.KEYWORD_ONLY,
-                'annotation': py_annotations[name],
-                'default': py_defaults[name],
+                "name": name,
+                "kind": Sig.KEYWORD_ONLY,
+                "annotation": py_annotations[name],
+                "default": py_defaults[name],
             }
             for name in self.traitlets
         ]
 
         return Sig([Param(**d) for d in param_dicts])
-
 
     # TODO: Might be an old one. Consider deleting! No widget_config_from_ts attr
     #    Find its definition in ConfigSourceDicts class
@@ -670,7 +672,7 @@ class ConfigsDacc:
     def diagnosis_items(self):
         t = self._duplicates_of_types_group()
         if t:
-            t = pd.DataFrame({k: [x['origin_name'] for x in v] for k, v in t.items()}).T
+            t = pd.DataFrame({k: [x["origin_name"] for x in v] for k, v in t.items()}).T
             yield "Duplicates of types group", t
         # TODO: add more (e.g. source differences defaults, descriptions, etc.)
 
@@ -681,7 +683,7 @@ class ConfigsDacc:
                 print(v.to_string())
 
     def _duplicates_of_types_group(
-        self, key_field='name', *, assert_expected_keys=True
+        self, key_field="name", *, assert_expected_keys=True
     ):
         name_and_value_pairs = ((x[key_field], x) for x in self._interfaces())
         return find_duplicates(name_and_value_pairs, val_filt=lambda x: len(x) > 1)
@@ -693,13 +695,13 @@ import re
 from dol import flatten_dict
 
 extra_default_key_to_traitlet_mapping = {
-    'greyout_point_opacity': 'point_greyout_opacity',
-    'hovered_point_ring_opacity': 'render_hovered_point_ring',  # Or add 'hovered_point_ring_opacity' if missing
-    'greyout_link_opacity': 'link_greyout_opacity',
-    'focused_point_ring_opacity': 'focused_point_ring_color',  # Or add 'focused_point_ring_opacity' if missing
-    'scale_to_zoom': 'initial_zoom_level',
-    'arrow_links': 'default_link_arrows',
-    'arrow_size_scale': 'link_arrows_size_scale',
+    "greyout_point_opacity": "point_greyout_opacity",
+    "hovered_point_ring_opacity": "render_hovered_point_ring",  # Or add 'hovered_point_ring_opacity' if missing
+    "greyout_link_opacity": "link_greyout_opacity",
+    "focused_point_ring_opacity": "focused_point_ring_color",  # Or add 'focused_point_ring_opacity' if missing
+    "scale_to_zoom": "initial_zoom_level",
+    "arrow_links": "default_link_arrows",
+    "arrow_size_scale": "link_arrows_size_scale",
 }
 
 
@@ -753,7 +755,7 @@ def transform_defaults_keys(flat_defaults):
 import re
 
 # Compiled regex to handle camel case to snake case conversions, including acronyms
-_camel_to_snake_re = re.compile(r'((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+_camel_to_snake_re = re.compile(r"((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
 
 
 def camel_to_snake(camel_string):
@@ -780,13 +782,14 @@ def camel_to_snake(camel_string):
         >>> camel_to_snake('XMLHttpRequestTest')
         'xml_http_request_test'
     """
-    return _camel_to_snake_re.sub(r'_\1', camel_string).lower()
+    return _camel_to_snake_re.sub(r"_\1", camel_string).lower()
 
 
 def first_and_last_dups(df, key_col):
     """Returns the first and last instances of duplicates in a dataframe."""
-    key_col = 'py_name'
-    return df[df.duplicated(key_col, 'first')], df[df.duplicated(key_col, 'last')]
+    key_col = "py_name"
+    return df[df.duplicated(key_col, "first")], df[df.duplicated(key_col, "last")]
+
 
 # --------------------------------------------------------------------------------------
 # Parsing Typescript (with AI)
@@ -882,9 +885,9 @@ def ai_md_parser(md_string: str) -> dict:
 
 
 def print_interfaces(
-    interfaces, name=None, *, indent_str=' ' * 4, verify=True, smart_preproc=True
+    interfaces, name=None, *, indent_str=" " * 4, verify=True, smart_preproc=True
 ):
-    '''
+    """
     Print the interfaces properties in a nice format.
 
     ```python
@@ -901,10 +904,10 @@ def print_interfaces(
 
     ```
 
-    '''
+    """
     if smart_preproc:
-        if 'interfaces' in interfaces:
-            interfaces = interfaces['interfaces']
+        if "interfaces" in interfaces:
+            interfaces = interfaces["interfaces"]
 
     if name:
         print(f"* **{name}**")
@@ -913,12 +916,12 @@ def print_interfaces(
         if verify:
             assert set(interface).issuperset(
                 {
-                    'name',
-                    'description',
-                    'properties',
+                    "name",
+                    "description",
+                    "properties",
                 }
             ), "Use verify=False to skip this check"
-        property_names = [x['name'] for x in interface['properties']]
+        property_names = [x["name"] for x in interface["properties"]]
         print(f"{indent_str}* **{interface['name']}**: ({len(property_names)})")
         import lkj
 
@@ -929,15 +932,15 @@ import pandas as pd
 
 
 def process_schema_object(obj):
-    name = obj.get('name', 'Unnamed')
-    properties = obj.get('properties', [])
+    name = obj.get("name", "Unnamed")
+    properties = obj.get("properties", [])
     df = pd.DataFrame(properties)
     return name, df
 
 
 def json_schema_to_dataframe(schema):
     if isinstance(schema, dict):
-        if 'properties' in schema:
+        if "properties" in schema:
             # Single object with properties
             name, df = process_schema_object(schema)
             return df
@@ -1014,10 +1017,10 @@ def to_dict(iterable, key_field: str):
     return {extract_key(x): x for x in iterable}
 
 
-def remove_empty_defaults(elements, no_default_sentinel='NO_DEFAULT'):
+def remove_empty_defaults(elements, no_default_sentinel="NO_DEFAULT"):
     for d in elements:
-        if d['default'] == no_default_sentinel:
-            d.pop('default')
+        if d["default"] == no_default_sentinel:
+            d.pop("default")
         yield d
 
 
@@ -1035,9 +1038,9 @@ class ConfigSourceDicts:
     @staticmethod
     def old_config_info():
         # config_info
-        _config_info = json_files['config_info.json']
+        _config_info = json_files["config_info.json"]
         config_info_properties = to_dict(
-            _config_info, 'Property'
+            _config_info, "Property"
         )  # {x['Property']: x for x in config_info}
         assert len(config_info_properties) == len(
             _config_info
@@ -1046,10 +1049,10 @@ class ConfigSourceDicts:
 
     @staticmethod
     def old_cosmos_config():
-        _cosmos_config = json_files['cosmos_config.json']
-        assert list(_cosmos_config) == ['config']
-        _cosmos_config = _cosmos_config['config']
-        cosmo_config_properties = to_dict(_cosmos_config, 'Property')
+        _cosmos_config = json_files["cosmos_config.json"]
+        assert list(_cosmos_config) == ["config"]
+        _cosmos_config = _cosmos_config["config"]
+        cosmo_config_properties = to_dict(_cosmos_config, "Property")
         assert len(cosmo_config_properties) == len(
             _cosmos_config
         ), f"cosmos_config had some duplicate properties"
@@ -1057,63 +1060,63 @@ class ConfigSourceDicts:
 
     @staticmethod
     def widget_config_from_md():
-        widget_config = json_files['_widget_config_from_md.json']
-        assert set(widget_config) == {'interfaces'}
-        assert len(widget_config['interfaces']) == 1
-        assert set(widget_config['interfaces'][0]) == {
-            'description',
-            'name',
-            'properties',
+        widget_config = json_files["_widget_config_from_md.json"]
+        assert set(widget_config) == {"interfaces"}
+        assert len(widget_config["interfaces"]) == 1
+        assert set(widget_config["interfaces"][0]) == {
+            "description",
+            "name",
+            "properties",
         }
-        t = remove_empty_defaults(widget_config['interfaces'][0]['properties'])
-        widget_config_from_md_properties = to_dict(t, 'name')
+        t = remove_empty_defaults(widget_config["interfaces"][0]["properties"])
+        widget_config_from_md_properties = to_dict(t, "name")
 
         assert len(widget_config_from_md_properties) == len(
-            widget_config['interfaces'][0]['properties']
+            widget_config["interfaces"][0]["properties"]
         ), f"widget_config_from_md had some duplicate properties"
         return widget_config_from_md_properties
 
     @staticmethod
     def widget_config_from_ts():
-        widget_config = json_files['_widget_config.json']
+        widget_config = json_files["_widget_config.json"]
 
         def _widget_config_properties():
             assert sorted(widget_config) == [
-                'config.ts',
-                'cosmos/config.ts',
-                'data.ts',
-                'labels.ts',
-                'simulation.ts',
+                "config.ts",
+                "cosmos/config.ts",
+                "data.ts",
+                "labels.ts",
+                "simulation.ts",
             ]
 
             for widget_config_value in widget_config.values():
-                assert set(widget_config_value) == {'interfaces'}
-                interfaces = widget_config_value['interfaces']
+                assert set(widget_config_value) == {"interfaces"}
+                interfaces = widget_config_value["interfaces"]
                 for interface in interfaces:
-                    assert set(interface) == {'description', 'name', 'properties'}
-                    for prop in interface['properties']:
+                    assert set(interface) == {"description", "name", "properties"}
+                    for prop in interface["properties"]:
                         assert set(prop).issuperset(
-                            {'description', 'name', 'type'}
+                            {"description", "name", "type"}
                         ), f"missing fields: {set(['description', 'name', 'type']) - set(prop)=})"
-                        prop['py_name'] = camel_to_snake(prop['name'])
-                        prop['origin_name'] = interface['name']
+                        prop["py_name"] = camel_to_snake(prop["name"])
+                        prop["origin_name"] = interface["name"]
                         yield prop
 
         interfaces = list(_widget_config_properties())
         # print(f"{len(interfaces)=}")
 
-        widget_config_properties = to_dict(interfaces, 'name')
+        widget_config_properties = to_dict(interfaces, "name")
         # assert len(widget_config_properties) == len(interfaces), f"widget_config had some duplicate properties"
 
-        duplicates = find_duplicates(((x['name'], x) for x in interfaces))
+        duplicates = find_duplicates(((x["name"], x) for x in interfaces))
         assert set(duplicates) == {
-            'disableSimulation',
-            'showTopLabelsLimit',
-            'showHoveredPointLabel',
-            'staticLabelWeight',
-            'dynamicLabelWeight',
-            'labelMargin',
-            'labelPadding',
+            "disableSimulation",
+            "showTopLabelsLimit",
+            "showHoveredPointLabel",
+            "staticLabelWeight",
+            "dynamicLabelWeight",
+            "labelMargin",
+            "labelPadding",
         }, "Not the same duplicate widget_config_properties as before (comment out this assertion if not a problem)"
 
         # Solve all duplicates taking the CosmographConfig orgin_name
@@ -1123,15 +1126,15 @@ class ConfigSourceDicts:
                 return dups[0]
             else:
                 return next(
-                    filter(lambda x: x['origin_name'] == 'CosmographConfig', dups)
+                    filter(lambda x: x["origin_name"] == "CosmographConfig", dups)
                 )
 
         dedupped_interfaces = find_duplicates(
-            ((x['name'], x) for x in interfaces), val_filt=lambda x: True
+            ((x["name"], x) for x in interfaces), val_filt=lambda x: True
         )
         dedupped_interfaces = list(map(dedupper, dedupped_interfaces.values()))
 
-        widget_config_properties = to_dict(dedupped_interfaces, 'py_name')
+        widget_config_properties = to_dict(dedupped_interfaces, "py_name")
 
         assert len(widget_config_properties) == len(
             dedupped_interfaces
@@ -1149,9 +1152,9 @@ class ConfigSourceDicts:
         }
 
 
-
 # --------------------------------------------------------------------------------------
 # TODO: might want to deprecate much of the below
+
 
 def get_various_configs():
     _callable_attrs = filter(callable, vars(ConfigSourceDicts).values())
@@ -1176,21 +1179,21 @@ class ConfigAnalysisDacc:
     def sig_and_doc_info(self):
 
         # get annotations from traitlets
-        annotations = self.sig_dfs['traitlets'].loc[self.sig_args]['annotation']
+        annotations = self.sig_dfs["traitlets"].loc[self.sig_args]["annotation"]
         # get defaults from ts
-        defaults = self.sig_dfs['widget_config_from_ts'].loc[self.sig_args]['default']
+        defaults = self.sig_dfs["widget_config_from_ts"].loc[self.sig_args]["default"]
         defaults = self._edit_defaults(defaults)
 
         # get property descriptions from md
         descriptions = (
             pd.DataFrame(
                 [
-                    {'name': v['name'], 'description': v['description']}
+                    {"name": v["name"], "description": v["description"]}
                     for v in self.c.widget_config_from_md.values()
                 ]
             )
-            .set_index('name')
-            .loc[self.sig_args]['description']
+            .set_index("name")
+            .loc[self.sig_args]["description"]
         )
 
         return pd.concat([annotations, defaults, descriptions], axis=1)
@@ -1213,14 +1216,14 @@ class ConfigAnalysisDacc:
         c = self.c
         py_annotations = {k: trait_to_py(v) for k, v in c.traitlets.items()}
         py_defaults = {
-            k: getattr(v, 'default_value', Undefined) for k, v in c.traitlets.items()
+            k: getattr(v, "default_value", Undefined) for k, v in c.traitlets.items()
         }
         param_dicts = [
             {
-                'name': name,
-                'kind': Sig.KEYWORD_ONLY,
-                'annotation': py_annotations[name],
-                'default': py_defaults[name],
+                "name": name,
+                "kind": Sig.KEYWORD_ONLY,
+                "annotation": py_annotations[name],
+                "default": py_defaults[name],
             }
             for name in c.traitlets
         ]
@@ -1239,9 +1242,9 @@ class ConfigAnalysisDacc:
         widget_config_from_md_sig = config_dict_to_sig(c.widget_config_from_md)
 
         return {
-            'traitlets': sig_to_df(traitlet_sig),
-            'widget_config_from_ts': sig_to_df(widget_config_from_ts_sig),
-            'widget_config_from_md': sig_to_df(widget_config_from_md_sig),
+            "traitlets": sig_to_df(traitlet_sig),
+            "widget_config_from_ts": sig_to_df(widget_config_from_ts_sig),
+            "widget_config_from_md": sig_to_df(widget_config_from_md_sig),
         }
 
     def print_traitlet_and_ts_diffs(self):
@@ -1268,13 +1271,13 @@ from dol import Pipe
 def config_dict_to_sig(config_dict):
     import ju
 
-    return ju.json_schema_to_signature({'properties': config_dict})
+    return ju.json_schema_to_signature({"properties": config_dict})
 
 
 def sig_to_df(sig):
     df = pd.DataFrame(map(parameter_to_dict, sig.params))
-    df = df.drop('kind', axis=1)
-    df = df.set_index('name', drop=True)
+    df = df.drop("kind", axis=1)
+    df = df.set_index("name", drop=True)
     return df
 
 
@@ -1296,7 +1299,7 @@ from traitlets import Undefined
 from i2 import Sig, Param
 
 
-def signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
+def signature_diffs(sig1, sig2, *, sig1_name="left", sig2_name="right"):
     """
 
     ```python
@@ -1315,32 +1318,32 @@ def signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
 
     df1, df2 = map(_ensure_df, (sig1, sig2))
 
-    diffs = dataframe_diffs(df1, df2, ['index_diff', 'columns_value_diff'])
+    diffs = dataframe_diffs(df1, df2, ["index_diff", "columns_value_diff"])
 
-    if 'index_diff' in diffs:
-        index_diff = diffs['index_diff']
+    if "index_diff" in diffs:
+        index_diff = diffs["index_diff"]
 
         # rename left_right and right_left keys to sig1_name and sig2_name respectively
         # index_diff is a dict
-        if 'left_right' in index_diff:
+        if "left_right" in index_diff:
             index_diff[f"in_{sig1_name}__but_not_in_{sig2_name}"] = index_diff.pop(
-                'left_right'
+                "left_right"
             )
-        if 'right_left' in index_diff:
+        if "right_left" in index_diff:
             index_diff[f"in_{sig2_name}__but_not_in_{sig1_name}"] = index_diff.pop(
-                'right_left'
+                "right_left"
             )
 
-    if 'columns_value_diff' in diffs:
-        columns_value_diff = diffs['columns_value_diff']
-        columns_value_diff['default'] = columns_value_diff['default'].rename(
-            columns={'left': f'{sig1_name}', 'right': f'{sig2_name}'}
+    if "columns_value_diff" in diffs:
+        columns_value_diff = diffs["columns_value_diff"]
+        columns_value_diff["default"] = columns_value_diff["default"].rename(
+            columns={"left": f"{sig1_name}", "right": f"{sig2_name}"}
         )
-        columns_value_diff['annotation'] = columns_value_diff['annotation'].rename(
-            columns={'left': f'{sig1_name}', 'right': f'{sig2_name}'}
+        columns_value_diff["annotation"] = columns_value_diff["annotation"].rename(
+            columns={"left": f"{sig1_name}", "right": f"{sig2_name}"}
         )
         # apply _change_type_to_str to all values of the annotation column
-        columns_value_diff['annotation'] = columns_value_diff['annotation'].map(
+        columns_value_diff["annotation"] = columns_value_diff["annotation"].map(
             _change_type_to_str
         )
 
@@ -1350,7 +1353,7 @@ def signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
 from pprint import pprint
 
 
-def print_signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
+def print_signature_diffs(sig1, sig2, *, sig1_name="left", sig2_name="right"):
     """
 
     ```python
@@ -1367,42 +1370,42 @@ def print_signature_diffs(sig1, sig2, *, sig1_name='left', sig2_name='right'):
     diffs = signature_diffs(sig1, sig2, sig1_name=sig1_name, sig2_name=sig2_name)
     for k, v in diffs.items():
         print(f"### {k}\n")
-        if k == 'columns_value_diff':
-            print('#### default\n')
-            print_df(v['default'])
-            print('\n')
-            print('#### annotation\n')
-            print_df(v['annotation'])
-            print('\n')
-        elif k == 'index_diff':
+        if k == "columns_value_diff":
+            print("#### default\n")
+            print_df(v["default"])
+            print("\n")
+            print("#### annotation\n")
+            print_df(v["annotation"])
+            print("\n")
+        elif k == "index_diff":
             for kk, vv in v.items():
                 print(f"#### {kk}\n")
                 pprint(vv)
-                print('\n')
+                print("\n")
         else:
             if isinstance(v, pd.DataFrame):
                 print_df(v)
             else:
                 pprint(v)
 
-        print('\n-----------------------------------------------------------------\n\n')
+        print("\n-----------------------------------------------------------------\n\n")
 
 
 print_traitlet_and_ts_diffs = partial(
     print_signature_diffs,
-    dacc.sig_dfs['traitlets'],
-    dacc.sig_dfs['widget_config_from_ts'],
-    sig1_name='traitlets',
-    sig2_name='widget_config_from_ts',
+    dacc.sig_dfs["traitlets"],
+    dacc.sig_dfs["widget_config_from_ts"],
+    sig1_name="traitlets",
+    sig2_name="widget_config_from_ts",
 )
 
 
 print_traitlet_and_md_diffs = partial(
     print_signature_diffs,
-    dacc.sig_dfs['traitlets'],
-    dacc.sig_dfs['widget_config_from_md'],
-    sig1_name='traitlets',
-    sig2_name='widget_config_from_md',
+    dacc.sig_dfs["traitlets"],
+    dacc.sig_dfs["widget_config_from_md"],
+    sig1_name="traitlets",
+    sig2_name="widget_config_from_md",
 )
 
 
@@ -1425,7 +1428,7 @@ def to_int_or_float(x):
 
 def none_if_null(x):
     "change 'null' strings to None (that's how json serialization will work)"
-    if isinstance(x, str) and x == 'null':
+    if isinstance(x, str) and x == "null":
         return None
     return x
 
@@ -1440,59 +1443,59 @@ def tuple_if_list(x):
 
 
 parse_md_schema = {
-    'name': 'whatevs',
-    'strict': False,
-    'schema': {
-        'type': 'object',
-        'properties': {
-            'interfaces': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'name': {
-                            'type': 'string',
-                            'description': 'The name of the interface.',
+    "name": "whatevs",
+    "strict": False,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "interfaces": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the interface.",
                         },
-                        'description': {
-                            'type': 'string',
-                            'description': 'A brief description of the interface (if available).',
+                        "description": {
+                            "type": "string",
+                            "description": "A brief description of the interface (if available).",
                         },
-                        'properties': {
-                            'type': 'array',
-                            'items': {
-                                'type': 'object',
-                                'properties': {
-                                    'name': {
-                                        'type': 'string',
-                                        'description': 'The name of the property within the interface.',
+                        "properties": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "The name of the property within the interface.",
                                     },
-                                    'type': {
-                                        'type': 'string',
-                                        'description': 'The type of the property.',
+                                    "type": {
+                                        "type": "string",
+                                        "description": "The type of the property.",
                                     },
-                                    'description': {
-                                        'type': 'string',
-                                        'description': 'A brief description of the property (if available).',
+                                    "description": {
+                                        "type": "string",
+                                        "description": "A brief description of the property (if available).",
                                     },
-                                    'default': {
-                                        'type': ['string', 'number', 'null'],
-                                        'description': 'The default value for the property (if available).',
+                                    "default": {
+                                        "type": ["string", "number", "null"],
+                                        "description": "The default value for the property (if available).",
                                     },
-                                    'group': {
-                                        'type': ['string'],
-                                        'description': 'The group to which the property belongs.',
+                                    "group": {
+                                        "type": ["string"],
+                                        "description": "The group to which the property belongs.",
                                     },
-                                    'optional': {
-                                        'type': 'boolean',
-                                        'description': 'Indicates whether the property is optional.',
+                                    "optional": {
+                                        "type": "boolean",
+                                        "description": "Indicates whether the property is optional.",
                                     },
                                 },
-                                'required': ['name', 'default'],
+                                "required": ["name", "default"],
                             },
                         },
                     },
-                    'required': ['name', 'properties'],
+                    "required": ["name", "properties"],
                 },
             }
         },
