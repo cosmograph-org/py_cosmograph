@@ -53,6 +53,15 @@ json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
 # color_names_set = set(json_files['color_names.json'])  # removed because problematic on windows
 
 # --------------------------------------------------------------------------------------
+# Pipeline for Cosmo
+
+class Pipeline(Pipe):
+    def add(self, *additional_funcs):
+        funcs = tuple(self.funcs) + tuple(additional_funcs)
+        return Pipeline(*funcs)
+
+
+# --------------------------------------------------------------------------------------
 # Extracting the interface from the data
 
 import typing
