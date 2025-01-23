@@ -49,7 +49,7 @@ def test_cosmo_graph_01_quests():
 def test_cosmo_partial_and_ingress_01():
     import pytest
     import pandas as pd
-    from cosmograph import Cosmograph
+    from cosmograph import cosmo, Cosmograph
 
     # Define the data with whimsical column names
     data_potions = {
@@ -75,7 +75,7 @@ def test_cosmo_partial_and_ingress_01():
     df_potions = pd.DataFrame(data_potions)
 
     # Test that Cosmograph widget works
-    asis = Cosmograph(
+    asis = cosmo(
         df_potions,
         point_x_by='Location_X',
         point_y_by='Location_Y',
@@ -87,7 +87,7 @@ def test_cosmo_partial_and_ingress_01():
 
     # If you were to iterate over different datas or configurations, you could make
     # a "partial" widget constructor that sets the common parameters (just don't include any data, points, or links arguments)
-    my_cosmo = Cosmograph(
+    my_cosmo = cosmo(
         point_x_by='Location_X',
         point_y_by='Location_Y',
         point_label_by='potion_name',
@@ -96,7 +96,7 @@ def test_cosmo_partial_and_ingress_01():
     )
 
     # You my_cosmo is not a widget now...
-    assert isinstance(my_cosmo, Cosmograph)
+    assert not isinstance(my_cosmo, Cosmograph)
     # ... but a callable that can be used to create widgets
     assert callable(my_cosmo), "my_cosmo is not callable!"
     # See, let's use it to create a widget
