@@ -223,7 +223,7 @@ def cosmo(
     changePoints: Callable[[Dict[str, Any]], Any] = None,
     changeLinks: Callable[[Dict[str, Any]], Any] = None,
     # extra params ---------------------------------------------------------------------
-    copy_before_ingress: bool = True,  # whether to make a copy of kwargs, as well as points and links before applying ingress
+    copy_before_ingress: bool = True,  # whether to make a copy the points and links before applying ingress
     data_resolution: Callable[
         [CosmoKwargs, Data], CosmoKwargs
     ] = prioritize_points,  # What to do with data (how to integrate it into the cosmo kwargs)
@@ -236,6 +236,19 @@ def cosmo(
     with signature, docs with argument descriptions, and a more flexible interface
     comprising some data processing, argument aliasing and validation, error handling,
     etc.
+
+    :param data: Convenience argument whose value will be used for either the points 
+        or links argument.
+    :param ingress: A function or sequence of functions that will be applied to the 
+        kwargs before they are passed to the Cosmograph constructor.
+    :param copy_before_ingress: Whether to make a copy of the points and links before
+        applying the ingress transformations. This is so that the original data is not
+        modified by the ingress functions.
+    :param data_resolution: A function that will be used to resolve the data argument. 
+        This is the function that takes care of how to handle the data argument,
+    :param validate_kwargs: A function that will be applied to the kwargs after the
+        ingress transformations. This is the function that will validate the kwargs
+        before they are passed to the Cosmograph constructor.
 
     """
     # Get the arguments as a dictionary
