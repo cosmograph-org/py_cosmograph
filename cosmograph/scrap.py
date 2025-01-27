@@ -1,5 +1,5 @@
 """Just some scrap"""
 
-print('hello')
+print("hello")
 
 foo = 43

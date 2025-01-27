@@ -89,7 +89,7 @@ def trait_to_py(trait: Union[TraitType, Type[TraitType]]) -> Union[object, type]
                 return typing.Any
         elif trait_type is traitlets.UseEnum:
             # For UseEnum traits, return the enum class
-            if hasattr(trait, 'enum_class'):
+            if hasattr(trait, "enum_class"):
                 return trait.enum_class
             else:
                 return enum.Enum

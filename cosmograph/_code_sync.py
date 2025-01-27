@@ -344,7 +344,7 @@ def parse_docstring_and_body(source_code):
     all_lines = source_code.splitlines()
 
     # Find the line index where the function definition starts
-    def_pattern = r'^\s*(?:async\s+def|def)\s+'
+    def_pattern = r"^\s*(?:async\s+def|def)\s+"
     def_line_idx = None
     for i, line in enumerate(all_lines):
         if re.search(def_pattern, line):

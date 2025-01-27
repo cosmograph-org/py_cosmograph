@@ -47,7 +47,7 @@ js_dir = files / "js"
 js_dir_path = str(js_dir)
 
 data_files = Files(data_dir_path)
-json_files = filt_iter.suffixes('.json')(JsonFiles(data_dir_path))
+json_files = filt_iter.suffixes(".json")(JsonFiles(data_dir_path))
 
 
 # color_names_set = set(json_files['color_names.json'])  # removed because problematic on windows
@@ -84,11 +84,11 @@ def _params_ssot(param_names=None):
 def cosmograph_base_signature(param_names=None):
     params_ssot = _params_ssot(param_names)
     for d in params_ssot:
-        d.pop('description', None)  # delete description if any
+        d.pop("description", None)  # delete description if any
         d.update(
             annotation=str_to_annotation(d["annotation"])
         )  # convert annotation to type
-        d['kind'] = Sig.KEYWORD_ONLY
+        d["kind"] = Sig.KEYWORD_ONLY
 
     return Sig([Param(**d) for d in params_ssot])
 

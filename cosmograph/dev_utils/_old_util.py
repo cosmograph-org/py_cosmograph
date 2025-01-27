@@ -6,7 +6,7 @@ from functools import lru_cache
 from cosmograph.util import data_files
 import json
 
-cosmos_config = json.loads(data_files['_old_cosmos_config.json'])['config']
+cosmos_config = json.loads(data_files["_old_cosmos_config.json"])["config"]
 
 _cosmos_config_info = cosmos_config
 _default_of_py_name = {d["py_name"]: d["Default"] for d in _cosmos_config_info}
@@ -109,17 +109,17 @@ def _tmp_test_of_py_costmos_call():
         "events_on_zoom_end='undefined', show_fpsmonitor='false', pixel_ratio='2', "
         "scale_nodes_on_zoom='true', random_seed='undefined')"
     )
-    assert _py_cosmos_call('CANVAS', node_color='blue') == (
+    assert _py_cosmos_call("CANVAS", node_color="blue") == (
         "canvas='CANVAS', config={'nodeColor': 'blue'}"
     )
-    assert _py_cosmos_call('CANVAS', node_color='blue', node_size=5) == (
+    assert _py_cosmos_call("CANVAS", node_color="blue", node_size=5) == (
         "canvas='CANVAS', config={'nodeColor': 'blue', 'nodeSize': 5}"
     )
 
     import pytest
 
     with pytest.raises(TypeError) as excinfo:
-        _py_cosmos_call('WTF', invalid_arg='whatevs')
+        _py_cosmos_call("WTF", invalid_arg="whatevs")
         assert "Invalid argument names: {'invalid_arg'}" in str(excinfo.value)
 
     # TODO: Just need to get the right blank spaces
@@ -140,11 +140,11 @@ def _tmp_test_of_py_costmos_call():
 
 def convert_js_to_py_val(x):
     if isinstance(x, str):
-        if x == 'undefined':
+        if x == "undefined":
             return None
-        if x == 'true':
+        if x == "true":
             return True
-        elif x == 'false':
+        elif x == "false":
             return False
         # TODO: Add list handling ('link_visibility_distance_range': '[50, 150]',)
         # elif x.startswith('[') and x.endswith(']'):
@@ -185,28 +185,28 @@ def _download_and_save_config_info():
     import json
 
     config_info = cosmos_config_info()
-    data_files['_old_cosmos_config.json'] = json.dumps(config_info).encode()
+    data_files["_old_cosmos_config.json"] = json.dumps(config_info).encode()
 
 
 # # TODO: Take out of try/catch once we have a stable source of config info
 try:
     import json
 
-    config_info = json.loads(data_files['config_info.json'])
+    config_info = json.loads(data_files["config_info.json"])
     _config_dflts = [
         {
-            'name': d['py_name'],
-            'kind': Sig.KEYWORD_ONLY,
-            'default': convert_js_to_py_val(d['Default']),
+            "name": d["py_name"],
+            "kind": Sig.KEYWORD_ONLY,
+            "default": convert_js_to_py_val(d["Default"]),
         }
         for d in config_info
     ]
 
     _original_cosmo_sig = Sig(cosmo)
-    _cosmo_sig = _original_cosmo_sig - 'display'
-    _cosmo_sig = _cosmo_sig - 'config'
+    _cosmo_sig = _original_cosmo_sig - "display"
+    _cosmo_sig = _cosmo_sig - "config"
     _cosmo_sig = _cosmo_sig + Sig.from_params(
-        [{'name': 'display', 'default': True, 'kind': Sig.KEYWORD_ONLY}]
+        [{"name": "display", "default": True, "kind": Sig.KEYWORD_ONLY}]
     )
     _cosmo_sig = _cosmo_sig + Sig.from_params(_config_dflts)
     _ko_names_kinds = {k: Sig.KEYWORD_ONLY for k in _cosmo_sig.names[3:]}

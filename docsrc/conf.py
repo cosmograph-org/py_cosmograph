@@ -13,14 +13,14 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 from epythet.config_parser import parse_config
 from pathlib import Path
 
 project, copyright, author, release, display_name = parse_config(
-    Path(__file__).absolute().parent.parent / 'setup.cfg'
+    Path(__file__).absolute().parent.parent / "setup.cfg"
 )
 
 # -- General configuration ---------------------------------------------------
@@ -29,37 +29,37 @@ project, copyright, author, release, display_name = parse_config(
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_toggleprompt',
-    'sphinx_copybutton',
-    'sphinx.ext.autodoc',  # Include documentation from docstrings
-    'sphinx.ext.doctest',  # Test snippets in the documentation
-    'sphinx.ext.githubpages',  # This extension creates .nojekyll file
-    'sphinx.ext.graphviz',  # Add Graphviz graphs
-    'sphinx.ext.napoleon',  # Support for NumPy and Google style docstrings
-    'sphinx.ext.todo',  # Support for todo items
-    'sphinx.ext.viewcode',  # Add links to highlighted source code
-    'myst_parser',  # Parse .md files
+    "sphinx_toggleprompt",
+    "sphinx_copybutton",
+    "sphinx.ext.autodoc",  # Include documentation from docstrings
+    "sphinx.ext.doctest",  # Test snippets in the documentation
+    "sphinx.ext.githubpages",  # This extension creates .nojekyll file
+    "sphinx.ext.graphviz",  # Add Graphviz graphs
+    "sphinx.ext.napoleon",  # Support for NumPy and Google style docstrings
+    "sphinx.ext.todo",  # Support for todo items
+    "sphinx.ext.viewcode",  # Add links to highlighted source code
+    "myst_parser",  # Parse .md files
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 
 # -- Options for Markdown support -------------------------------------------
