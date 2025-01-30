@@ -6,6 +6,7 @@ wads/data/wads_configs.json
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 
 .DS_Store
