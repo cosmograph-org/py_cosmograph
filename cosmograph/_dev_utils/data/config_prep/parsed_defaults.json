@@ -1,0 +1,58 @@
+{
+    "cosmos/variables.ts": {
+        "defaultNodeColor": "#b3b3b3",
+        "defaultGreyoutNodeOpacity": 0.1,
+        "defaultNodeSize": 4,
+        "defaultLinkColor": "#666666",
+        "defaultGreyoutLinkOpacity": 0.1,
+        "defaultLinkWidth": 1,
+        "defaultBackgroundColor": "#222222",
+        "defaultConfigValues": {
+            "disableSimulation": false,
+            "spaceSize": 4096,
+            "nodeSizeScale": 1,
+            "linkWidthScale": 1,
+            "arrowSizeScale": 1,
+            "renderLinks": true,
+            "curvedLinks": false,
+            "curvedLinkSegments": 19,
+            "curvedLinkWeight": 0.8,
+            "curvedLinkControlPointDistance": 0.5,
+            "arrowLinks": true,
+            "linkVisibilityDistanceRange": [
+                50,
+                150
+            ],
+            "linkVisibilityMinTransparency": 0.25,
+            "hoveredNodeRingColor": "white",
+            "focusedNodeRingColor": "white",
+            "useQuadtree": false,
+            "simulation": {
+                "decay": 1000,
+                "gravity": 0,
+                "center": 0,
+                "repulsion": 0.1,
+                "repulsionTheta": 1.7,
+                "repulsionQuadtreeLevels": 12,
+                "linkSpring": 1,
+                "linkDistance": 2,
+                "linkDistRandomVariationRange": [
+                    1,
+                    1.2
+                ],
+                "repulsionFromMouse": 2,
+                "friction": 0.85
+            },
+            "showFPSMonitor": false,
+            "pixelRatio": 2,
+            "scaleNodesOnZoom": true,
+            "disableZoom": false,
+            "fitViewOnInit": true,
+            "fitViewDelay": 250,
+            "nodeSamplingDistance": 150
+        },
+        "hoveredNodeRingOpacity": 0.7,
+        "focusedNodeRingOpacity": 0.95,
+        "defaultScaleToZoom": 3
+    }
+}

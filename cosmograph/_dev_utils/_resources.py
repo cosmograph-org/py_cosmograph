@@ -1,5 +1,105 @@
 """
 Define and acquire resources for the Cosmograph package.
+
+Read these docs (with a mermaid graph) here: 
+https://github.com/cosmograph-org/py_cosmograph/discussions/32#discussioncomment-12004615
+
+
+This module provides a framework for synchronizing the configuration parameters of a 
+JavaScript visualization library, **cosmograph**, with Python’s **cosmograph_widget**. 
+Although the JS side is currently missing a formal single source of truth (SSOT), 
+the Python side endeavors to unify the multiple JS/TS files, markdown documentation, 
+and Python **traitlets** into a coherent SSOT that drives all Python-facing parameters 
+(name, type, default, description).
+
+In practice, the module parses and reconciles TS code and markdown documentation 
+(optionally retrieved from GitHub). It then merges these details with Python-side 
+traitlets defined in the `cosmograph_widget.Cosmograph` class. The result is a robust 
+“SSOT” JSON file, so that the Python interface stays in sync with the latest or staged 
+TS changes.
+
+## Key Components
+
+### `ConfigsDacc`
+A central class that creates, inspects, and updates the comprehensive SSOT data for 
+cosmograph’s configuration parameters. Typical functionalities include:
+
+1. **Parse and store source texts.**  
+   Via methods like `source_strings`, the class fetches TypeScript and markdown files—
+   either from local paths or GitHub—and caches the text locally 
+   (e.g., JSON and parquet caching via decorators like `cache_to_json_files`).
+   
+2. **Extract and unify details.**  
+   Once the raw content is fetched, `parsed_defaults`, `parsed_types`, and 
+   `parsed_descriptions` parse them into structured dictionaries or DataFrame objects. 
+   The module compares these results against Python’s `traitlets` in 
+   `cosmograph_widget.Cosmograph`.
+
+3. **Generate SSOT artifacts.**  
+   - **`matched_info_df`**: A merged DataFrame that shows parameter alignment across 
+     defaults, types, descriptions, and actual traitlets.  
+   - **`cosmograph_base_signature`** and **`cosmograph_base_docs`**: Automatic generation 
+     of Python function signatures and docstrings that match the discovered TS/markdown 
+     content.  
+   - **`cosmograph_base_params_json`**: A JSON-serialized listing of parameter info 
+     (names, types, defaults, descriptions), forming the final SSOT the Python side 
+     relies on.
+
+4. **Diagnosis and staging.**  
+   The module includes utilities for diagnosing alignment issues (`print_diagnosis`, 
+   `signature_diffs`, `info_dfs`). To handle updates carefully, developers can make a 
+   staged instance of `ConfigsDacc` (pointing to a temporary or “staging” directory) 
+   and compare it to the “current” instance that points to the active SSOT. Once 
+   verified, staged files can replace the existing ones.
+
+### `ResourcesDacc`
+A smaller, focused class that manages non-configuration resources (like color tables or 
+other references) using the same caching mechanisms. It is less about parameter 
+alignment and more about storing prepared data used elsewhere in cosmograph.
+
+### Older Classes: `ConfigSourceDicts` and `ConfigAnalysisDacc`
+These belong to a legacy approach for handling configuration data, mostly loading from 
+older JSON references:
+
+- **`ConfigSourceDicts`**: Staticmethods returning older key–value data from local JSON 
+  files.  
+- **`ConfigAnalysisDacc`**: A more ad-hoc aggregator for analyzing those older 
+  configurations, now largely superseded by `ConfigsDacc`.
+
+## Typical Workflow
+
+1. **Instantiate**  
+   Simply create a `ConfigsDacc` instance, which reads or creates caching files in a 
+   standard data directory.
+
+2. **Fetch & parse sources**  
+   The call `c.source_strings` triggers loading from GitHub. Then `c.parsed_defaults`, 
+   `c.parsed_types`, and `c.parsed_descriptions` become available, each containing 
+   structured Python data for defaults, interfaces, or doc descriptions.
+
+3. **Inspect merges**  
+   Access `c.matched_info_df` for an aligned table of parameter names across all 
+   sources. This reveals any mismatches in defaults or missing doc strings.
+
+4. **Generate Python interface**  
+   - `c.cosmograph_base_signature()` returns a Python signature object with matching 
+     defaults and type annotations, all from the SSOT.  
+   - `c.cosmograph_base_docs()` yields docstring text that can directly drop into a 
+     Python class or function.
+
+5. **Staging updates**  
+   - Create a second `ConfigsDacc` with its `config_files_dir` set to a staging path.  
+   - Re-compute or fetch from updated TS/markdown sources.  
+   - Compare the staged data to the current SSOT (check `matched_info_df`, parameter 
+     differences, or docstring changes).  
+   - If correct, copy the staged JSON files over to the main config directory, or 
+     update `_params_ssot.json` as needed.
+
+With these tools, Python developers can confidently maintain a local single source of 
+truth for cosmograph’s parameter definitions—anticipating future changes on the JS side 
+without breaking alignment in Python.
+
+
 """
 
 import os
@@ -24,15 +124,19 @@ from dol.filesys import mk_json_bytes_wrap
 from i2 import postprocess
 
 
-from cosmograph.util import data_dir_path, json_files, data_files
-
-
 # -------------------------------------------------------------------------------------
 # General utils
+from cosmograph.util import files
+
+data_dir = files / "_dev_utils" / "data"
+data_dir_path = str(data_dir)
 
 
 _json_wrap = mk_json_bytes_wrap(dumps_kwargs={"indent": 4})
 JsonFiles = _json_wrap(TextFiles)  # TODO: should we add json filter? change name?
+
+data_files = Files(data_dir_path)
+json_files = filt_iter.suffixes(".json")(JsonFiles(data_dir_path))
 
 cache_to_json_files = partial(cache_this, cache=json_files, key=add_extension("json"))
 resources_jsons = filt_iter.suffixes([".json"])(JsonFiles(data_dir_path))
@@ -166,7 +270,7 @@ from i2.doc_mint import params_to_docstring
 from i2 import Sig, Param
 
 # TODO: Note, we need ju for config_dict_to_sig and for trait_to_py. Consider vendorizing config_dict_to_sig
-from cosmograph.dev_utils._traitlets_util import trait_to_py  # vendorized from ju
+from cosmograph._dev_utils._traitlets_util import trait_to_py  # vendorized from ju
 
 EXCLUDE_PARAMS = ("_ipc_points", "_ipc_links")
 
@@ -988,8 +1092,6 @@ from typing import Callable
 from collections import defaultdict
 
 from dol import Pipe
-
-from cosmograph.util import json_files
 
 
 def gather_items(pairs, *, val_filt: Callable = lambda x: True):

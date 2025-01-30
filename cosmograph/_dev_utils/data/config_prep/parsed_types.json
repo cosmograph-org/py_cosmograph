@@ -1,0 +1,944 @@
+{
+    "cosmos/config.ts": {
+        "interfaces": [
+            {
+                "name": "GraphConfigInterface",
+                "description": "Interface for graph configuration parameters.",
+                "properties": [
+                    {
+                        "name": "disableSimulation",
+                        "type": "boolean",
+                        "description": "Do not run the simulation, just render the graph. Default value: `false`",
+                        "optional": true
+                    },
+                    {
+                        "name": "backgroundColor",
+                        "type": "string | [number, number, number, number]",
+                        "description": "Canvas background color. Can be either a hex color string or an array of RGBA values. Default value: '#222222'",
+                        "optional": true
+                    },
+                    {
+                        "name": "spaceSize",
+                        "type": "number",
+                        "description": "Simulation space size (max 8192). Default value: `8192`",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointColor",
+                        "type": "string | [number, number, number, number]",
+                        "description": "Default color for points. Can be a hex string or RGBA array. Default value: '#b3b3b3'",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointGreyoutOpacity",
+                        "type": "number",
+                        "description": "Greyed out point opacity when selection is active. Default value: `0.1`",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointSize",
+                        "type": "number",
+                        "description": "Default size value for points. Default size is `4`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointSizeScale",
+                        "type": "number",
+                        "description": "Scale factor for point size. Default is `1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "hoveredPointCursor",
+                        "type": "string",
+                        "description": "Cursor style for hovering over a point. Default value: `auto`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "renderHoveredPointRing",
+                        "type": "boolean",
+                        "description": "Rings rendering around a point on hover toggle. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "hoveredPointRingColor",
+                        "type": "string | [number, number, number, number]",
+                        "description": "Hovered point ring color. Either hex or RGBA. Default is `white`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "focusedPointRingColor",
+                        "type": "string | [number, number, number, number]",
+                        "description": "Focused point ring color. Either hex or RGBA. Default is `white`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "focusedPointIndex",
+                        "type": "number",
+                        "description": "Set focus on a point by index. Default value: `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "renderLinks",
+                        "type": "boolean",
+                        "description": "Toggle link rendering. Default `true`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkColor",
+                        "type": "string | [number, number, number, number]",
+                        "description": "Default color for links. Either hex or RGBA. Default is '#666666'.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkGreyoutOpacity",
+                        "type": "number",
+                        "description": "Greyed out link opacity when selection is active. Default `0.1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkWidth",
+                        "type": "number",
+                        "description": "Default link width when values aren't provided. Default `1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkWidthScale",
+                        "type": "number",
+                        "description": "Scale factor for link width. Default `1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "curvedLinks",
+                        "type": "boolean",
+                        "description": "Render links as curved lines. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "curvedLinkSegments",
+                        "type": "number",
+                        "description": "Number of segments in a curved line. Default `19`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "curvedLinkWeight",
+                        "type": "number",
+                        "description": "Weight affecting curve shape. Default `0.8`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "curvedLinkControlPointDistance",
+                        "type": "number",
+                        "description": "Position of curve control point on normal from center. Default `0.5`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkArrows",
+                        "type": "boolean",
+                        "description": "Control displaying link arrows. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkArrowsSizeScale",
+                        "type": "number",
+                        "description": "Scale factor for link arrows size. Default `1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkVisibilityDistanceRange",
+                        "type": "number[]",
+                        "description": "Range for link visibility in pixels. Default `[50, 150]`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkVisibilityMinTransparency",
+                        "type": "number",
+                        "description": "Transparency at max link distance. Default `0.25`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "useQuadtree",
+                        "type": "boolean",
+                        "description": "Toggle use of classic quadtree. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationDecay",
+                        "type": "number",
+                        "description": "Decay coefficient for simulation cool down rate. Default `5000`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationGravity",
+                        "type": "number",
+                        "description": "Gravity force coefficient. Default `0.25`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationCenter",
+                        "type": "number",
+                        "description": "Centering to center mass force coefficient. Default `0`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationRepulsion",
+                        "type": "number",
+                        "description": "Repulsion force coefficient. Default `1.0`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationRepulsionTheta",
+                        "type": "number",
+                        "description": "Decreases/increases detalization of Many-Body force calculations. Default `1.15`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationRepulsionQuadtreeLevels",
+                        "type": "number",
+                        "description": "Depth of Barnes\u2013Hut approximation. Default `12`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationLinkSpring",
+                        "type": "number",
+                        "description": "Link spring force coefficient. Default `1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationLinkDistance",
+                        "type": "number",
+                        "description": "Minimum link distance. Default `10`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationLinkDistRandomVariationRange",
+                        "type": "number[]",
+                        "description": "Random variation range for link distance. Default `[1, 1.2]`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationRepulsionFromMouse",
+                        "type": "number",
+                        "description": "Repulsion coefficient from mouse position. Default `2`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationFriction",
+                        "type": "number",
+                        "description": "Friction coefficient. Default `0.85`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "simulationCluster",
+                        "type": "number",
+                        "description": "Cluster coefficient. Default `0.1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationStart",
+                        "type": "() => void",
+                        "description": "Callback when simulation starts. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationTick",
+                        "type": "(alpha: number, hoveredIndex?: number, pointPosition?: [number, number]) => void",
+                        "description": "Callback on every simulation tick. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationEnd",
+                        "type": "() => void",
+                        "description": "Callback when simulation ends. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationPause",
+                        "type": "() => void",
+                        "description": "Callback when simulation pauses. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationRestart",
+                        "type": "() => void",
+                        "description": "Callback when simulation restarts. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onClick",
+                        "type": "(index: number | undefined, pointPosition: [number, number] | undefined, event: MouseEvent) => void",
+                        "description": "Callback function on canvas click. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onMouseMove",
+                        "type": "(index: number | undefined, pointPosition: [number, number] | undefined, event: MouseEvent) => void",
+                        "description": "Callback function on mouse movement. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onPointMouseOver",
+                        "type": "(index: number, pointPosition: [number, number], event: MouseEvent | D3DragEvent<HTMLElement, undefined, Hovered> | D3ZoomEvent<HTMLElement, undefined> | undefined) => void",
+                        "description": "Callback when a point appears under the mouse. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onPointMouseOut",
+                        "type": "(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | undefined) => void",
+                        "description": "Callback when a point is no longer under mouse. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onZoomStart",
+                        "type": "(e: D3ZoomEvent<HTMLElement, undefined>, userDriven: boolean) => void",
+                        "description": "Callback when zoom or pan starts. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onZoom",
+                        "type": "(e: D3ZoomEvent<HTMLElement, undefined>, userDriven: boolean) => void",
+                        "description": "Callback during zoom or pan. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onZoomEnd",
+                        "type": "(e: D3ZoomEvent<HTMLElement, undefined>, userDriven: boolean) => void",
+                        "description": "Callback when zoom or pan ends. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onDragStart",
+                        "type": "(e: D3DragEvent<HTMLElement, undefined, Hovered>) => void",
+                        "description": "Callback when dragging starts. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onDrag",
+                        "type": "(e: D3DragEvent<HTMLElement, undefined, Hovered>) => void",
+                        "description": "Callback during dragging. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onDragEnd",
+                        "type": "(e: D3DragEvent<HTMLElement, undefined, Hovered>) => void",
+                        "description": "Callback when dragging ends. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "showFPSMonitor",
+                        "type": "boolean",
+                        "description": "Toggle WebGL performance monitor. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pixelRatio",
+                        "type": "number",
+                        "description": "Canvas pixel ratio. Default `2`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "scalePointsOnZoom",
+                        "type": "boolean",
+                        "description": "Resize points on zooming toggle. Default `true`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "initialZoomLevel",
+                        "type": "number",
+                        "description": "Initial zoom level for graph. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "disableZoom",
+                        "type": "boolean",
+                        "description": "Disable zoom in/out. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "enableDrag",
+                        "type": "boolean",
+                        "description": "Enable point dragging in graph. Default `false`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "fitViewOnInit",
+                        "type": "boolean",
+                        "description": "Fit view on initialization. Default `true`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "fitViewDelay",
+                        "type": "number",
+                        "description": "Delay before fitting view if `fitViewOnInit` is enabled. Default `250`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "fitViewPadding",
+                        "type": "number",
+                        "description": "Padding applied when fitting view. Default `0.1`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "fitViewDuration",
+                        "type": "number",
+                        "description": "Duration for fitting view. Default `250`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "fitViewByPointsInRect",
+                        "type": "[[number, number], [number, number]] | [number, number][]",
+                        "description": "Fit view by points in defined rectangle on init. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "randomSeed",
+                        "type": "number | string",
+                        "description": "Control randomness with seed. Default `undefined`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointSamplingDistance",
+                        "type": "number",
+                        "description": "Distance in pixels between neighboring points for sampling. Default `150`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "disableAttribution",
+                        "type": "boolean",
+                        "description": "Toggle rendering of attribution. Default `false`.",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    "cosmograph/config.ts": {
+        "interfaces": [
+            {
+                "name": "BasicConfig",
+                "description": "Configuration options for basic styles and functionalities.",
+                "properties": [
+                    {
+                        "name": "disableSimulation",
+                        "type": "boolean | null",
+                        "description": "Indicates whether the simulation should be disabled.",
+                        "optional": true,
+                        "default": "null"
+                    },
+                    {
+                        "name": "rectangularSelectorClassName",
+                        "type": "string",
+                        "description": "CSS class for the rectangular selector.",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "CallbackConfig",
+                "description": "Configuration options for various callback functions used in the graph.",
+                "properties": [
+                    {
+                        "name": "onPointsFiltered",
+                        "type": "(filteredPoints: CosmographData) => void",
+                        "description": "Callback for filtering points by point crossfilter.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onLinksFiltered",
+                        "type": "(filteredLinks: CosmographData) => void",
+                        "description": "Callback for filtering links by link crossfilter.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onLabelClick",
+                        "type": "(index: number, id: string, event: MouseEvent) => void",
+                        "description": "Callback for clicking on a label.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onDataUpdated",
+                        "type": "({ pointsCount, linksCount, pointsSummary, linksSummary }: { pointsCount: number; linksCount: number; pointsSummary?: Record<string, unknown>[]; linksSummary?: Record<string, unknown>[] }) => void",
+                        "description": "Callback for when data is updated after rendering.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onAreaSelected",
+                        "type": "(selection: [[number, number], [number, number]] | null) => void",
+                        "description": "Callback for when area selection is performed.",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    "cosmograph/data.ts": {
+        "interfaces": [
+            {
+                "name": "CosmographPointsConfig",
+                "description": "Configuration interface for cosmograph points.",
+                "properties": [
+                    {
+                        "name": "points",
+                        "type": "CosmographInputData",
+                        "description": "Input data for the points.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointIdBy",
+                        "type": "string",
+                        "description": "Unique identifier column for each point. Required for mapping links to points correctly.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointIndexBy",
+                        "type": "string",
+                        "description": "Numeric index column for each point used for efficient lookups and should be a sequential integer starting from 0.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointColorBy",
+                        "type": "string",
+                        "description": "Column name for the point color. If provided, points will be colored based on this column.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointColorByFn",
+                        "type": "AccessorFn<string | [number, number, number, number]>",
+                        "description": "Function to generate the color for each point based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointSizeBy",
+                        "type": "string",
+                        "description": "Column name for the point size. Points will be sized based on this column.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointSizeRange",
+                        "type": "[number, number]",
+                        "description": "Range for automatic point size scaling. Works when `pointSizeBy` column contains numeric values.",
+                        "optional": true,
+                        "default": "[2, 9]"
+                    },
+                    {
+                        "name": "pointSizeByFn",
+                        "type": "AccessorFn<number> | null",
+                        "description": "Function to generate the size for each point based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointClusterBy",
+                        "type": "string",
+                        "description": "Column name for the point clusters. Points will be clustered by this column.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointClusterStrengthBy",
+                        "type": "string",
+                        "description": "Defines how strongly each point is attracted to its assigned cluster. Works when `pointClusterBy` is provided.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointLabelBy",
+                        "type": "string",
+                        "description": "Column name for the point label.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointLabelWeightBy",
+                        "type": "string",
+                        "description": "Column name for point label weight. Accepts float values from 0 to 1. Higher values make labels more likely to be shown.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointXBy",
+                        "type": "string",
+                        "description": "The column name for the point's x-coordinate.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointYBy",
+                        "type": "string",
+                        "description": "The column name for the point's y-coordinate.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointIncludeColumns",
+                        "type": "string[]",
+                        "description": "An array of additional column names to include in the point data.",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "CosmographLinksConfig",
+                "description": "Configuration interface for cosmograph links.",
+                "properties": [
+                    {
+                        "name": "links",
+                        "type": "CosmographInputData",
+                        "description": "The input data for the links.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkSourceBy",
+                        "type": "string",
+                        "description": "Column name for the source point of each link. Should match pointIdBy values in points data.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkSourceIndexBy",
+                        "type": "string",
+                        "description": "Column name for the source point index of each link. Should match pointIndexBy values in points data.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkTargetBy",
+                        "type": "string",
+                        "description": "Column name for the target point of each link. Should match pointIdBy values in points data.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkTargetIndexBy",
+                        "type": "string",
+                        "description": "Column name for the target point index of each link. Should match pointIndexBy values in points data.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkColorBy",
+                        "type": "string",
+                        "description": "Column name for the link color. Links will be colored based on this column.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkColorByFn",
+                        "type": "AccessorFn<string | [number, number, number, number]>",
+                        "description": "Function to generate the color for each link based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkWidthBy",
+                        "type": "string",
+                        "description": "Column name for the link width.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkWidthRange",
+                        "type": "[number, number]",
+                        "description": "Range for automatic link width scaling. Works when `linkWidthBy` column contains numeric values.",
+                        "optional": true,
+                        "default": "[1, 9]"
+                    },
+                    {
+                        "name": "linkWidthByFn",
+                        "type": "AccessorFn<number>",
+                        "description": "Function to generate width for each link based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkArrowBy",
+                        "type": "string",
+                        "description": "Column name that determines whether a link should have an arrow.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkArrowByFn",
+                        "type": "AccessorFn<boolean>",
+                        "description": "Function to determine if a link should have an arrow based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkStrengthBy",
+                        "type": "string",
+                        "description": "Column name for the link strength affecting the force simulation.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkStrengthByFn",
+                        "type": "AccessorFn<number>",
+                        "description": "Function to generate the strength for each link based on the column value.",
+                        "optional": true
+                    },
+                    {
+                        "name": "linkStrengthRange",
+                        "type": "[number, number]",
+                        "description": "Range for automatic link strength scaling and affects only during the active simulation.",
+                        "optional": true,
+                        "default": "[0.2, 1.0]"
+                    },
+                    {
+                        "name": "linkIncludeColumns",
+                        "type": "string[]",
+                        "description": "An array of additional column names to include in the link data.",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "CosmographClustersConfig",
+                "description": "Configuration interface for cosmograph clusters.",
+                "properties": [
+                    {
+                        "name": "clusterPositions",
+                        "type": "(number | undefined)[]",
+                        "description": "Array of cluster positions with every two elements representing x and y coordinates.",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    "cosmograph/labels.ts": {
+        "interfaces": [
+            {
+                "name": "LabelsCosmographConfig",
+                "description": "Configuration for displaying labels on the Cosmograph canvas.",
+                "properties": [
+                    {
+                        "name": "showLabels",
+                        "type": "boolean",
+                        "description": "Whether to show labels (except hovered) on the Cosmograph canvas.",
+                        "optional": true,
+                        "default": "false"
+                    },
+                    {
+                        "name": "showDynamicLabels",
+                        "type": "boolean",
+                        "description": "Show automatic labels for the evenly distributed points that are currently visible on the screen. Works only when `pointLabelBy` is provided.",
+                        "optional": true,
+                        "default": "false"
+                    },
+                    {
+                        "name": "showLabelsFor",
+                        "type": "string[]",
+                        "description": "An array of point ids to show labels for. Works only when `pointLabelBy` is provided.",
+                        "optional": true,
+                        "default": "undefined"
+                    },
+                    {
+                        "name": "showTopLabels",
+                        "type": "boolean",
+                        "description": "Show labels for the top points. Works only when `pointLabelBy` is provided.",
+                        "optional": true,
+                        "default": "false"
+                    },
+                    {
+                        "name": "showTopLabelsLimit",
+                        "type": "number",
+                        "description": "Sets the maximum number of top points to show labels for.",
+                        "optional": true,
+                        "default": "100"
+                    },
+                    {
+                        "name": "showTopLabelsBy",
+                        "type": "string",
+                        "description": "Specify the numeric column that is used to determine the top points that will be sorted by. Works only when `pointLabelBy` is provided.",
+                        "optional": true,
+                        "default": "undefined"
+                    },
+                    {
+                        "name": "pointLabelFn",
+                        "type": "AccessorFn<string>",
+                        "description": "Specifies the function that will generate the labels based on `pointLabelBy` column. Should return a `string`.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointLabelWeightFn",
+                        "type": "AccessorFn<number>",
+                        "description": "Specifies the function that will generate the label weights. Should return a number between 0 and 1.",
+                        "optional": true
+                    },
+                    {
+                        "name": "pointLabelClassName",
+                        "type": "string | ((text: string, pointIndexBy: number, pointIdBy?: string) => string)",
+                        "description": "Specifies the CSS class to use for the point labels. Can be a fixed string or a function that returns a string based on point index and optional point ID.",
+                        "optional": true
+                    },
+                    {
+                        "name": "staticLabelWeight",
+                        "type": "number",
+                        "description": "Specifies the weight of the static labels.",
+                        "optional": true,
+                        "default": "0.8"
+                    },
+                    {
+                        "name": "dynamicLabelWeight",
+                        "type": "number",
+                        "description": "Specifies the weight of the dynamic labels.",
+                        "optional": true,
+                        "default": "0.7"
+                    },
+                    {
+                        "name": "labelMargin",
+                        "type": "number",
+                        "description": "Specifies the margin between the label and the point.",
+                        "optional": true,
+                        "default": "5"
+                    },
+                    {
+                        "name": "labelPadding",
+                        "type": "{top: number, left: number, right: number, bottom: number}",
+                        "description": "Specifies the padding of the label element.",
+                        "optional": true,
+                        "default": "{ left: 7, top: 4, right: 7, bottom: 4 }"
+                    },
+                    {
+                        "name": "customLabels",
+                        "type": "CosmographCustomLabel[]",
+                        "description": "Specifies an array of custom labels to be displayed on the Cosmograph canvas.",
+                        "optional": true
+                    },
+                    {
+                        "name": "showHoveredPointLabel",
+                        "type": "boolean",
+                        "description": "Whether to show a hovered point label.",
+                        "optional": true,
+                        "default": "false"
+                    },
+                    {
+                        "name": "hoveredPointLabelClassName",
+                        "type": "string | ((text: string, pointIndexBy: number, pointIdBy?: string) => string)",
+                        "description": "Specifies the CSS class to use for the hovered point label. Can be a fixed string or a function that returns a string based on point index and optional point ID.",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    "cosmograph/simulation.ts": {
+        "interfaces": [
+            {
+                "name": "SimulationConfig",
+                "description": "Configuration interface for simulation settings.",
+                "properties": [
+                    {
+                        "name": "simulationDecay",
+                        "type": "GraphConfigInterface['simulationDecay']",
+                        "description": "Decay coefficient. Use bigger values if you want the simulation to \"cool down\" slower.",
+                        "optional": true,
+                        "default": "5000"
+                    },
+                    {
+                        "name": "simulationGravity",
+                        "type": "GraphConfigInterface['simulationGravity']",
+                        "description": "Gravity force coefficient.",
+                        "optional": true,
+                        "default": "0.25"
+                    },
+                    {
+                        "name": "simulationCenter",
+                        "type": "GraphConfigInterface['simulationCenter']",
+                        "description": "Centering to center mass force coefficient.",
+                        "optional": true,
+                        "default": "0"
+                    },
+                    {
+                        "name": "simulationRepulsion",
+                        "type": "GraphConfigInterface['simulationRepulsion']",
+                        "description": "Repulsion force coefficient.",
+                        "optional": true,
+                        "default": "1.0"
+                    },
+                    {
+                        "name": "simulationRepulsionTheta",
+                        "type": "GraphConfigInterface['simulationRepulsionTheta']",
+                        "description": "Decreases / increases the detalization of the Many-Body force calculations. When `useQuadtree` is set to `true`, this property corresponds to the Barnes\u2013Hut approximation criterion.",
+                        "optional": true,
+                        "default": "1.15"
+                    },
+                    {
+                        "name": "simulationRepulsionQuadtreeLevels",
+                        "type": "GraphConfigInterface['simulationRepulsionQuadtreeLevels']",
+                        "description": "Barnes\u2013Hut approximation depth. Can only be used when `useQuadtree` is set `true`.",
+                        "optional": true,
+                        "default": "12"
+                    },
+                    {
+                        "name": "simulationLinkSpring",
+                        "type": "GraphConfigInterface['simulationLinkSpring']",
+                        "description": "Link spring force coefficient.",
+                        "optional": true,
+                        "default": "1"
+                    },
+                    {
+                        "name": "simulationLinkDistance",
+                        "type": "GraphConfigInterface['simulationLinkDistance']",
+                        "description": "Minimum link distance.",
+                        "optional": true,
+                        "default": "10"
+                    },
+                    {
+                        "name": "simulationLinkDistRandomVariationRange",
+                        "type": "GraphConfigInterface['simulationLinkDistRandomVariationRange']",
+                        "description": "Range of random link distance values.",
+                        "optional": true,
+                        "default": "[1, 1.2]"
+                    },
+                    {
+                        "name": "simulationRepulsionFromMouse",
+                        "type": "GraphConfigInterface['simulationRepulsionFromMouse']",
+                        "description": "Repulsion coefficient from mouse position. The repulsion force is activated by pressing the right mouse button.",
+                        "optional": true,
+                        "default": "2"
+                    },
+                    {
+                        "name": "simulationFriction",
+                        "type": "GraphConfigInterface['simulationFriction']",
+                        "description": "Friction coefficient.",
+                        "optional": true,
+                        "default": "0.85"
+                    },
+                    {
+                        "name": "simulationClusterStrength",
+                        "type": "GraphConfigInterface['simulationCluster']",
+                        "description": "Coefficient of simulation cluster strength from 0 to 1. If `undefined`, the graph will not apply any clustering force to the simulation.",
+                        "optional": true,
+                        "default": "undefined"
+                    },
+                    {
+                        "name": "simulationImpulse",
+                        "type": "number",
+                        "description": "Coefficient of simulation impulse from 0 to 1. If `undefined`, the graph will not apply a new impulse to the renders during adding or removing data items, but instead will use the current simulation impulse value from the graph. Has no impact if `disableSimulation` is `true`.",
+                        "optional": true,
+                        "default": "undefined"
+                    }
+                ]
+            },
+            {
+                "name": "SimulationEventConfig",
+                "description": "Configuration interface for simulation event callbacks.",
+                "properties": [
+                    {
+                        "name": "onSimulationStart",
+                        "type": "GraphConfigInterface['onSimulationStart']",
+                        "description": "Callback function that will be called when the simulation starts.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationEnd",
+                        "type": "GraphConfigInterface['onSimulationEnd']",
+                        "description": "Callback function that will be called when the simulation stops.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationPause",
+                        "type": "GraphConfigInterface['onSimulationPause']",
+                        "description": "Callback function that will be called when the simulation is paused.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationRestart",
+                        "type": "GraphConfigInterface['onSimulationRestart']",
+                        "description": "Callback function that will be called when the simulation is restarted.",
+                        "optional": true
+                    },
+                    {
+                        "name": "onSimulationTick",
+                        "type": "GraphConfigInterface['onSimulationTick']",
+                        "description": "Callback function that will be called on every tick of the simulation.\n\n@param {number} alpha - The value of alpha will decrease over time as the simulation \"cools down\".\n @param {number | undefined} index - The index of the hovered point.\n @param {[number, number] | undefined} pointPosition - The position of the point under the cursor.",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    }
+}

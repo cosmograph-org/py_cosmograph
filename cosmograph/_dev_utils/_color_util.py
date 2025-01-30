@@ -7,7 +7,7 @@ from numbers import Number
 import pandas as pd
 import numpy as np
 
-from cosmograph.dev_utils._resources import resources_dacc
+from cosmograph._dev_utils._resources import resources_dacc
 
 html_color_names_set = resources_dacc.color_names_set
 
