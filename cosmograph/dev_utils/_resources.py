@@ -1,4 +1,6 @@
-"""Define and acquire resources for the Cosmograph package."""
+"""
+Define and acquire resources for the Cosmograph package.
+"""
 
 import os
 from typing import Optional, Union
