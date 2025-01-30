@@ -493,8 +493,6 @@ class ConfigsDacc:
         """
         Dataframe containing various features of properties extracted from the TS files.
         """
-        # widget_config = json_files['_widget_config.json']
-
         interfaces = list(self._interfaces(assert_expected_keys=assert_expected_keys))
         # print(f"{len(interfaces)=}")
 
@@ -1164,7 +1162,7 @@ class ConfigSourceDicts:
 
     @staticmethod
     def widget_config_from_md():
-        widget_config = json_files["_widget_config_from_md.json"]
+        widget_config = json_files["legacy/_widget_config_from_md.json"]
         assert set(widget_config) == {"interfaces"}
         assert len(widget_config["interfaces"]) == 1
         assert set(widget_config["interfaces"][0]) == {
@@ -1182,7 +1180,7 @@ class ConfigSourceDicts:
 
     @staticmethod
     def widget_config_from_ts():
-        widget_config = json_files["_widget_config.json"]
+        widget_config = json_files["legacy/_widget_config.json"]
 
         def _widget_config_properties():
             assert sorted(widget_config) == [
@@ -1495,22 +1493,35 @@ def print_signature_diffs(sig1, sig2, *, sig1_name="left", sig2_name="right"):
         print("\n-----------------------------------------------------------------\n\n")
 
 
-print_traitlet_and_ts_diffs = partial(
-    print_signature_diffs,
-    dacc.sig_dfs["traitlets"],
-    dacc.sig_dfs["widget_config_from_ts"],
-    sig1_name="traitlets",
-    sig2_name="widget_config_from_ts",
-)
+try:
+    print_traitlet_and_ts_diffs = partial(
+        print_signature_diffs,
+        dacc.sig_dfs["traitlets"],
+        dacc.sig_dfs["widget_config_from_ts"],
+        sig1_name="traitlets",
+        sig2_name="widget_config_from_ts",
+    )
 
-
-print_traitlet_and_md_diffs = partial(
-    print_signature_diffs,
-    dacc.sig_dfs["traitlets"],
-    dacc.sig_dfs["widget_config_from_md"],
-    sig1_name="traitlets",
-    sig2_name="widget_config_from_md",
-)
+    print_traitlet_and_md_diffs = partial(
+        print_signature_diffs,
+        dacc.sig_dfs["traitlets"],
+        dacc.sig_dfs["widget_config_from_md"],
+        sig1_name="traitlets",
+        sig2_name="widget_config_from_md",
+    )
+except KeyError:
+    def _print_warning():
+        print(f"""
+    Some of the legacy functionalities will need legacy data files to work.
+    You probably don't need any of these legacy functionalities, but if you do, 
+    you'll need the `_widget_config.json` and the `_widget_config_from_md.json`
+    files (to be placed in the `_dev_utils/data/legacy/` folder)
+    Here's some old (2025-01-30) versions of these files:
+    - [_widget_config_from_md.json](https://github.com/cosmograph-org/py_cosmograph/blob/f369654d5e1228d1caef4ca7a595e52ad032893c/cosmograph/data/_widget_config_from_md.json)
+    - [_widget_config.json](https://github.com/cosmograph-org/py_cosmograph/blob/f369654d5e1228d1caef4ca7a595e52ad032893c/cosmograph/data/_widget_config.json)
+""")
+    print_traitlet_and_ts_diffs = _print_warning
+    print_traitlet_and_md_diffs = _print_warning
 
 
 # --------------------------------------------------------------------------------------
