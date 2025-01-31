@@ -1,4 +1,4 @@
-"""Utils for color """
+"""Utils for color"""
 
 import re
 from typing import Any, Callable, Sequence, Union

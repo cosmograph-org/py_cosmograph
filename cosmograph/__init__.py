@@ -11,7 +11,7 @@ Python binders to cosmograph functionality
 ... }
 >>> points, links = map(pd.DataFrame, single_link.values())
 >>> g = cosmo(
-...     points=points, 
+...     points=points,
 ...     links=links,
 ...     point_id_by='id',
 ...     link_source_by='source',

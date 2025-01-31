@@ -1,10 +1,10 @@
 """
 Synching code to the SSOT.
 
-Note: The `_resources` module has the utilities to extract, diagnose, and produce 
+Note: The `_resources` module has the utilities to extract, diagnose, and produce
 the SSOT from the JS codebase.
 
-This _code_sync module is meant to contain the code that is used to inject this SSOT 
+This _code_sync module is meant to contain the code that is used to inject this SSOT
 into the python code.
 """
 
@@ -27,20 +27,20 @@ def order_cosmo_params(old_sig: Sig):
             old_sig = Sig(old_sig)
         else:
             raise TypeError("old_sig must be a Sig object.")
-        
+
     first_args = [
-        'data',
-        'points',
-        'links',
-        'point_x_by',
-        'point_y_by',
-        'point_size_by',
-        'point_color_by',
-        'point_label_by',
+        "data",
+        "points",
+        "links",
+        "point_x_by",
+        "point_y_by",
+        "point_size_by",
+        "point_color_by",
+        "point_label_by",
     ]
-    by_args = list(filter(lambda x: x.endswith('_by'), old_sig.names))
-    point_args = list(filter(lambda x: x.startswith('point_'), old_sig.names))
-    link_args = list(filter(lambda x: x.startswith('link_'), old_sig.names))
+    by_args = list(filter(lambda x: x.endswith("_by"), old_sig.names))
+    point_args = list(filter(lambda x: x.startswith("point_"), old_sig.names))
+    link_args = list(filter(lambda x: x.startswith("link_"), old_sig.names))
 
     arg_order = []
     arg_order.extend(first_args)
@@ -75,13 +75,13 @@ def param_spec_code_lines(sig: Sig):
         yield param_spec
 
 
-def string_of_param_spec_code_lines(sig: Sig, tab='\t'):
+def string_of_param_spec_code_lines(sig: Sig, tab="\t"):
     """Prints lines of code for each parameter in a signature."""
 
-    return tab + f',\n{tab}'.join(param_spec_code_lines(sig))
+    return tab + f",\n{tab}".join(param_spec_code_lines(sig))
 
 
-def print_param_spec_code_lines(sig: Sig, tab='\t'):
+def print_param_spec_code_lines(sig: Sig, tab="\t"):
     """Prints lines of code for each parameter in a signature."""
     print(string_of_param_spec_code_lines(sig, tab))
 

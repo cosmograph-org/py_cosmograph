@@ -55,6 +55,7 @@ json_files = filt_iter.suffixes(".json")(JsonFiles(data_dir_path))
 # --------------------------------------------------------------------------------------
 # Pipeline for Cosmo
 
+
 class Pipeline(Pipe):
     def add(self, *additional_funcs):
         funcs = tuple(self.funcs) + tuple(additional_funcs)
@@ -172,8 +173,8 @@ def annotation_to_str(annotation, *, remove_typing_prefix=True):
         raise ValueError(f"Unknown annotation type: {annotation}")
 
     if remove_typing_prefix:
-        typing_module_pattern = r'(?:(?<=\W)|^)typing\.'
-        annotation_str = re.sub(typing_module_pattern, '', annotation_str)
+        typing_module_pattern = r"(?:(?<=\W)|^)typing\."
+        annotation_str = re.sub(typing_module_pattern, "", annotation_str)
 
     return annotation_str
 

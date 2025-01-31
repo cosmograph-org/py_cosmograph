@@ -32,15 +32,15 @@ def base_cosmo(**kwargs):
 
 
 def process_cosmo_input(kwargs: CosmoKwargs) -> CosmoKwargs:
-    data = kwargs.pop('data', None)
+    data = kwargs.pop("data", None)
     return CosmoArguments(data, kwargs).prepare_kwargs()
 
 
 def copy_points_and_links(kwargs):
-    if kwargs.get('points', None) is not None:
-        kwargs['points'] = kwargs['points'].copy()
-    if kwargs.get('links', None) is not None:
-        kwargs['links'] = kwargs['links'].copy()
+    if kwargs.get("points", None) is not None:
+        kwargs["points"] = kwargs["points"].copy()
+    if kwargs.get("links", None) is not None:
+        kwargs["links"] = kwargs["links"].copy()
     return kwargs
 
 
@@ -64,12 +64,12 @@ def prioritize_points(kwargs, data=None):
         - If both `points` and `links` are given, raise an error.
     """
     if data is not None:
-        if kwargs.get('points', None) is None:
+        if kwargs.get("points", None) is None:
             # If points is None, take data to be points (whether links is None or not)
-            kwargs['points'] = data
-        elif kwargs.get('links', None) is None:  # and points is not None
+            kwargs["points"] = data
+        elif kwargs.get("links", None) is None:  # and points is not None
             # If points are given, but links is None, use data as links
-            kwargs['links'] = data
+            kwargs["links"] = data
         else:
             # If both points and links are given, raise an error
             raise ValueError(
@@ -89,13 +89,13 @@ def validate_kwargs(kwargs):
         if invalid_kws_that_are_aliases := invalid_keywords & set(argument_aliases):
             # make a message for the aliases, mentioning the keyword they are aliases for
             # and should be replaced by
-            error_msg += '\n'.join(
+            error_msg += "\n".join(
                 f"You said `{kw}`: Did you mean `{argument_aliases[kw]}`?"
                 for kw in invalid_kws_that_are_aliases
             )
 
         if invalid_kws_that_are_not_aliases := invalid_keywords - set(argument_aliases):
-            t = ', '.join(invalid_kws_that_are_not_aliases)
+            t = ", ".join(invalid_kws_that_are_not_aliases)
             error_msg += f"And these I have no idea about: {t}"
 
         raise ValueError(error_msg)
@@ -237,14 +237,14 @@ def cosmo(
     comprising some data processing, argument aliasing and validation, error handling,
     etc.
 
-    :param data: Convenience argument whose value will be used for either the points 
+    :param data: Convenience argument whose value will be used for either the points
         or links argument.
-    :param ingress: A function or sequence of functions that will be applied to the 
+    :param ingress: A function or sequence of functions that will be applied to the
         kwargs before they are passed to the Cosmograph constructor.
     :param copy_before_ingress: Whether to make a copy of the points and links before
         applying the ingress transformations. This is so that the original data is not
         modified by the ingress functions.
-    :param data_resolution: A function that will be used to resolve the data argument. 
+    :param data_resolution: A function that will be used to resolve the data argument.
         This is the function that takes care of how to handle the data argument,
     :param validate_kwargs: A function that will be applied to the kwargs after the
         ingress transformations. This is the function that will validate the kwargs
@@ -256,8 +256,8 @@ def cosmo(
 
     # If there's no data arguments (data, points, links)
     # return a partial function with other settings
-    if all(val is None for val in map(kwargs.get, ['data', 'points', 'links'])):
-        _ = kwargs.pop('data')
+    if all(val is None for val in map(kwargs.get, ["data", "points", "links"])):
+        _ = kwargs.pop("data")
         return partial(cosmo, **kwargs)
 
     # extract all arguments that are not base cosmograph arguments
@@ -265,11 +265,11 @@ def cosmo(
     data, ingress, copy_before_ingress, data_resolution, validate_kwargs = map(
         kwargs.pop,
         [
-            'data',
-            'ingress',
-            'copy_before_ingress',
-            'data_resolution',
-            'validate_kwargs',
+            "data",
+            "ingress",
+            "copy_before_ingress",
+            "data_resolution",
+            "validate_kwargs",
         ],
     )
 
@@ -333,7 +333,7 @@ class CosmoArguments:
             - If both `points` and `links` are given, raise an error.
         """
         data = self.data
-        points, links = self.get(['points', 'links'], default=None)
+        points, links = self.get(["points", "links"], default=None)
 
         if data is not None:
             if points is None:
@@ -371,8 +371,8 @@ class CosmoArguments:
 
 # Make aliases for the arguments
 argument_aliases = {
-    'nodes': 'points',
-    'edges': 'links',
+    "nodes": "points",
+    "edges": "links",
 }
 # camel case aliases
 argument_aliases = dict(
@@ -417,7 +417,7 @@ class GraphJson(BaseModel):
 from cosmograph.validation import ensure_json_string
 
 
-html_code_data_def_template = '''
+html_code_data_def_template = """
 <div>
     <canvas></canvas>
 </div>
@@ -429,7 +429,7 @@ html_code_data_def_template = '''
     graph.setData(data.nodes, data.links);
     graph.fitView();
 </script>
-'''
+"""
 
 
 # TODO: Function should be moved to a better place
