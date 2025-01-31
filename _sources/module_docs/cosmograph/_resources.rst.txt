@@ -1,4 +1,0 @@
-cosmograph._resources
-=====================
-.. automodule:: cosmograph._resources
-   :members:

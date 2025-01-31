@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.util &mdash; cosmograph 0.0.37 documentation</title>
+  <title>cosmograph.util &mdash; cosmograph 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -50,16 +50,13 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../cosmograph.html">cosmograph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="_code_sync.html">cosmograph._code_sync</a></li>
-<li class="toctree-l1"><a class="reference internal" href="_resources.html">cosmograph._resources</a></li>
-<li class="toctree-l1"><a class="reference internal" href="_traitlets_util.html">cosmograph._traitlets_util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="base.html">cosmograph.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scrap.html">cosmograph.scrap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">cosmograph.tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests/base_test.html">cosmograph.tests.base_test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests/datagen.html">cosmograph.tests.datagen</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">cosmograph.util</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.JsFiles"><code class="docutils literal notranslate"><span class="pre">JsFiles</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.annotation_to_str"><code class="docutils literal notranslate"><span class="pre">annotation_to_str()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.cosmograph_base_docs"><code class="docutils literal notranslate"><span class="pre">cosmograph_base_docs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cosmograph.util.default_is_safe"><code class="docutils literal notranslate"><span class="pre">default_is_safe()</span></code></a></li>
@@ -106,9 +103,14 @@
 <dd><p>A store of js files</p>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="cosmograph.util.Pipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">funcs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">named_funcs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#Pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.Pipeline" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="cosmograph.util.annotation_to_str">
-<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">annotation_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#annotation_to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.annotation_to_str" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cosmograph.util.</span></span><span class="sig-name descname"><span class="pre">annotation_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_typing_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cosmograph/util.html#annotation_to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cosmograph.util.annotation_to_str" title="Link to this definition"></a></dt>
 <dd><p>Encodes Python type annotations as strings for JSON serialization.</p>
 <p>This is part of a specialized Python-to-string codec designed to encode and decode
 Python type annotations in a way that allows them to be serialized and deserialized
@@ -141,8 +143,8 @@ in JSON-compatible formats.</p>
 …     typing.Callable[[typing.Dict[str, Any]], Any]
 … ]
 &gt;&gt;&gt; encoded = list(map(annotation_to_str, original))
-&gt;&gt;&gt; encoded
-[‘bool’, ‘float’, ‘list[typing.Any]’, ‘typing.Union[str, list[float]]’, ‘int’, ‘str’, ‘list[float]’, ‘list[list[float]]’, ‘typing.Union[int, str]’, ‘list[str]’, ‘object’, ‘list[int]’, ‘typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]’]</p>
+&gt;&gt;&gt; encoded  # doctest: +NORMALIZE_WHITESPACE
+[‘bool’, ‘float’, ‘list[Any]’, ‘Union[str, list[float]]’, ‘int’, ‘str’,     ‘list[float]’, ‘list[list[float]]’, ‘Union[int, str]’, ‘list[str]’, ‘object’, ‘list[int]’,     ‘Callable[[Dict[str, Any]], Any]’]</p>
 </dd></dl>
 
 <dl class="py function">

@@ -3,11 +3,7 @@
    :caption: Contents:
 
    module_docs/cosmograph
-   module_docs/cosmograph/_code_sync
-   module_docs/cosmograph/_resources
-   module_docs/cosmograph/_traitlets_util
    module_docs/cosmograph/base
-   module_docs/cosmograph/scrap
    module_docs/cosmograph/tests
    module_docs/cosmograph/tests/base_test
    module_docs/cosmograph/tests/datagen

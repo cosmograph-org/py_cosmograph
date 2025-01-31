@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.util &mdash; cosmograph 0.0.37 documentation</title>
+  <title>cosmograph.util &mdash; cosmograph 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -47,11 +47,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph.html">cosmograph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_code_sync.html">cosmograph._code_sync</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_resources.html">cosmograph._resources</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/_traitlets_util.html">cosmograph._traitlets_util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/base.html">cosmograph.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/scrap.html">cosmograph.scrap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests.html">cosmograph.tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/base_test.html">cosmograph.tests.base_test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/cosmograph/tests/datagen.html">cosmograph.tests.datagen</a></li>
@@ -89,6 +85,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span><span class="p">,</span> <span class="n">partial</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">count</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
@@ -108,6 +105,10 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># type annotations</span>
+
+<span class="n">CosmoKwargs</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Constants and data access</span>
@@ -132,6 +133,18 @@
 
 
 <span class="c1"># color_names_set = set(json_files[&#39;color_names.json&#39;])  # removed because problematic on windows</span>
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Pipeline for Cosmo</span>
+
+<div class="viewcode-block" id="Pipeline">
+<a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.Pipeline">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pipeline</span><span class="p">(</span><span class="n">Pipe</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">additional_funcs</span><span class="p">):</span>
+        <span class="n">funcs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">funcs</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">additional_funcs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Pipeline</span><span class="p">(</span><span class="o">*</span><span class="n">funcs</span><span class="p">)</span></div>
+
+
 
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Extracting the interface from the data</span>
@@ -204,7 +217,7 @@
 
 <div class="viewcode-block" id="annotation_to_str">
 <a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.annotation_to_str">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">annotation_to_str</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">annotation_to_str</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">remove_typing_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Encodes Python type annotations as strings for JSON serialization.</span>
 
@@ -238,19 +251,27 @@
 <span class="sd">    ...     typing.Callable[[typing.Dict[str, Any]], Any]</span>
 <span class="sd">    ... ]</span>
 <span class="sd">    &gt;&gt;&gt; encoded = list(map(annotation_to_str, original))</span>
-<span class="sd">    &gt;&gt;&gt; encoded</span>
-<span class="sd">    [&#39;bool&#39;, &#39;float&#39;, &#39;list[typing.Any]&#39;, &#39;typing.Union[str, list[float]]&#39;, &#39;int&#39;, &#39;str&#39;, \</span>
-<span class="sd">&#39;list[float]&#39;, &#39;list[list[float]]&#39;, &#39;typing.Union[int, str]&#39;, &#39;list[str]&#39;, &#39;object&#39;, &#39;list[int]&#39;, \</span>
-<span class="sd">&#39;typing.Callable[[typing.Dict[str, typing.Any]], typing.Any]&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; encoded  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    [&#39;bool&#39;, &#39;float&#39;, &#39;list[Any]&#39;, &#39;Union[str, list[float]]&#39;, &#39;int&#39;, &#39;str&#39;, \</span>
+<span class="sd">    &#39;list[float]&#39;, &#39;list[list[float]]&#39;, &#39;Union[int, str]&#39;, &#39;list[str]&#39;, &#39;object&#39;, &#39;list[int]&#39;, \</span>
+<span class="sd">    &#39;Callable[[Dict[str, Any]], Any]&#39;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">annotation</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="n">annotation</span>
+    <span class="k">elif</span> <span class="n">annotation</span> <span class="o">==</span> <span class="n">Sig</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="s2">&quot;Any&quot;</span>
     <span class="k">elif</span> <span class="n">is_parameterized_type</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown annotation type: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown annotation type: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">remove_typing_prefix</span><span class="p">:</span>
+        <span class="n">typing_module_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?:(?&lt;=\W)|^)typing\.&#39;</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">typing_module_pattern</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">annotation_str</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">annotation_str</span></div>
 
 
 
