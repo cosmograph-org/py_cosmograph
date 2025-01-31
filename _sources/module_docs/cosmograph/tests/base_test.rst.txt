@@ -1,4 +1,0 @@
-cosmograph.tests.base_test
-==========================
-.. automodule:: cosmograph.tests.base_test
-   :members:

@@ -1,4 +1,0 @@
-cosmograph.tests
-================
-.. automodule:: cosmograph.tests
-   :members:

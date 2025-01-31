@@ -4,8 +4,5 @@
 
    module_docs/cosmograph
    module_docs/cosmograph/base
-   module_docs/cosmograph/tests
-   module_docs/cosmograph/tests/base_test
-   module_docs/cosmograph/tests/datagen
    module_docs/cosmograph/util
    module_docs/cosmograph/validation
