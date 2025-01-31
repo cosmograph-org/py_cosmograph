@@ -10,6 +10,7 @@ The **Cosmograph Widget** brings the power of Cosmograph's GPU-accelerated force
 - **Seamless Integration**: Embeds naturally into Jupyter notebooks, JupyterLab, and other notebook-based environments.
 - **Rich Configuration API**: Fine-tune graph appearance, behavior, and layout parameters through easy-to-use Python APIs.
 
+
 ## 🚀 Installation
 
 Note: You'll need python 3.10 or greater. 
