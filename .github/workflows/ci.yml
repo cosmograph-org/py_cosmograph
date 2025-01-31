@@ -126,6 +126,7 @@ jobs:
     steps:
       - uses: i2mint/epythet/actions/publish-github-pages@master
         with:
+          ignore: tests _dev_utils
           # IMPORTANT Note: You don't need to specify GITHUB_TOKEN in your repo secrets.
           # GITHUB_TOKEN is special & automatically provided to your workflow run.
           github-token: ${{ secrets.GITHUB_TOKEN }}
