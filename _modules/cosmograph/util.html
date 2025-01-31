@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.util &mdash; cosmograph 0.0.38 documentation</title>
+  <title>cosmograph.util &mdash; cosmograph 0.0.39 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=423071ad"></script>
+      <script src="../../_static/documentation_options.js?v=e648f5b4"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -136,6 +136,7 @@
 
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Pipeline for Cosmo</span>
+
 
 <div class="viewcode-block" id="Pipeline">
 <a class="viewcode-back" href="../../module_docs/cosmograph/util.html#cosmograph.util.Pipeline">[docs]</a>
@@ -268,8 +269,8 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown annotation type: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">remove_typing_prefix</span><span class="p">:</span>
-        <span class="n">typing_module_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?:(?&lt;=\W)|^)typing\.&#39;</span>
-        <span class="n">annotation_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">typing_module_pattern</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">annotation_str</span><span class="p">)</span>
+        <span class="n">typing_module_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(?:(?&lt;=\W)|^)typing\.&quot;</span>
+        <span class="n">annotation_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">typing_module_pattern</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">annotation_str</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">annotation_str</span></div>
 

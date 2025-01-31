@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cosmograph.base &mdash; cosmograph 0.0.38 documentation</title>
+  <title>cosmograph.base &mdash; cosmograph 0.0.39 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=423071ad"></script>
+      <script src="../../_static/documentation_options.js?v=e648f5b4"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -117,15 +117,15 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">process_cosmo_input</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">CosmoKwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CosmoKwargs</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CosmoArguments</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_kwargs</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">copy_points_and_links</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;links&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;links&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">kwargs</span>
 
 
@@ -151,12 +151,12 @@
 <span class="sd">        - If both `points` and `links` are given, raise an error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># If points is None, take data to be points (whether links is None or not)</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;links&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># and points is not None</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;links&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># and points is not None</span>
             <span class="c1"># If points are given, but links is None, use data as links</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If both points and links are given, raise an error</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -177,13 +177,13 @@
         <span class="k">if</span> <span class="n">invalid_kws_that_are_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">argument_aliases</span><span class="p">):</span>
             <span class="c1"># make a message for the aliases, mentioning the keyword they are aliases for</span>
             <span class="c1"># and should be replaced by</span>
-            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;You said `</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">`: Did you mean `</span><span class="si">{</span><span class="n">argument_aliases</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span><span class="si">}</span><span class="s2">`?&quot;</span>
                 <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">invalid_kws_that_are_aliases</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">invalid_kws_that_are_not_aliases</span> <span class="o">:=</span> <span class="n">invalid_keywords</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">argument_aliases</span><span class="p">):</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_kws_that_are_not_aliases</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_kws_that_are_not_aliases</span><span class="p">)</span>
             <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;And these I have no idea about: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
@@ -327,14 +327,14 @@
 <span class="sd">    comprising some data processing, argument aliasing and validation, error handling,</span>
 <span class="sd">    etc.</span>
 
-<span class="sd">    :param data: Convenience argument whose value will be used for either the points </span>
+<span class="sd">    :param data: Convenience argument whose value will be used for either the points</span>
 <span class="sd">        or links argument.</span>
-<span class="sd">    :param ingress: A function or sequence of functions that will be applied to the </span>
+<span class="sd">    :param ingress: A function or sequence of functions that will be applied to the</span>
 <span class="sd">        kwargs before they are passed to the Cosmograph constructor.</span>
 <span class="sd">    :param copy_before_ingress: Whether to make a copy of the points and links before</span>
 <span class="sd">        applying the ingress transformations. This is so that the original data is not</span>
 <span class="sd">        modified by the ingress functions.</span>
-<span class="sd">    :param data_resolution: A function that will be used to resolve the data argument. </span>
+<span class="sd">    :param data_resolution: A function that will be used to resolve the data argument.</span>
 <span class="sd">        This is the function that takes care of how to handle the data argument,</span>
 <span class="sd">    :param validate_kwargs: A function that will be applied to the kwargs after the</span>
 <span class="sd">        ingress transformations. This is the function that will validate the kwargs</span>
@@ -346,8 +346,8 @@
 
     <span class="c1"># If there&#39;s no data arguments (data, points, links)</span>
     <span class="c1"># return a partial function with other settings</span>
-    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;links&#39;</span><span class="p">])):</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="s2">&quot;links&quot;</span><span class="p">])):</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">cosmo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># extract all arguments that are not base cosmograph arguments</span>
@@ -355,11 +355,11 @@
     <span class="n">data</span><span class="p">,</span> <span class="n">ingress</span><span class="p">,</span> <span class="n">copy_before_ingress</span><span class="p">,</span> <span class="n">data_resolution</span><span class="p">,</span> <span class="n">validate_kwargs</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">,</span>
         <span class="p">[</span>
-            <span class="s1">&#39;data&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;ingress&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;copy_before_ingress&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;data_resolution&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;validate_kwargs&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ingress&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;copy_before_ingress&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data_resolution&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;validate_kwargs&quot;</span><span class="p">,</span>
         <span class="p">],</span>
     <span class="p">)</span>
 
@@ -428,7 +428,7 @@
 <span class="sd">            - If both `points` and `links` are given, raise an error.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;links&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="s2">&quot;links&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -468,8 +468,8 @@
 
 <span class="c1"># Make aliases for the arguments</span>
 <span class="n">argument_aliases</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="s1">&#39;points&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;edges&#39;</span><span class="p">:</span> <span class="s1">&#39;links&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="s2">&quot;points&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="s2">&quot;links&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="c1"># camel case aliases</span>
 <span class="n">argument_aliases</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -523,19 +523,19 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cosmograph.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_json_string</span>
 
 
-<span class="n">html_code_data_def_template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">&lt;div&gt;</span>
-<span class="s1">    &lt;canvas&gt;&lt;/canvas&gt;</span>
-<span class="s1">&lt;/div&gt;</span>
+<span class="n">html_code_data_def_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;div&gt;</span>
+<span class="s2">    &lt;canvas&gt;&lt;/canvas&gt;</span>
+<span class="s2">&lt;/div&gt;</span>
 
-<span class="s1">&lt;script&gt;</span>
-<span class="s1">    const data = </span><span class="si">{json_data_str}</span>
-<span class="s1">    const canvas = document.querySelector(&quot;canvas&quot;);</span>
-<span class="s1">    const graph = new cosmos.Graph(canvas);</span>
-<span class="s1">    graph.setData(data.nodes, data.links);</span>
-<span class="s1">    graph.fitView();</span>
-<span class="s1">&lt;/script&gt;</span>
-<span class="s1">&#39;&#39;&#39;</span>
+<span class="s2">&lt;script&gt;</span>
+<span class="s2">    const data = </span><span class="si">{json_data_str}</span>
+<span class="s2">    const canvas = document.querySelector(&quot;canvas&quot;);</span>
+<span class="s2">    const graph = new cosmos.Graph(canvas);</span>
+<span class="s2">    graph.setData(data.nodes, data.links);</span>
+<span class="s2">    graph.fitView();</span>
+<span class="s2">&lt;/script&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="c1"># TODO: Function should be moved to a better place</span>
