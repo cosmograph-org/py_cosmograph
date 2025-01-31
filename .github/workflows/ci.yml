@@ -40,7 +40,7 @@ jobs:
         uses: i2mint/isee/actions/pytest-validation@master
         with:
           root-dir: ${{ env.PROJECT_NAME }}
-          paths-to-ignore: examples,scrap,dev_utils
+          paths-to-ignore: examples,scrap,_dev_utils
 
   windows-validation:
     name: Windows Validation
