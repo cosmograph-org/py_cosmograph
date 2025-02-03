@@ -338,7 +338,7 @@
     {
         "name":"point_color_by_map",
         "default":null,
-        "annotation":"list[list[Union[str, list[float]]]]",
+        "annotation":"list[list[typing.Union[str, list[float]]]]",
         "description":"An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values. Used when point_color_strategy is set to `'map'`."
     },
     {
