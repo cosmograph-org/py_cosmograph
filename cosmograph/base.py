@@ -149,6 +149,7 @@ def cosmo(
     point_cluster_by: str = None,
     point_cluster_strength_by: str = None,
     point_include_columns: list[str] = None,
+    point_timeline_by: str = None,
     link_color: Union[str, list[float]] = None,
     link_greyout_opacity: float = None,
     link_width: float = None,

@@ -402,6 +402,12 @@
         "description":"An array of additional column names to include in point data."
     },
     {
+        "name":"point_timeline_by",
+        "default":null,
+        "annotation":"str",
+        "description":"Column to determine values for the timeline. Shows a timeline if set."
+    },
+    {
         "name":"link_source_by",
         "default":null,
         "annotation":"str",
