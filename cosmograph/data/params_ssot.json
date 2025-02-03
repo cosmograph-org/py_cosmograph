@@ -330,6 +330,24 @@
         "description":""
     },
     {
+        "name":"point_color_palette",
+        "default":null,
+        "annotation":"list[str]",
+        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'palette'`, `'interpolatePalette'`, or `'degree'`."
+    },
+    {
+        "name":"point_color_by_map",
+        "default":null,
+        "annotation":"list[list[typing.Union[str, list[float]]]]",
+        "description":"An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values. Used when point_color_strategy is set to `'map'`."
+    },
+    {
+        "name":"point_color_strategy",
+        "default":null,
+        "annotation":"str",
+        "description":"Specifies the strategy for coloring points based on data from the point_color_by column."
+    },
+    {
         "name":"point_size_by",
         "default":null,
         "annotation":"str",
@@ -382,6 +400,12 @@
         "default":null,
         "annotation":"list[str]",
         "description":"An array of additional column names to include in point data."
+    },
+    {
+        "name":"point_timeline_by",
+        "default":null,
+        "annotation":"str",
+        "description":"Column to determine values for the timeline. Shows a timeline if set."
     },
     {
         "name":"link_source_by",
