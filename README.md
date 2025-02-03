@@ -158,10 +158,10 @@ Zooming in a bit:
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
 
-- [Cosmograph Widget (Colab notebook) ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
-- [Mobius in Cosmograph Widget (Colab notebook)🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
-- [Clusters in Cosmograph (Colab notebook) 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
-- [English Words 🔤](https://colab.research.google.com/drive/1jZ2tPJw4gHpTCJVwCggRPWLmasfJIjPc?usp=sharing)
+- [Cosmograph Widget ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
+- [Mobius in Cosmograph Widget 🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
+- [Clusters in Cosmograph 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
+- [English Words 🔤](https://colab.research.google.com/drive/1TocOW1ZkwwDapNTY0F-lBGmhrs7BtIPK)
 
 
 ## 🛸 Issues and Feedback
