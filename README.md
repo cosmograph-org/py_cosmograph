@@ -55,9 +55,8 @@ widget = cosmo(
   link_source_by='source',
   link_target_by='target',
   point_color_by='category',
-  point_include_columns=['value'],
   point_label_by='label',
-  link_include_columns=['value'],
+  point_size_by='value'
 )
 widget
 ```
@@ -65,7 +64,7 @@ widget
 The widget will render an interactive graph visualization inline, allowing you to 
 explore and manipulate your data directly. 
 
-![](https://github.com/user-attachments/assets/328ff643-dcd8-479b-938a-40d43246cd39)
+![](https://github.com/user-attachments/assets/954a0556-ad8d-48f4-9295-8e547e9a338e)
 
 You also use the widget object to interact with the rendered graph.
 
@@ -114,16 +113,17 @@ g = cosmo(
     point_y_by='umap_y',
     point_color_by='pos',
     point_size_by='frequency',
-    point_size_scale=0.01,  # often have to play with this number to get the size right
+    point_size_scale=6,  # often have to play with this number to get the size right
+    disable_point_size_legend=True
 )
 g
 ```
 
-![image](https://github.com/user-attachments/assets/22bf49e9-a4ee-41f4-ba74-4557a0b52d98)
+![image](https://github.com/user-attachments/assets/3c54f524-349e-45b7-96ae-64864c76033a)
 
 Zooming in a bit:
 
-![image](https://github.com/user-attachments/assets/ad81eb4e-401d-433b-945a-f460a44c81de)
+![image](https://github.com/user-attachments/assets/b915d07f-06da-497a-a7e3-469ffdd5e1f2)
 
 
 And now, let's put some hypernym-hyponym links, and let the network converge to a stable 
@@ -141,18 +141,17 @@ h = cosmo(
     # point_y_by='umap_y',
     point_color_by='pos',
     point_size_by='frequency',
-    point_size_scale=0.01,  # often have to play with this number to get the size right
-    space_size=8112
+    point_size_scale=0.2,  # often have to play with this number to get the size right
+    disable_point_size_legend=True
 )
 h
 ```
 
-![image](https://github.com/user-attachments/assets/23312ab7-7b28-495d-a69e-9b6e44c61842)
+![image](https://github.com/user-attachments/assets/36e79cbf-d5e5-4afa-8bc5-59ae4c452082)
 
 Zooming in a bit:
 
-![image](https://github.com/user-attachments/assets/8cf95878-b4a3-49ae-985e-e017d346886b)
-
+![image](https://github.com/user-attachments/assets/e988950d-9f53-40c2-8b77-18cfb92efb50)
 
 ## 🎉 More Examples
 
