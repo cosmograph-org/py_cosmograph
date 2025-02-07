@@ -157,7 +157,8 @@ Zooming in a bit:
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
 
-- [Cosmograph Widget ✌️](https://colab.research.google.com/drive/1d0Gsn6KlCNCjPp8n8fpm82ctBpARasVX)
+- [Timeline in Cosmograph Widget ⏳](https://colab.research.google.com/drive/1fK7SLsoMFiDt9_42z9W7jo0z43yCL-CR)
+- [Real-Time Data Exploration with Cosmograph Widget 🪄](https://colab.research.google.com/drive/1bL3hcPbP2xPuxrtgmYaTU_hChCrdCp2Q)
 - [Mobius in Cosmograph Widget 🎗️](https://colab.research.google.com/drive/1-FlUSyRAgdhXT6rNyi3uYrIIlGX8gRuk)
 - [Clusters in Cosmograph 🫧](https://colab.research.google.com/drive/1Rt8rmmeMuWyFjEqae2DdJ3NYymtjC9cT)
 - [English Words 🔤](https://colab.research.google.com/drive/1TocOW1ZkwwDapNTY0F-lBGmhrs7BtIPK)
