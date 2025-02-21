@@ -1,0 +1,96 @@
+.wrapper {
+	overflow: auto;
+	height: 450px;
+	display: flex;
+	flex-flow: column;
+	color: #ccc;
+}
+
+.wrapper .graph {
+	flex: 1;
+	/* height: 100%; */
+	min-height: 0;
+	display: flex;
+}
+
+.wrapper .timeline {
+	height: 75px;
+	min-height: 75px;
+	display: none;
+	position: relative;
+	background: var(--cosmograph-timeline-background);
+	width: 100%;
+	overflow: hidden;
+}
+
+.wrapper .bottom {
+	position: absolute;
+	overflow: hidden;
+	display: flex;
+	gap: 8px;
+	bottom: 1rem;
+	left: 1rem;
+	flex-direction: column;
+	pointer-events: none;
+}
+
+.wrapper .bottom .pointSizeLegend {
+	width: fit-content;
+}
+
+.wrapper .bottom .linkWidthLegend {
+	width: fit-content;
+}
+
+.wrapper .bottom .pointColorLegend {
+	width: fit-content;
+}
+
+.wrapper .bottom .pointTypeColorLegend {
+	width: 100%;
+}
+
+.wrapper .bottom .linkColorLegend {
+	width: fit-content;
+}
+
+.wrapper .bottom .disable {
+	display: none;
+}
+
+.wrapper .pointLabelClassName {
+	color: whitesmoke;
+}
+
+.wrapper .controls {
+	position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.wrapper .controls .selectAreaButton {
+	width: 15px;
+	height: 15px;
+	margin-bottom: 0.5rem;
+}
+
+.wrapper .controls .fitViewButton {
+	width: 15px;
+	height: 15px;
+}
+
+.wrapper .controls .playButton {
+	width: 15px;
+	height: 15px;
+	margin-bottom: 0.5rem;
+}
+
+.wrapper .controls .zoomInOutButton {
+	width: 15px;
+	height: 30px;
+}
+
+/* Widget output div has a 8px left and right padding which looks off */
+.cell-output-ipywidget-background {
+	padding: 0 !important;
+}

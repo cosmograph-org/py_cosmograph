@@ -4,8 +4,7 @@ Utils to prepare data for cosmos
 
 import json
 from typing import Dict, Any
-from functools import lru_cache, partial
-from itertools import count
+from functools import partial
 import re
 
 from IPython.display import HTML, Javascript, display as ipython_display
@@ -66,7 +65,6 @@ class Pipeline(Pipe):
 # Extracting the interface from the data
 
 import typing
-import re
 from typing import Any, Callable
 from i2 import Sig, Param, params_to_docstring
 
@@ -225,8 +223,6 @@ def str_to_annotation(string, is_safe: Callable[[str], bool] = default_is_safe):
 # --------------------------------------------------------------------------------------
 # General/Misc utils
 
-from functools import lru_cache
-import re
 
 
 def move_to_front(df: pd.DataFrame, cols) -> pd.DataFrame:
@@ -361,4 +357,3 @@ def _nodes_from_links(links):
     return [{"id": x} for x in ordered_unique(_yield_nodes_from_links(links))]
 
 
-from cosmograph.validation import is_links, is_graph_json, is_nodes

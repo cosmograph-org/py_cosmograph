@@ -12,7 +12,6 @@ import inspect
 import textwrap
 import ast
 import re
-from functools import partial
 from inspect import Signature
 from i2 import Sig
 
@@ -248,12 +247,7 @@ def extract_function_source(func):
     return textwrap.dedent(original_source)
 
 
-import ast
-import re
 
-import ast
-import re
-import textwrap
 
 
 def parse_docstring_and_body(source_code):
@@ -543,7 +537,6 @@ def code_str_with_signature(func, sig, suffix="_with_new_sig"):
     )
 
 
-import ast
 
 
 def extract_func_name_from_code(code_str):
@@ -656,7 +649,6 @@ def execute_and_get_function(code_str, func_name=None):
     return namespace[func_name]
 
 
-import inspect
 import typing
 from typing import get_origin, get_args
 

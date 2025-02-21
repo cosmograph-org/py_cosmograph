@@ -20,11 +20,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Dependencies
-        uses: i2mint/isee/actions/install-packages@master
-        with:
-          dependency-files: setup.cfg
-          # ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Uncomment this if you need to install private dependencies from source
+      - name: Install Hatch
+        run: pip install hatch
+
+      - name: Run Tests
+        run: hatch run test:pytest
 
       - name: Format Source Code
         uses: i2mint/isee/actions/format-source-code@master
@@ -58,16 +58,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Package
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install .
-          # If pytest is not already installed through setup.cfg or setup.py requirements,
-          # include the line below:
-          python -m pip install pytest
+      - name: Install Hatch
+        run: pip install hatch
 
       - name: Run Tests
-        run: python -m pytest --maxfail=1 --disable-warnings
+        run: hatch run test:pytest
 
   publish:
     name: Publish
@@ -95,7 +90,7 @@ jobs:
         uses: i2mint/isee/actions/bump-version-number@master
 
       - name: Package
-        uses: i2mint/isee/actions/package@master
+        run: hatch build
         # Uncomment this if you need to install private dependencies from source
         # with:  
           # ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  
