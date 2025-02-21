@@ -1,7 +1,7 @@
 name: Continuous Integration
 on: [push, pull_request]
 env:
-  PROJECT_NAME: cosmograph
+  PROJECT_NAME: src/cosmograph
 
 jobs:
   validation:
@@ -29,12 +29,11 @@ jobs:
       - name: Format Source Code
         uses: i2mint/isee/actions/format-source-code@master
 
-      - name: Pylint Validation
-        uses: i2mint/isee/actions/pylint-validation@master
-        with:
-          root-dir: ${{ env.PROJECT_NAME }}
-          enable: missing-module-docstring
-          ignore: tests,examples,scrap
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Ruff Validation
+        run: ruff check ${{ env.PROJECT_NAME }}
 
       - name: Pytest Validation
         uses: i2mint/isee/actions/pytest-validation@master
