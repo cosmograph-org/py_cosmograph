@@ -114,3 +114,10 @@ venv.bak/
 
 # PyCharm
 .idea
+
+# Node
+node_modules
+.eslintcache
+meta.json
+
+src/cosmograph/widget/static

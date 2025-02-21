@@ -407,7 +407,7 @@ class ConfigsDacc:
 
     @cached_property
     def traitlets(self):
-        from cosmograph_widget import Cosmograph
+        from cosmograph.widget import Cosmograph
         from traitlets.traitlets import BaseDescriptor
 
         Cosmograph = get_cosmograph_widget_class(self.cosmograph_widget_source)
@@ -433,7 +433,7 @@ class ConfigsDacc:
                 "cosmograph/labels.ts",
                 "cosmograph/simulation.ts",
                 "cosmos/config.ts",
-            ], f"Not the keys I expected! If you want to ignore this, set assert_expected_keys=False"
+            ], "Not the keys I expected! If you want to ignore this, set assert_expected_keys=False"
 
         for widget_config_value in self.parsed_types.values():
             assert set(widget_config_value) == {"interfaces"}
@@ -796,7 +796,6 @@ class ConfigsDacc:
 configs_dacc = ConfigsDacc()
 
 import re
-from dol import flatten_dict
 
 extra_default_key_to_traitlet_mapping = {
     "greyout_point_opacity": "point_greyout_opacity",
@@ -856,7 +855,6 @@ def transform_defaults_keys(flat_defaults):
     return transformed
 
 
-import re
 
 # Compiled regex to handle camel case to snake case conversions, including acronyms
 _camel_to_snake_re = re.compile(r"((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
@@ -899,7 +897,6 @@ def first_and_last_dups(df, key_col):
 # Parsing Typescript (with AI)
 
 from functools import partial
-from dol import Pipe
 
 
 def parse_ts_with_oa(*args, **kwargs):
@@ -1089,7 +1086,6 @@ from functools import partial, cached_property
 from typing import Callable
 from collections import defaultdict
 
-from dol import Pipe
 
 
 def gather_items(pairs, *, val_filt: Callable = lambda x: True):
@@ -1130,7 +1126,6 @@ def setdiff(a, b):
     return set(a) - set(b)
 
 
-import json
 from operator import itemgetter
 from functools import lru_cache
 from dol import FuncReader, redirect_getattr_to_getitem
@@ -1146,7 +1141,7 @@ class ConfigSourceDicts:
         )  # {x['Property']: x for x in config_info}
         assert len(config_info_properties) == len(
             _config_info
-        ), f"config_info had some duplicate properties"
+        ), "config_info had some duplicate properties"
         return _config_info
 
     @staticmethod
@@ -1157,7 +1152,7 @@ class ConfigSourceDicts:
         cosmo_config_properties = to_dict(_cosmos_config, "Property")
         assert len(cosmo_config_properties) == len(
             _cosmos_config
-        ), f"cosmos_config had some duplicate properties"
+        ), "cosmos_config had some duplicate properties"
         return _cosmos_config
 
     @staticmethod
@@ -1175,7 +1170,7 @@ class ConfigSourceDicts:
 
         assert len(widget_config_from_md_properties) == len(
             widget_config["interfaces"][0]["properties"]
-        ), f"widget_config_from_md had some duplicate properties"
+        ), "widget_config_from_md had some duplicate properties"
         return widget_config_from_md_properties
 
     @staticmethod
@@ -1240,13 +1235,13 @@ class ConfigSourceDicts:
 
         assert len(widget_config_properties) == len(
             dedupped_interfaces
-        ), f"widget_config had some duplicate properties"
+        ), "widget_config had some duplicate properties"
         # print(f"{len(widget_config_properties)=}")
         return widget_config_properties
 
     @staticmethod
     def traitlets():
-        from cosmograph_widget import Cosmograph
+        from cosmograph.widget import Cosmograph
         from traitlets.traitlets import BaseDescriptor
 
         return {
@@ -1334,8 +1329,6 @@ class ConfigAnalysisDacc:
 
     @cached_property
     def sig_dfs(self):
-        from traitlets import Undefined
-        from i2 import Sig, Param
 
         c = self.c
 
@@ -1367,7 +1360,6 @@ get_sig_dfs = lambda: dacc.sig_dfs
 
 import pandas as pd
 from i2.signatures import parameter_to_dict
-from dol import Pipe
 
 
 def config_dict_to_sig(config_dict):
@@ -1398,7 +1390,6 @@ def _change_type_to_str(x):
 
 
 from traitlets import Undefined
-from i2 import Sig, Param
 
 
 def signature_diffs(sig1, sig2, *, sig1_name="left", sig2_name="right"):
@@ -1513,7 +1504,7 @@ except KeyError:
 
     def _print_warning():
         print(
-            f"""
+            """
     Some of the legacy functionalities will need legacy data files to work.
     You probably don't need any of these legacy functionalities, but if you do, 
     you'll need the `_widget_config.json` and the `_widget_config_from_md.json`
