@@ -315,7 +315,9 @@ def _postprocess(func, egress):
     return Pipe(func, egress)
 
 
-postprocess = lambda egress: partial(_postprocess, egress=egress)
+def postprocess(egress):
+    return partial(_postprocess, egress=egress)
+
 display_output = postprocess(ipython_display)
 to_html_obj = postprocess(HTML)
 to_js_obj = postprocess(Javascript)

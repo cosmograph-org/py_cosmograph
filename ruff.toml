@@ -42,7 +42,18 @@ target-version = "py39"
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = ["E4", "E7", "E9", "F", "D100"]
-ignore = []
+ignore = [
+    # (Thor): Keeping all imports at the top: Sure, best in most cases, but keeping imports close to the functions,
+    # or within the functions themselves has it's place (especially when the location and dependencies of things are still shifting).
+    # See for example this discussion - https://stackoverflow.com/questions/3095071/in-python-what-happens-when-you-import-inside-of-a-function 
+    # (or this one for JS - https://stackoverflow.com/questions/35817080/node-requiring-module-inside-function)
+    "E402",
+    # (Thor): Using __all__ instead of just imports (that aren't used) does indeed give you
+    # more python support than just importing, like I do. But I consider that a limitation of python,
+    # not a nice feature: It often makes you violate SSOT. For example, when you want to add something,
+    # you need to remember to include in __all__ list, or when you remove something you need to remember also remove in __all__ list.
+    "F401"
+]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
