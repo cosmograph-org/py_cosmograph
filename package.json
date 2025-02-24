@@ -1,10 +1,10 @@
 {
 	"type": "module",
 	"scripts": {
-		"clean": "rm -rf src/cosmograph/widget/static",
-    "build:esbuild": "esbuild js/widget.ts --minify --bundle --splitting --entry-names=[name]-[hash] --metafile=meta.json --format=esm --outdir=src/cosmograph/widget/static",
+		"clean": "rm -rf cosmograph/widget/static",
+    "build:esbuild": "esbuild js/widget.ts --minify --bundle --splitting --entry-names=[name]-[hash] --metafile=meta.json --format=esm --outdir=cosmograph/widget/static",
     "build:meta": "node create-meta-file.cjs",
-		"dev": "npm run clean && esbuild js/widget.ts --format=esm --bundle --outdir=src/cosmograph/widget/static --sourcemap=inline --watch",
+		"dev": "npm run clean && esbuild js/widget.ts --format=esm --bundle --outdir=cosmograph/widget/static --sourcemap=inline --watch",
 		"build": "npm run clean && npm run build:esbuild && npm run build:meta",
 		"typecheck": "tsc --noEmit",
 		"lint": "eslint --cache ./js"
