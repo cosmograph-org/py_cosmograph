@@ -5,12 +5,11 @@
 ```text
 py_cosmograph/
 ├── js/              # Source JavaScript
-├── src/             # Python package source
-│   └── cosmograph/
-│       └── widget/
-|           └── __init__.py
-│       └── __about__.py # <- cosmograph version here
-│       └── __init__.py
+│── cosmograph/
+│   └── widget/
+|       └── __init__.py
+│   └── __about__.py # <- cosmograph version here
+│   └── __init__.py
 ├── tests/           # Test suite
 ├── pyproject.toml   # Build configuration
 └── package.json     # NPM configuration
@@ -33,7 +32,7 @@ npm run dev
 |---------------------|------------------------------|
 | Start Jupyter Lab   | `hatch run jupyter lab`      |
 | Run Tests           | `hatch run test:pytest`      |
-| Lint & Format       | `ruff check src/cosmograph`  |
-| Build Package       | `hatch run build`            |
+| Lint & Format       | `ruff check cosmograph`  |
+| Build Package       | `hatch build`            |
 | Bump Version        | `hatch version [major\|minor\|patch\|b]` |
-| Publish             | `hatch run publish`          |
+| Publish             | `hatch publish`          |

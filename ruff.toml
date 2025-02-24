@@ -29,7 +29,7 @@ exclude = [
     "notebooks",
 ]
 
-extend-exclude = ["tests", "src/cosmograph/_dev_utils"]
+extend-exclude = ["tests", "cosmograph/_dev_utils"]
 # Same as Black.
 line-length = 88
 indent-width = 4
