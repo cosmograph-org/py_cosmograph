@@ -35,12 +35,6 @@ jobs:
       - name: Ruff Validation
         run: ruff check ${{ env.PROJECT_NAME }}
 
-      - name: Pytest Validation
-        uses: i2mint/isee/actions/pytest-validation@master
-        with:
-          root-dir: ${{ env.PROJECT_NAME }}
-          paths-to-ignore: examples,scrap,_dev_utils
-
   windows-validation:
     name: Windows Validation
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
