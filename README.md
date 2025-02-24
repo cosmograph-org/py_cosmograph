@@ -177,3 +177,4 @@ Submit issues to https://github.com/cosmograph-org/py_cosmograph/issues.
 
 👾 [Join the Cosmograph Discord Community](https://discord.gg/Rv8RUQuzsx)
 
+🛠️ [Development Setup](DEVELOPMENT.md)

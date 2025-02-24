@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "cosmograph/__about__.py"
+
+[project]
+name = "cosmograph"
+description = "Visualize large-scale network graphs and machine learning embeddings"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+keywords = ["Graph", "Embedding", "Network", "Visualization", "Machine Learning"]
+dependencies = [
+    "anywidget",
+    "pyarrow",
+    "pandas",
+    "numpy",
+    "traitlets",
+    "i2>=0.1.45",
+    "dol>=0.3.7",
+    "tabled>=0.1.17",
+    "ju>=0.1.16",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = ["watchfiles", "jupyterlab"]
+test = ["linked"]
+dev_utils = [
+    "lxml",
+    "IPython",
+    "hubcap",
+    "i2",
+    "ju",
+    "jy",
+    "lkj",
+    "matplotlib",
+    "oa",
+    "pydantic",
+    "pytest",
+    "requests",
+    "tabled",
+]
+
+# automatically add the dev feature to the default env (e.g., hatch shell)
+[tool.hatch.envs.default]
+features = ["dev"]
+python = "3.10"
+dependencies = [
+  "pandas",
+]
+
+[tool.hatch.envs.test]
+dependencies = [
+  "pytest",
+]
+
+[tool.hatch.build]
+only-packages = true
+artifacts = ["cosmograph/widget/static/*", "cosmograph/data/*"]
+
+[tool.hatch.build.hooks.jupyter-builder]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["cosmograph/widget/static/meta.json"]
+skip-if-exists = ["cosmograph/widget/static/meta.json"]
+dependencies = ["hatch-jupyter-builder>=0.5.0"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+npm = "npm"
+build_cmd = "build"

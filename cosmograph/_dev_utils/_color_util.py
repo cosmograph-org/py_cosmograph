@@ -53,7 +53,6 @@ def get_matplotlib_palette(
     - palette_func (Callable): Function mapping values to colors.
     """
     import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
 
     if palette is None:
         palette = "tab10" if categorical else "viridis"

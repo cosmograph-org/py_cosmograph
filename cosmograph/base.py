@@ -4,11 +4,10 @@ from typing import Dict, Any, Union, Callable, Sequence
 from functools import cached_property, partial
 from i2.doc_mint import inject_docstring_content
 
-from cosmograph_widget import Cosmograph
+from cosmograph.widget import Cosmograph
 
 from cosmograph.util import (
     CosmoKwargs,
-    Pipeline,
     snake_to_camel_case,
     cosmograph_base_docs,
     cosmograph_base_signature,
@@ -393,7 +392,7 @@ argument_aliases = dict(
 # --------------------------------------------------------------------------------------
 # Some old code that might be useful
 
-from typing import List, Optional, Tuple
+from typing import List
 from pydantic import BaseModel
 
 NodeId = str  # TODO: Also include ints? Oblige ids to be valid python identifiers?
