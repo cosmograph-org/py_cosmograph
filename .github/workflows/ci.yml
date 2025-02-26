@@ -76,11 +76,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Format Source Code
-        uses: i2mint/isee/actions/format-source-code@master
+      - name: Install Hatch
+        run: pip install hatch
 
       - name: Update Version Number
-        uses: i2mint/isee/actions/bump-version-number@master
+        run: |
+          hatch version patch
+          VERSION=$(hatch version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Package
         run: hatch build
@@ -97,7 +100,7 @@ jobs:
       - name: Check In
         uses: i2mint/isee/actions/check-in@master
         with:
-          commit-message: "**CI** Formatted code + Updated version number and documentation. [skip ci]"
+          commit-message: "**CI** Updated version number. [skip ci]"
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Tag Repository With New Version Number
