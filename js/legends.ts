@@ -7,6 +7,40 @@ import {
 } from '@cosmograph/cosmograph'
 
 import { createWidgetLegendElements } from './widget-elements'
+import { isDuckDBStringType, isDuckDBNumericType } from './helper'
+
+export enum PointColorStrategy {
+  Palette = 'palette',
+  InterpolatePalette = 'interpolatePalette',
+  Map = 'map',
+  Degree = 'degree',
+  Direct = 'direct'
+}
+
+export enum PointSizeStrategy {
+  Degree = 'degree',
+  Auto = 'auto',
+  Direct = 'direct'
+}
+
+export enum ColorType {
+  Range = 'range',
+  Type = 'type'
+}
+
+export function getPointColorLegendType(cosmograph: Cosmograph, column_by: string | null): ColorType | undefined {
+  const pointsSummary = cosmograph.stats.pointsSummary
+  const pointColorBy = column_by
+  const activePointColorStrategy = cosmograph.activePointColorStrategy
+  if (activePointColorStrategy === PointColorStrategy.Degree) return ColorType.Range
+  if (activePointColorStrategy === PointColorStrategy.Direct) return undefined
+
+  const pointColorInfo = pointsSummary?.find(d => d.column_name === pointColorBy)
+  if (pointColorInfo && isDuckDBNumericType(pointColorInfo.column_type)) return ColorType.Range
+  if (pointColorInfo && isDuckDBStringType(pointColorInfo.column_type)) return ColorType.Type
+
+  return undefined
+}
 
 export class CosmographLegends {
   public pointSizeLegendContainer: HTMLDivElement
@@ -36,133 +70,67 @@ export class CosmographLegends {
 
   public setCosmograph(cosmograph: Cosmograph): void {
     this.cosmograph = cosmograph
+
+    this._pointSizeLegend = new CosmographSizeLegend(this.cosmograph, this.pointSizeLegendContainer, {
+      label: d => `points by ${d}`,
+    })
+    this._pointRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.pointColorLegendContainer, {
+      label: d => `points by ${d}`,
+    })
+    this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer)
+    this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, this.linkWidthLegendContainer, {
+      useLinksData: true,
+      label: d => `links by ${d}`,
+    })
+    this._linkRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.linkColorLegendContainer, {
+      useLinksData: true,
+      label: d => `links by ${d}`,
+    })
+    this._pointSizeLegend.hide()
+    this._pointRangeColorLegend.hide()
+    this._pointTypeColorLegend.hide()
+    this._linkWidthLegend.hide()
+    this._linkRangeColorLegend.hide()
   }
 
-  public async updateLegend(
+  public async update(
     type: 'point' | 'link',
-    property: 'size' | 'color' | 'width',
-    colorType?: 'range' | 'type'
+    property: 'size' | 'color' | 'width'
   ): Promise<void> {
     if (!this.cosmograph) return
-    const disable = this.model.get(`disable_${type}_${property}_legend`) as (boolean | null)
     const column_by = this.model.get(`${type}_${property}_by`) as (string | null)
+    const disable = this.model.get(`disable_${type}_${property}_legend`) as (boolean | null)
+    const hide = disable === true
 
-    let hide = disable || false
-
-    if (!hide) {
-      const pointColorStrategy = this.cosmograph.config.pointColorStrategy
-      const isPointColor = `${type}_${property}` === 'point_color'
-
-      if (typeof column_by === 'string') {
-        hide = isPointColor && colorType === 'type' && (pointColorStrategy === 'degree' || pointColorStrategy === undefined)
-      } else {
-        const pointSizeStrategy = this.cosmograph.config.pointSizeStrategy
-        const isPointSize = `${type}_${property}` === 'point_size'
-        hide = !(isPointSize && pointSizeStrategy === 'degree') && !(isPointColor && pointColorStrategy === 'degree')
-      }
-    }
-
-    const { container, legendInstance } = await this._getLegendContainerAndInstance(type, property, hide, colorType)
-    if (`${type}_${property}` === 'point_color' && (colorType === 'range' || colorType === undefined) && this._pointTypeColorLegend) {
-      this._updateLegendVisibility(this.pointTypeColorLegendContainer, this._pointTypeColorLegend, true)
-    }
-    if (`${type}_${property}` === 'point_color' && (colorType === 'type' || colorType === undefined) && this._pointRangeColorLegend) {
-      this._updateLegendVisibility(this.pointColorLegendContainer, this._pointRangeColorLegend, true)
-    }
-    if (!container || !legendInstance) return
-    this._updateLegendVisibility(container, legendInstance, hide)
-  }
-
-  private async _getLegendContainerAndInstance(
-    type: 'point' | 'link',
-    property: 'size' | 'color' | 'width',
-    hide: boolean,
-    colorType?: 'range' | 'type'
-  ): Promise<{ container: HTMLDivElement | undefined; legendInstance: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined }> {
-    if (!this.cosmograph) return { container: undefined, legendInstance: undefined }
-    await this.cosmograph.graphReady()
-    let container: HTMLDivElement | undefined
-    let legendInstance: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined
     switch (`${type}_${property}`) {
       case 'point_size':
-        container = this.pointSizeLegendContainer
-        if (!hide && !this._pointSizeLegend) {
-          this._pointSizeLegend = new CosmographSizeLegend(this.cosmograph, container, {
-            label: d => `${type}s by ${d}`,
-          })
-        }
-        legendInstance = this._pointSizeLegend
+        const activePointSizeStrategy = this.cosmograph.activePointSizeStrategy
+        this._updateVisibility(this._pointSizeLegend, hide || (
+          (activePointSizeStrategy === PointSizeStrategy.Auto || activePointSizeStrategy === PointSizeStrategy.Direct) && !column_by
+        ))
         break
       case 'point_color':
-        if (colorType === 'range') {
-          container = this.pointColorLegendContainer
-          if (!hide && !this._pointRangeColorLegend) {
-            this._pointRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, container, {
-              label: d => `${type}s by ${d}`,
-            })
-          }
-          legendInstance = this._pointRangeColorLegend
-        } else if (colorType === 'type') {
-          container = this.pointTypeColorLegendContainer
-          if (!this._pointTypeColorLegend && !hide) {
-            this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, container)
-          }
-          legendInstance = this._pointTypeColorLegend
-        }
+        const colorType = getPointColorLegendType(this.cosmograph, column_by)
+        this._updateVisibility(this._pointRangeColorLegend, hide || colorType !== ColorType.Range)
+        this._updateVisibility(this._pointTypeColorLegend, hide || colorType !== ColorType.Type)
         break
       case 'link_width':
-        container = this.linkWidthLegendContainer
-        if (!hide) {
-          if (this._linkWidthLegend) {
-            await this._linkWidthLegend.setConfig({
-              ...(await this._linkWidthLegend.getConfig()),
-              useLinksData: true,
-              label: d => `${type}s by ${d}`,
-            })
-          } else {
-            this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, container, {
-              useLinksData: true,
-              label: d => `${type}s by ${d}`,
-            })
-          }
-        }
-        legendInstance = this._linkWidthLegend
+        this._updateVisibility(this._linkWidthLegend, hide || !column_by)
         break
       case 'link_color':
-        container = this.linkColorLegendContainer
-        if (!hide) {
-          if (this._linkRangeColorLegend) {
-            await this._linkRangeColorLegend.setConfig({
-              ...(await this._linkRangeColorLegend.getConfig()),
-              useLinksData: true,
-              label: d => `${type}s by ${d}`,
-            })
-          } else {
-            this._linkRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, container, {
-              useLinksData: true,
-              label: d => `${type}s by ${d}`,
-            })
-          }
-        }
-        legendInstance = this._linkRangeColorLegend
+        this._updateVisibility(this._linkRangeColorLegend, hide || !column_by)
         break
-      default:
-        return { container: undefined, legendInstance: undefined }
     }
-
-    return { container, legendInstance }
   }
 
-  private _updateLegendVisibility(
-    container: HTMLDivElement,
-    legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend,
+  private _updateVisibility(
+    legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined,
     hide: boolean
   ): void {
+    if (!legend) return
     if (hide) {
-      container.classList.add('disable')
       legend.hide()
     } else {
-      container.classList.remove('disable')
       legend.show()
     }
   }
