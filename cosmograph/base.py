@@ -144,6 +144,7 @@ def cosmo(
     point_id_by: str = None,
     point_index_by: str = None,
     point_size_range: list[float] = None,
+    point_size_strategy: str = None,
     point_label_weight_by: str = None,
     point_cluster_by: str = None,
     point_cluster_strength_by: str = None,

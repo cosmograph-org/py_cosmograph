@@ -5,7 +5,7 @@ import { tableFromIPC } from 'apache-arrow'
 import { subscribe, toCamelCase } from './helper'
 import { configProperties } from './config-props'
 import { createWidgetContainer } from './widget-elements'
-import { prepareCosmographDataAndMutate, resolveOptimalPointColorStrategy, resolveOptimalPointSizeStrategy, getPointColorLegendType, updateLinkColorFn } from './cosmograph-data'
+import { prepareCosmographDataAndMutate } from './cosmograph-data'
 import { CosmographLegends } from './legends'
 import { PointTimeline } from './components/point-timeline'
 import { ControlButtonsComponent } from './components/control-buttons'
@@ -108,17 +108,17 @@ async function render({ model, el }: RenderProps) {
       cosmographConfig.links = ipc ? tableFromIPC(ipc.buffer) : undefined
     },
 
-    disable_point_size_legend: async () => {
-      await legends.updateLegend('point', 'size')
+    disable_point_size_legend: () => {
+      legends.update('point', 'size')
     },
-    disable_link_width_legend: async () => {
-      await legends.updateLegend('link', 'width')
+    disable_link_width_legend: () => {
+      legends.update('link', 'width')
     },
-    disable_point_color_legend: async () => {
-      await legends.updateLegend('point', 'color')
+    disable_point_color_legend: () => {
+      legends.update('point', 'color')
     },
-    disable_link_color_legend: async () => {
-      await legends.updateLegend('link', 'color')
+    disable_link_color_legend: () => {
+      legends.update('link', 'color')
     },
   }
 
@@ -142,42 +142,27 @@ async function render({ model, el }: RenderProps) {
     .map(([propName, onModelChange]) => subscribe(model, `change:${propName}`, async () => {
       onModelChange()
 
-      // If color associated properties change, update the color strategy
-      if (propName === 'point_color_by' || propName === 'point_color_palette' || propName === 'point_color_by_map' || propName === 'point_color_strategy') {
-        const pointsSummary = cosmograph?.stats.pointsSummary
-        cosmographConfig.pointColorStrategy = model.get('point_color_strategy') ?? resolveOptimalPointColorStrategy(cosmographConfig, pointsSummary)
-      }
-
-      // If size associated properties change, update the size strategy
-      if (propName === 'point_size_by' || propName === 'point_size_range' || propName === 'point_size_strategy') {
-        const pointsSummary = cosmograph?.stats.pointsSummary
-        cosmographConfig.pointSizeStrategy = model.get('point_size_strategy') ?? resolveOptimalPointSizeStrategy(cosmographConfig, pointsSummary)
-      }
-
-      if (propName === 'link_color_by') {
-        if (cosmograph?.stats.linksSummary) updateLinkColorFn(cosmograph.stats.linksSummary, cosmographConfig)
-      }
-
       if (configProperties.includes(propName)) {
-        await cosmograph?.setConfig(cosmographConfig)
+        cosmograph?.setConfig(cosmographConfig)
+        // await when config is set
+        await cosmograph?.getConfig()
       }
 
       // If color associated properties change, update the color legend after setting the config to cosmograph
-      if (propName === 'point_color_by' || propName === 'point_color_palette' || propName === 'point_color_by_map' || propName === 'point_color_strategy') {
-        const pointColorType = getPointColorLegendType(cosmograph?.stats.pointsSummary, cosmographConfig)
-        await legends.updateLegend('point', 'color', pointColorType)
-      }
-
-      if (propName === 'link_color_by') {
-        await legends.updateLegend('link', 'color')
+      if (propName === 'point_color_by' || propName === 'point_color_strategy') {
+        legends.update('point', 'color')
       }
 
       if (propName === 'point_size_by') {
-        await legends.updateLegend('point', 'size')
+        legends.update('point', 'size')
+      }
+
+      if (propName === 'link_color_by') {
+        legends.update('link', 'color')
       }
 
       if (propName === 'link_width_by') {
-        await legends.updateLegend('link', 'width')
+        legends.update('link', 'width')
       }
 
       // `point_timeline_by` can be initialized once with first provided property
@@ -193,19 +178,12 @@ async function render({ model, el }: RenderProps) {
 
   await prepareCosmographDataAndMutate(cosmographConfig)
 
-  cosmographConfig.onDataUpdated = async (stats) => {
+  cosmographConfig.onGraphRebuilt = () => {
     if (!cosmograph) return
-    await legends.updateLegend('point', 'size')
-    await legends.updateLegend('link', 'width')
-
-    if (stats.linksSummary) {
-      updateLinkColorFn(stats.linksSummary, cosmographConfig)
-    }
-
-    await cosmograph.setConfig(cosmographConfig)
-    const pointColorType = getPointColorLegendType(stats.pointsSummary, cosmographConfig)
-    await legends.updateLegend('point', 'color', pointColorType)
-    await legends.updateLegend('link', 'color')
+    legends.update('point', 'size')
+    legends.update('point', 'color')
+    legends.update('link', 'width')
+    legends.update('link', 'color')
 
     pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
   }

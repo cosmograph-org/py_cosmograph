@@ -360,6 +360,12 @@
         "description":""
     },
     {
+        "name":"point_size_strategy",
+        "default":null,
+        "annotation":"str",
+        "description":""
+    },
+    {
         "name":"point_label_by",
         "default":null,
         "annotation":"str",

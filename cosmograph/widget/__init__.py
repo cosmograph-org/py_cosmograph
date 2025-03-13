@@ -114,6 +114,7 @@ class Cosmograph(anywidget.AnyWidget):
 
     point_size_by = Unicode(None, allow_none=True).tag(sync=True)
     point_size_range = List(Float, default_value=None, allow_none=True).tag(sync=True)
+    point_size_strategy = Unicode(None, allow_none=True).tag(sync=True)
     point_label_by = Unicode(None, allow_none=True).tag(sync=True)
     point_label_weight_by = Unicode(None, allow_none=True).tag(sync=True)
     point_x_by = Unicode(None, allow_none=True).tag(sync=True)
@@ -142,7 +143,7 @@ class Cosmograph(anywidget.AnyWidget):
 
     show_labels = Bool(None, allow_none=True).tag(sync=True)
     show_dynamic_labels = Bool(None, allow_none=True).tag(sync=True)
-    show_labels_for = List(Unicode, allow_none=True).tag(sync=True)
+    show_labels_for = List(Unicode, default_value=None, allow_none=True).tag(sync=True)
     show_top_labels = Bool(None, allow_none=True).tag(sync=True)
     show_top_labels_limit = Int(None, allow_none=True).tag(sync=True)
     show_top_labels_by = Unicode(None, allow_none=True).tag(sync=True)
