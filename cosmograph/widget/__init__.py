@@ -4,9 +4,13 @@ import json
 
 import pyarrow as pa
 import anywidget
-from traitlets import Bool, Float, List, Int, Unicode, Union, Bytes, Any, observe
+from traitlets import Bool, Float, List, Int, Unicode, Union, Bytes, Any, observe, Dict
+
+from .export_project import export_project
+from cosmograph.config import register_instance, unregister_instance, get_api_key
 
 meta_path = pathlib.Path(__file__).parent / "static" / "meta.json"
+
 try:
     with open(meta_path) as f:
         meta_data = json.load(f)
@@ -175,6 +179,9 @@ class Cosmograph(anywidget.AnyWidget):
     clicked_point_id = Unicode(None, allow_none=True).tag(sync=True)
     selected_point_indices = List(Int, allow_none=True).tag(sync=True)
     selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
+    cosmograph_config = Dict(default_value={}, allow_none=True).tag(sync=True)
+
+    api_key = Unicode(None, allow_none=True)
 
     # Convert a Pandas DataFrame into a binary format and then write it to an IPC (Inter-Process Communication) stream.
     # The `with` statement ensures that the IPC stream is properly closed after writing the data.
@@ -274,3 +281,22 @@ class Cosmograph(anywidget.AnyWidget):
 
     def capture_screenshot(self):
         self.send({"type": "capture_screenshot"})
+
+    def export_project_by_name(self, project_name: str):
+        export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Register this instance to receive API key updates
+        register_instance(self)
+
+        # If no API key was provided but global one exists, use it
+        if self.api_key is None:
+            global_api_key = get_api_key()
+            if global_api_key is not None:
+                self.api_key = global_api_key
+
+    def __del__(self):
+        # Clean up by unregistering when the instance is deleted
+        unregister_instance(self)
+        super().__del__()

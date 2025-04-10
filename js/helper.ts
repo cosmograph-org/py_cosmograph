@@ -1,16 +1,6 @@
 import type { AnyModel } from '@anywidget/types'
 
 /**
- * Converts a string to camel case.
- * Example: "disable_simulation" -> "disableSimulation"
- * @param str - The input string to convert.
- * @returns The input string converted to camel case.
- */
-export function toCamelCase(str: string): string {
-  return str.replace(/_([A-z])/g, (_, group1) => group1.toUpperCase())
-}
-
-/**
  * Subscribes a callback function to a named event on the provided model.
  *
  * @param model - The model object to subscribe the callback to.

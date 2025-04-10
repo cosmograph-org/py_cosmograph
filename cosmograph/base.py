@@ -13,6 +13,8 @@ from cosmograph.util import (
     cosmograph_base_signature,
 )
 
+from cosmograph.config import get_api_key
+
 cosmo_base_sig = cosmograph_base_signature()
 cosmo_base_params_doc_str = cosmograph_base_docs()
 
@@ -220,6 +222,7 @@ def cosmo(
     disable_link_width_legend: bool = None,
     disable_point_color_legend: bool = None,
     disable_link_color_legend: bool = None,
+    api_key: str = None,
     clicked_point_index: int = None,
     clicked_point_id: str = None,
     selected_point_indices: list[int] = None,
@@ -296,6 +299,12 @@ def cosmo(
 
     # validate the kwargs
     kwargs = validate_kwargs(kwargs)
+
+    # If api_key is None, use the global one if available
+    if kwargs.get('api_key') is None:
+        global_api_key = get_api_key()
+        if global_api_key is not None:
+            kwargs['api_key'] = global_api_key
 
     # Make a Cosmograph widget instance with these kwargs
     return Cosmograph(**kwargs)
