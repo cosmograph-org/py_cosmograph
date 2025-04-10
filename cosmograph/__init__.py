@@ -25,6 +25,7 @@ Python binders to cosmograph functionality
 
 from cosmograph.base import cosmo, base_cosmo
 from cosmograph.widget import Cosmograph
+from cosmograph.config import set_api_key, get_api_key
 
 from importlib.metadata import version, PackageNotFoundError
 

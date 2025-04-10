@@ -1,14 +1,13 @@
 import type { RenderProps } from '@anywidget/types'
 import { Cosmograph, CosmographConfig } from '@cosmograph/cosmograph'
-import { tableFromIPC } from 'apache-arrow'
 
-import { subscribe, toCamelCase } from './helper'
-import { configProperties } from './config-props'
+import { subscribe } from './helper'
 import { createWidgetContainer } from './widget-elements'
 import { prepareCosmographDataAndMutate } from './cosmograph-data'
 import { CosmographLegends } from './legends'
 import { PointTimeline } from './components/point-timeline'
 import { ControlButtonsComponent } from './components/control-buttons'
+import snakeToCamelConfigProps from './config-props.json'
 
 import './widget.css'
 
@@ -98,14 +97,23 @@ async function render({ model, el }: RenderProps) {
     },
   }
 
+  const updatePythonCosmographConfig = (): void => {
+    const camelCaseConfigProps = new Set(Object.values(snakeToCamelConfigProps))
+    const filteredConfig = Object.fromEntries(
+      Object.entries(cosmographConfig).filter(([camelCasePropKey]) => camelCaseConfigProps.has(camelCasePropKey))
+    )
+    model.set('cosmograph_config', filteredConfig)
+    model.save_changes()
+  }
+
   const modelChangeHandlers: { [key: string]: () => void } = {
     _ipc_points: () => {
       const ipc = model.get('_ipc_points')
-      cosmographConfig.points = ipc ? tableFromIPC(ipc.buffer) : undefined
+      cosmographConfig.points = ipc ? ipc.buffer : undefined
     },
     _ipc_links: () => {
       const ipc = model.get('_ipc_links')
-      cosmographConfig.links = ipc ? tableFromIPC(ipc.buffer) : undefined
+      cosmographConfig.links = ipc ? ipc.buffer : undefined
     },
 
     disable_point_size_legend: () => {
@@ -123,52 +131,51 @@ async function render({ model, el }: RenderProps) {
   }
 
   // Set config properties from model
-  configProperties.forEach((prop) => {
-    modelChangeHandlers[prop] = async () => {
-      const value = model.get(prop)
+  Object.entries(snakeToCamelConfigProps).forEach(([snakeCaseProp, camelCaseProp]) => {
+    modelChangeHandlers[snakeCaseProp] = async () => {
+      const value = model.get(snakeCaseProp)
 
-      // "disable_simulation" -> "disableSimulation", "simulation_decay" -> "simulationDecay", etc.
-      const snakeToCamelProp = toCamelCase(prop) as keyof CosmographConfig
       if (value === null) {
-        delete cosmographConfig[snakeToCamelProp]
+        delete cosmographConfig[camelCaseProp as keyof CosmographConfig]
       } else {
-        cosmographConfig[snakeToCamelProp] = value
+        cosmographConfig[camelCaseProp as keyof CosmographConfig] = value
       }
     }
   })
 
   const unsubscribes = Object
     .entries(modelChangeHandlers)
-    .map(([propName, onModelChange]) => subscribe(model, `change:${propName}`, async () => {
+    .map(([snakeCaseProp, onModelChange]) => subscribe(model, `change:${snakeCaseProp}`, async () => {
       onModelChange()
 
-      if (configProperties.includes(propName)) {
+      if (snakeToCamelConfigProps[snakeCaseProp as keyof typeof snakeToCamelConfigProps]) {
         cosmograph?.setConfig(cosmographConfig)
         // await when config is set
         await cosmograph?.getConfig()
+        updatePythonCosmographConfig()
       }
 
       // If color associated properties change, update the color legend after setting the config to cosmograph
-      if (propName === 'point_color_by' || propName === 'point_color_strategy') {
+      if (snakeCaseProp === 'point_color_by' || snakeCaseProp === 'point_color_strategy') {
         legends.update('point', 'color')
       }
 
-      if (propName === 'point_size_by') {
+      if (snakeCaseProp === 'point_size_by') {
         legends.update('point', 'size')
       }
 
-      if (propName === 'link_color_by') {
+      if (snakeCaseProp === 'link_color_by') {
         legends.update('link', 'color')
       }
 
-      if (propName === 'link_width_by') {
+      if (snakeCaseProp === 'link_width_by') {
         legends.update('link', 'width')
       }
 
       // `point_timeline_by` can be initialized once with first provided property
       // In order to update accessor need to re-prepare the data for cosmograph
       // or provide column name in `point_include_columns` array
-      if (propName === 'point_timeline_by') {
+      if (snakeCaseProp === 'point_timeline_by') {
         pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
       }
     }))
@@ -187,6 +194,8 @@ async function render({ model, el }: RenderProps) {
 
     pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
   }
+
+  updatePythonCosmographConfig()
 
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
