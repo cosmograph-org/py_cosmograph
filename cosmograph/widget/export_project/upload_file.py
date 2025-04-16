@@ -32,7 +32,13 @@ def upload_file(api_key: str, data: dict[str, Any]) -> dict[str, Any]:
     )
     response.raise_for_status()
     logger.info("Response: %s", json.dumps(response.json(), indent=4))
-    upload_url = response.json()["result"]["data"]["json"]["url"]
+    response_json = response.json()
+    try:
+      upload_url = response_json["result"]["data"]["json"]["url"]
+    except (KeyError, TypeError) as e:
+      logger.error("❌ Unexpected response format: %s", response_json)
+      msg = f"Failed to parse upload URL from response: {e}"
+      raise ValueError(msg) from e
   except requests.RequestException as e:
     logger.error("❌ Failed to get upload URL: %s", e)
     msg = f"Failed to get upload URL: {e}"

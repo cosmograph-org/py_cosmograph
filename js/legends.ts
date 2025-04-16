@@ -103,23 +103,28 @@ export class CosmographLegends {
     const hide = disable === true
 
     switch (`${type}_${property}`) {
-      case 'point_size':
+      case 'point_size': {
         const activePointSizeStrategy = this.cosmograph.activePointSizeStrategy
         this._updateVisibility(this._pointSizeLegend, hide || (
           (activePointSizeStrategy === PointSizeStrategy.Auto || activePointSizeStrategy === PointSizeStrategy.Direct) && !column_by
         ))
         break
-      case 'point_color':
+      }
+
+      case 'point_color': {
         const colorType = getPointColorLegendType(this.cosmograph, column_by)
         this._updateVisibility(this._pointRangeColorLegend, hide || colorType !== ColorType.Range)
         this._updateVisibility(this._pointTypeColorLegend, hide || colorType !== ColorType.Type)
         break
-      case 'link_width':
+      }
+      case 'link_width': {
         this._updateVisibility(this._linkWidthLegend, hide || !column_by)
         break
-      case 'link_color':
+      }
+      case 'link_color': {
         this._updateVisibility(this._linkRangeColorLegend, hide || !column_by)
         break
+      }
     }
   }
 

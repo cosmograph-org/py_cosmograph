@@ -31,6 +31,7 @@ def create_project(
 
   """
 
+  cosmograph_config = cosmograph_config or {}
   data_sources = []
   column_mapping = {
     "points": {"columns": {}},

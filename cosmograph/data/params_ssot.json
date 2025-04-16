@@ -363,7 +363,7 @@
         "name":"point_size_strategy",
         "default":null,
         "annotation":"str",
-        "description":""
+        "description":"Specifies the strategy for sizing points based on data from the point_size_by column."
     },
     {
         "name":"point_label_by",
@@ -609,6 +609,6 @@
         "name":"api_key",
         "default":null,
         "annotation":"str",
-        "description":""
+        "description":"API key for authenticating with Cosmograph services. Can be set globally using set_api_key() function."
     }
 ]

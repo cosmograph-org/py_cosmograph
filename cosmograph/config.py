@@ -30,7 +30,7 @@ def get_api_key() -> str:
     return _GLOBAL_API_KEY
 
 
-def register_instance(instance):
+def register_instance(instance) -> None:
     """
     Register a cosmograph instance to receive API key updates.
 
@@ -40,7 +40,7 @@ def register_instance(instance):
     _COSMOGRAPH_INSTANCES.add(instance)
 
 
-def unregister_instance(instance):
+def unregister_instance(instance) -> None:
     """
     Unregister a cosmograph instance.
 
