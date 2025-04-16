@@ -42,6 +42,7 @@ export default [
       'no-unused-vars': 0,
       'no-use-before-define': ['error'],
       'no-multiple-empty-lines': ['error', { max: 2, maxBOF: 0, maxEOF: 0 }],
+      'no-case-declarations': 'error',
       'max-len': ['warn', { code: 200, tabWidth: 2, ignoreTrailingComments: true, ignoreComments: true, ignoreUrls: true }],
 
       'keyword-spacing': ['error'],
