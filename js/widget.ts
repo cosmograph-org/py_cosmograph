@@ -52,11 +52,11 @@ async function render({ model, el }: RenderProps) {
       cosmograph?.fitViewByCoordinates(msg.coordinates, msg.duration, msg.padding)
     }
     if (msg.type === 'focus_point_by_index') {
-      cosmograph?.focusPoint(msg.index ?? undefined)
+      cosmograph?.setFocusedPoint(msg.index ?? undefined)
     }
     if (msg.type === 'focus_point') {
       const index = (await cosmograph?.getPointIndicesByIds([msg.id]))?.[0]
-      cosmograph?.focusPoint(index)
+      cosmograph?.setFocusedPoint(index)
     }
     if (msg.type === 'start') {
       cosmograph?.start(msg.alpha ?? undefined)
@@ -191,7 +191,7 @@ async function render({ model, el }: RenderProps) {
     legends.update('point', 'color')
     legends.update('link', 'width')
     legends.update('link', 'color')
-
+    console.log(`onGraphRebuilt model.get('point_timeline_by')`, model.get('point_timeline_by'))
     pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
   }
 
@@ -199,6 +199,7 @@ async function render({ model, el }: RenderProps) {
 
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
+  console.log(`model.get('point_timeline_by')`, model.get('point_timeline_by'))
   pointTimeline = new PointTimeline(cosmograph, timelineContainer, {
     accessor: model.get('point_timeline_by'),
   })

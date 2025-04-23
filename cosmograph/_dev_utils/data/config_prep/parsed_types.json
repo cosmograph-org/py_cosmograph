@@ -228,7 +228,7 @@
                         "optional": true
                     },
                     {
-                        "name": "simulationCluster",
+                        "name": "simulationClusterStrength",
                         "type": "number",
                         "description": "Cluster coefficient. Default `0.1`.",
                         "optional": true
@@ -727,13 +727,6 @@
                         "description": "Sets the maximum number of top points to show labels for.",
                         "optional": true,
                         "default": "100"
-                    },
-                    {
-                        "name": "showTopLabelsBy",
-                        "type": "string",
-                        "description": "Specify the numeric column that is used to determine the top points that will be sorted by. Works only when `pointLabelBy` is provided.",
-                        "optional": true,
-                        "default": "undefined"
                     },
                     {
                         "name": "pointLabelFn",

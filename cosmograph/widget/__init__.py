@@ -111,8 +111,8 @@ class Cosmograph(anywidget.AnyWidget):
     point_color_palette = List(Unicode, default_value=None, allow_none=True).tag(
         sync=True
     )
-    point_color_by_map = List(
-        List(Union([Unicode(), List(Float())])), default_value=None, allow_none=True
+    point_color_by_map = Dict(
+        Unicode(), Union([Unicode(), List(Float())]), default_value=None, allow_none=True
     ).tag(sync=True)
     point_color_strategy = Unicode(None, allow_none=True).tag(sync=True)
 

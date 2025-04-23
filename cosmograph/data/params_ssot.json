@@ -6,6 +6,40 @@
         "description":"Prevents the simulation from running, merely rendering the graph."
     },
     {
+        "name":"select_point_on_click",
+        "default": null,
+        "annotation":"bool",
+        "description":"Controls whether to select a clicked point with the connected points."
+    },
+    {
+        "name":"select_point_on_label_click",
+        "default": null,
+        "annotation":"bool",
+        "description":"Controls whether to select a point with the connected points when the point's label is clicked."
+    },
+    {
+        "name":"focus_point_on_click",
+        "default": null,
+        "annotation":"bool",
+        "description":"Controls whether to focus on a point when the point itself is clicked."
+    },
+    {
+        "name":"focus_point_on_label_click",
+        "default": null,
+        "annotation":"bool",
+        "description":"Controls whether to focus on a point when the point's label is clicked."
+    },
+    {
+        "name":"components_display_state_mode",
+        "default": null,
+        "annotation":"bool",
+        "description":"Controls display state messages behavior for all Cosmograph components."
+    },
+    
+    
+    
+
+    {
         "name":"simulation_decay",
         "default":1000,
         "annotation":"float",
@@ -75,10 +109,10 @@
         "description":"Sets simulation friction."
     },
     {
-        "name":"simulation_cluster",
+        "name":"simulation_cluster_strength",
         "default":null,
         "annotation":"float",
-        "description":""
+        "description":"Coefficient of simulation cluster strength from 0 to 1. If `undefined`, the graph will not apply any clustering force to the simulation."
     },
     {
         "name":"background_color",
@@ -234,7 +268,7 @@
         "description":"Activates quadtree algorithm for Many-Body force when set to True."
     },
     {
-        "name":"show_FPS_monitor",
+        "name":"show_fps_monitor",
         "default":false,
         "annotation":"bool",
         "description":"Display an FPS counter in the upper right corner of the canvas."
@@ -338,7 +372,7 @@
     {
         "name":"point_color_by_map",
         "default":null,
-        "annotation":"list[list[typing.Union[str, list[float]]]]",
+        "annotation":"typing.Dict[str, typing.Union[str, list[float]]]",
         "description":"An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values. Used when point_color_strategy is set to `'map'`."
     },
     {
@@ -504,34 +538,70 @@
         "description":"Maximum number of top points to show labels for."
     },
     {
-        "name":"show_top_labels_by",
+        "name":"show_cluster_labels",
+        "default":false,
+        "annotation":"bool",
+        "description":"Show labels for the clusters based on the `pointClusterBy` column. When any point is selected, cluster labels will be hidden until the selection is cleared."
+    },
+    {
+        "name":"show_focused_point_label",
+        "default":null,
+        "annotation":"bool",
+        "description":"Controls whether to show the label for the focused point."
+    },
+    {
+        "name":"point_label_color",
         "default":null,
         "annotation":"str",
-        "description":"Column to determine which points are considered as a top."
+        "description":"Specifies the CSS color to use for the point labels."
+    },
+    {
+        "name":"point_label_font_size",
+        "default":13,
+        "annotation":"float",
+        "description":"Specifies the font size to use for the point labels."
+    },
+    {
+        "name":"cluster_label_font_size",
+        "default":16,
+        "annotation":"float",
+        "description":"Specifies the font size to use for the cluster labels."
+    },
+    {
+        "name":"scale_cluster_labels",
+        "default":true,
+        "annotation":"bool",
+        "description":"Whether to scale the cluster labels based on the number of points in the cluster."
     },
     {
         "name":"static_label_weight",
-        "default":null,
+        "default":0.8,
         "annotation":"float",
-        "description":"Weight of static labels."
+        "description":"Specifies the weight of the static labels."
     },
     {
         "name":"dynamic_label_weight",
-        "default":null,
+        "default":0.7,
         "annotation":"float",
-        "description":"Weight of dynamic labels."
+        "description":"Specifies the weight of the dynamic labels."
     },
     {
         "name":"label_margin",
-        "default":null,
+        "default":5,
         "annotation":"float",
-        "description":""
+        "description":"Specifies the margin between the label and the point."
+    },
+    {
+        "name":"label_padding",
+        "default":[6.5, 4.5, 6.5, 4.5],
+        "annotation":"list[float]",
+        "description":"Specifies the [left, top, right, bottom] padding of the label element."
     },
     {
         "name":"show_hovered_point_label",
-        "default":null,
+        "default":false,
         "annotation":"bool",
-        "description":"Flag to display the label for the currently hovered point."
+        "description":"Whether to show a hovered point label."
     },
     {
         "name":"disable_point_size_legend",
