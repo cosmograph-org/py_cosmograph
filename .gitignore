@@ -121,3 +121,4 @@ node_modules
 meta.json
 
 cosmograph/widget/static
+.cosmograph_cache
