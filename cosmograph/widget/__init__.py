@@ -2,10 +2,10 @@
 import pathlib
 import json
 
-import pyarrow as pa
 import anywidget
 from traitlets import Bool, Float, List, Int, Unicode, Union, Bytes, Any, observe, Dict
 
+from .utils import get_buffered_arrow_table
 from .export_project import export_project
 from cosmograph.config import register_instance, unregister_instance, get_api_key
 
@@ -183,30 +183,15 @@ class Cosmograph(anywidget.AnyWidget):
 
     api_key = Unicode(None, allow_none=True)
 
-    # Convert a Pandas DataFrame into a binary format and then write it to an IPC (Inter-Process Communication) stream.
-    # The `with` statement ensures that the IPC stream is properly closed after writing the data.
-    def get_buffered_arrow_table(self, df):
-        # TODO: Add support for input data with different formats (e.g. CSV, Appache Arrow, DuckDB, etc.)
-        table = pa.Table.from_pandas(df)
-        sink = pa.BufferOutputStream()
-        with pa.ipc.new_stream(sink, table.schema) as writer:
-            writer.write(table)
-        buffer = sink.getvalue()
-        return buffer.to_pybytes()
-
     @observe("points")
     def changePoints(self, change):
         points = change.new
-        points_int32 = points.select_dtypes(include=["int64"]).astype("int32")
-        points[points_int32.columns] = points_int32
-        self._ipc_points = self.get_buffered_arrow_table(points)
+        self._ipc_points = get_buffered_arrow_table(points)
 
     @observe("links")
     def changeLinks(self, change):
         links = change.new
-        links_int32 = links.select_dtypes(include=["int64"]).astype("int32")
-        links[links_int32.columns] = links_int32
-        self._ipc_links = self.get_buffered_arrow_table(links)
+        self._ipc_links = get_buffered_arrow_table(links)
 
     # Public cosmograph widget methods that can be called from Python
     # to interact with the Cosmograph 👇

@@ -21,6 +21,7 @@ dependencies = [
     "dol>=0.3.7",
     "tabled>=0.1.17",
     "ju>=0.1.16",
+    "joblib",
 ]
 dynamic = ["version"]
 
