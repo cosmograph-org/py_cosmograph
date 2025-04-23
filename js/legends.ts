@@ -77,7 +77,7 @@ export class CosmographLegends {
     this._pointRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.pointColorLegendContainer, {
       label: d => `points by ${d}`,
     })
-    this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer)
+    this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer, {})
     this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, this.linkWidthLegendContainer, {
       useLinksData: true,
       label: d => `links by ${d}`,

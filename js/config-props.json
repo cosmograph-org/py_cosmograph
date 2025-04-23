@@ -1,5 +1,11 @@
 {
   "disable_simulation": "disableSimulation",
+  "select_point_on_click": "selectPointOnClick",
+  "select_point_on_label_click": "selectPointOnLabelClick",
+  "focus_point_on_click": "focusPointOnClick",
+  "focus_point_on_label_click": "focusPointOnLabelClick",
+  "components_display_state_mode": "componentsDisplayStateMode",
+
   "simulation_decay": "simulationDecay",
   "simulation_gravity": "simulationGravity",
   "simulation_center": "simulationCenter",
@@ -11,7 +17,8 @@
   "simulation_link_dist_random_variation_range": "simulationLinkDistRandomVariationRange",
   "simulation_repulsion_from_mouse": "simulationRepulsionFromMouse",
   "simulation_friction": "simulationFriction",
-  "simulation_cluster": "simulationCluster",
+  "simulation_cluster_strength": "simulationClusterStrength",
+
   "background_color": "backgroundColor",
   "space_size": "spaceSize",
   "point_color": "pointColor",
@@ -50,15 +57,16 @@
   "fit_view_by_points_in_rect": "fitViewByPointsInRect",
   "random_seed": "randomSeed",
   "point_sampling_distance": "pointSamplingDistance",
+
   "point_id_by": "pointIdBy",
   "point_index_by": "pointIndexBy",
   "point_color_by": "pointColorBy",
-  "point_color_palette": "pointColorPalette",
   "point_color_by_map": "pointColorByMap",
+  "point_color_palette": "pointColorPalette",
   "point_color_strategy": "pointColorStrategy",
   "point_size_by": "pointSizeBy",
-  "point_size_range": "pointSizeRange",
   "point_size_strategy": "pointSizeStrategy",
+  "point_size_range": "pointSizeRange",
   "point_label_by": "pointLabelBy",
   "point_label_weight_by": "pointLabelWeightBy",
   "point_x_by": "pointXBy",
@@ -76,15 +84,25 @@
   "link_strength_by": "linkStrengthBy",
   "link_strength_range": "linkStrengthRange",
   "link_include_columns": "linkIncludeColumns",
+
+  "cluster_positions_map": "clusterPositionsMap",
+
   "show_labels": "showLabels",
   "show_dynamic_labels": "showDynamicLabels",
+  "show_labels_for": "showLabelsFor",
   "show_top_labels": "showTopLabels",
   "show_top_labels_limit": "showTopLabelsLimit",
-  "show_top_labels_by": "showTopLabelsBy",
-  "show_labels_for": "showLabelsFor",
+  "show_cluster_labels": "showClusterLabels",
+  "show_focused_point_label": "showFocusedPointLabel",
+  "point_label_color": "pointLabelColor",
+  "point_label_font_size": "pointLabelFontSize",
+  "cluster_label_font_size": "clusterLabelFontSize",
+  "scale_cluster_labels": "scaleClusterLabels",
   "static_label_weight": "staticLabelWeight",
   "dynamic_label_weight": "dynamicLabelWeight",
   "label_margin": "labelMargin",
+  "label_padding": "labelPadding",
   "show_hovered_point_label": "showHoveredPointLabel",
+
   "point_timeline_by": "pointTimelineBy"
 }
