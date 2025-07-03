@@ -7,8 +7,13 @@ import json
 from .config import API_BASE, logger
 
 
-def upload_file(api_key: str, data: dict[str, Any]) -> dict[str, Any]:
+def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str, Any]:
   """Generate signed URL and upload file to Cosmograph server.
+
+  Args:
+    api_key: Cosmograph API key
+    data: Dictionary containing file data (file_name, content_length, content)
+    project_id: Project ID to associate the file with
 
   Raises:
     ValueError: If file upload or URL generation fails
@@ -24,6 +29,7 @@ def upload_file(api_key: str, data: dict[str, Any]) -> dict[str, Any]:
       json={
         "json": {
           "apiKey": api_key,
+          "projectId": project_id,
           "fileName": data["file_name"],
           "contentLength": data["content_length"],
           "contentType": "application/parquet"
@@ -31,7 +37,7 @@ def upload_file(api_key: str, data: dict[str, Any]) -> dict[str, Any]:
       },
     )
     response.raise_for_status()
-    logger.info("Response: %s", json.dumps(response.json(), indent=4))
+    # logger.info("Response: %s", json.dumps(response.json(), indent=4))
     response_json = response.json()
     try:
       upload_url = response_json["result"]["data"]["json"]["url"]

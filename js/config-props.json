@@ -47,6 +47,7 @@
   "show_fps_monitor": "showFPSMonitor",
   "pixel_ratio": "pixelRatio",
   "scale_points_on_zoom": "scalePointsOnZoom",
+  "scale_links_on_zoom": "scaleLinksOnZoom",
   "initial_zoom_level": "initialZoomLevel",
   "disable_zoom": "disableZoom",
   "enable_drag": "enableDrag",
@@ -57,6 +58,9 @@
   "fit_view_by_points_in_rect": "fitViewByPointsInRect",
   "random_seed": "randomSeed",
   "point_sampling_distance": "pointSamplingDistance",
+
+  "polygonal_selector_stroke_color": "polygonalSelectorStrokeColor",
+  "polygonal_selector_line_width": "polygonalSelectorLineWidth",
 
   "point_id_by": "pointIdBy",
   "point_index_by": "pointIndexBy",
@@ -103,6 +107,11 @@
   "label_margin": "labelMargin",
   "label_padding": "labelPadding",
   "show_hovered_point_label": "showHoveredPointLabel",
+  "use_point_color_strategy_for_cluster_labels": "usePointColorStrategyForClusterLabels",
+  "select_cluster_on_label_click": "selectClusterOnLabelClick",
+
+  "status_indicator_mode": "statusIndicatorMode",
+  "preserve_point_positions_on_data_update": "preservePointPositionsOnDataUpdate",
 
   "point_timeline_by": "pointTimelineBy"
 }

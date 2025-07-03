@@ -2,7 +2,7 @@
 import logging
 import sys
 
-API_BASE = "https://cosmograph.fly.dev/api/trpc"
+API_BASE = "https://run.cosmograph.app/api/trpc"
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(

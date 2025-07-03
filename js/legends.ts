@@ -86,11 +86,13 @@ export class CosmographLegends {
       useLinksData: true,
       label: d => `links by ${d}`,
     })
-    this._pointSizeLegend.hide()
-    this._pointRangeColorLegend.hide()
-    this._pointTypeColorLegend.hide()
-    this._linkWidthLegend.hide()
-    this._linkRangeColorLegend.hide()
+
+    // Hide legends safely - workaround for cosmograph lib bug where _uiComponent might be undefined
+    this._safeHideLegend(this._pointSizeLegend)
+    this._safeHideLegend(this._pointRangeColorLegend)
+    this._safeHideLegend(this._pointTypeColorLegend)
+    this._safeHideLegend(this._linkWidthLegend)
+    this._safeHideLegend(this._linkRangeColorLegend)
   }
 
   public async update(
@@ -128,15 +130,41 @@ export class CosmographLegends {
     }
   }
 
+  /**
+   * Safely hide a legend - workaround for cosmograph lib bug where _uiComponent might be undefined
+   */
+  private _safeHideLegend(legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined): void {
+    if (!legend) return
+    try {
+      legend.hide()
+    } catch (error) {
+      // Silently catch errors from undefined _uiComponent in cosmograph lib
+      console.warn('Legend hide failed (cosmograph lib bug):', error)
+    }
+  }
+
+  /**
+   * Safely show a legend - workaround for cosmograph lib bug where _uiComponent might be undefined
+   */
+  private _safeShowLegend(legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined): void {
+    if (!legend) return
+    try {
+      legend.show()
+    } catch (error) {
+      // Silently catch errors from undefined _uiComponent in cosmograph lib
+      console.warn('Legend show failed (cosmograph lib bug):', error)
+    }
+  }
+
   private _updateVisibility(
     legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined,
     hide: boolean
   ): void {
     if (!legend) return
     if (hide) {
-      legend.hide()
+      this._safeHideLegend(legend)
     } else {
-      legend.show()
+      this._safeShowLegend(legend)
     }
   }
 }

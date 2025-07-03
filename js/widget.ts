@@ -38,6 +38,18 @@ async function render({ model, el }: RenderProps) {
     if (msg.type === 'deactivate_rect_selection') {
       cosmograph?.deactivateRectSelection()
     }
+    if (msg.type === 'activate_polygonal_selection') {
+      cosmograph?.activatePolygonalSelection()
+    }
+    if (msg.type === 'deactivate_polygonal_selection') {
+      cosmograph?.deactivatePolygonalSelection()
+    }
+    if (msg.type === 'select_points_in_polygon') {
+      cosmograph?.selectPointsInPolygon(msg.polygon)
+    }
+    if (msg.type === 'unselect_points_by_indices') {
+      cosmograph?.unselectPointsByIndicies(msg.indices)
+    }
     if (msg.type === 'fit_view') {
       cosmograph?.fitView()
     }
@@ -93,6 +105,11 @@ async function render({ model, el }: RenderProps) {
       const indices = cosmograph?.getSelectedPointIndices()
       model.set('selected_point_indices', indices ?? [])
       model.set('selected_point_ids', indices ? await cosmograph?.getPointIdsByIndices(indices) : [])
+      model.save_changes()
+    },
+    onClusterLabelClick: async (cluster) => {
+      // Handle cluster label click event
+      model.set('clicked_cluster', cluster)
       model.save_changes()
     },
   }
@@ -191,7 +208,6 @@ async function render({ model, el }: RenderProps) {
     legends.update('point', 'color')
     legends.update('link', 'width')
     legends.update('link', 'color')
-    console.log(`onGraphRebuilt model.get('point_timeline_by')`, model.get('point_timeline_by'))
     pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
   }
 
@@ -199,7 +215,6 @@ async function render({ model, el }: RenderProps) {
 
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
-  console.log(`model.get('point_timeline_by')`, model.get('point_timeline_by'))
   pointTimeline = new PointTimeline(cosmograph, timelineContainer, {
     accessor: model.get('point_timeline_by'),
   })
