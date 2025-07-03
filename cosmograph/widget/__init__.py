@@ -88,6 +88,7 @@ class Cosmograph(anywidget.AnyWidget):
     show_FPS_monitor = Bool(None, allow_none=True).tag(sync=True)
     pixel_ratio = Float(None, allow_none=True).tag(sync=True)
     scale_points_on_zoom = Bool(None, allow_none=True).tag(sync=True)
+    scale_links_on_zoom = Bool(None, allow_none=True).tag(sync=True)
     initial_zoom_level = Float(None, allow_none=True).tag(sync=True)
     disable_zoom = Bool(None, allow_none=True).tag(sync=True)
     enable_drag = Bool(None, allow_none=True).tag(sync=True)
@@ -102,6 +103,12 @@ class Cosmograph(anywidget.AnyWidget):
         [Int(None, allow_none=True), Unicode(None, allow_none=True)]
     ).tag(sync=True)
     point_sampling_distance = Int(None, allow_none=True).tag(sync=True)
+
+    # Polygonal selection configuration
+    polygonal_selector_stroke_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    ).tag(sync=True)
+    polygonal_selector_line_width = Float(None, allow_none=True).tag(sync=True)
 
     # Parameters based on parameters from Cosmograph library
     point_id_by = Unicode(None, allow_none=True).tag(sync=True)
@@ -159,6 +166,12 @@ class Cosmograph(anywidget.AnyWidget):
     # label_padding = Float(None, allow_none=True).tag(sync=True)
 
     show_hovered_point_label = Bool(None, allow_none=True).tag(sync=True)
+    use_point_color_strategy_for_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
+    select_cluster_on_label_click = Bool(None, allow_none=True).tag(sync=True)
+
+    # Advanced configuration options
+    status_indicator_mode = Unicode(None, allow_none=True).tag(sync=True)
+    preserve_point_positions_on_data_update = Bool(None, allow_none=True).tag(sync=True)
 
     # Not related to Cosmograph configuration settings
     disable_point_size_legend = Bool(None, allow_none=True).tag(sync=True)
@@ -177,6 +190,7 @@ class Cosmograph(anywidget.AnyWidget):
     # The following are used to store values from JS side widget
     clicked_point_index = Int(None, allow_none=True).tag(sync=True)
     clicked_point_id = Unicode(None, allow_none=True).tag(sync=True)
+    clicked_cluster = Any(None, allow_none=True).tag(sync=True)
     selected_point_indices = List(Int, allow_none=True).tag(sync=True)
     selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
     cosmograph_config = Dict(default_value={}, allow_none=True).tag(sync=True)
@@ -212,6 +226,18 @@ class Cosmograph(anywidget.AnyWidget):
 
     def deactivate_rect_selection(self):
         self.send({"type": "deactivate_rect_selection"})
+
+    def activate_polygonal_selection(self):
+        self.send({"type": "activate_polygonal_selection"})
+
+    def deactivate_polygonal_selection(self):
+        self.send({"type": "deactivate_polygonal_selection"})
+
+    def select_points_in_polygon(self, polygon):
+        self.send({"type": "select_points_in_polygon", "polygon": polygon})
+
+    def unselect_points_by_indices(self, indices):
+        self.send({"type": "unselect_points_by_indices", "indices": indices})
 
     def fit_view(self):
         self.send({"type": "fit_view"})
