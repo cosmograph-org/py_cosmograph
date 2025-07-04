@@ -54,21 +54,31 @@ export function createWidgetLegendElements(el: HTMLElement): Record<string, HTML
 }
 
 export function createWidgetControlElements(el: HTMLElement): Record<string, HTMLDivElement> {
-  const playButtonContainer = document.createElement('div')
-  playButtonContainer.classList.add('playButton')
-  el.appendChild(playButtonContainer)
-
-  const selectAreaButtonContainer = document.createElement('div')
-  selectAreaButtonContainer.classList.add('selectAreaButton')
-  el.appendChild(selectAreaButtonContainer)
+  // Create left controls container
+  const leftControlsContainer = document.createElement('div')
+  leftControlsContainer.classList.add('leftControls')
+  el.appendChild(leftControlsContainer)
 
   const fitViewButtonContainer = document.createElement('div')
   fitViewButtonContainer.classList.add('fitViewButton')
-  el.appendChild(fitViewButtonContainer)
+  leftControlsContainer.appendChild(fitViewButtonContainer)
+
+  const selectAreaButtonContainer = document.createElement('div')
+  selectAreaButtonContainer.classList.add('selectAreaButton')
+  leftControlsContainer.appendChild(selectAreaButtonContainer)
+
+  // Create right controls container
+  const rightControlsContainer = document.createElement('div')
+  rightControlsContainer.classList.add('rightControls')
+  el.appendChild(rightControlsContainer)
+
+  const playButtonContainer = document.createElement('div')
+  playButtonContainer.classList.add('playButton')
+  rightControlsContainer.appendChild(playButtonContainer)
 
   const zoomInOutButtonContainer = document.createElement('div')
   zoomInOutButtonContainer.classList.add('zoomInOutButton')
-  el.appendChild(zoomInOutButtonContainer)
+  rightControlsContainer.appendChild(zoomInOutButtonContainer)
 
   return {
     fitViewButtonContainer,
