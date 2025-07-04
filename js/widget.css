@@ -63,28 +63,46 @@
 }
 
 .wrapper .controls {
-	position: absolute;
-  top: 1rem;
-  right: 1rem;
+	
 }
 
+.wrapper .leftControls {
+	position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.wrapper .rightControls {
+	position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.wrapper .leftControls .selectAreaButton,
+.wrapper .rightControls .selectAreaButton,
 .wrapper .controls .selectAreaButton {
 	width: 15px;
 	height: 15px;
 	margin-bottom: 0.5rem;
 }
 
+.wrapper .leftControls .fitViewButton,
+.wrapper .rightControls .fitViewButton,
 .wrapper .controls .fitViewButton {
 	width: 15px;
 	height: 15px;
 }
 
+.wrapper .leftControls .playButton,
+.wrapper .rightControls .playButton,
 .wrapper .controls .playButton {
 	width: 15px;
 	height: 15px;
 	margin-bottom: 0.5rem;
 }
 
+.wrapper .leftControls .zoomInOutButton,
+.wrapper .rightControls .zoomInOutButton,
 .wrapper .controls .zoomInOutButton {
 	width: 15px;
 	height: 30px;
