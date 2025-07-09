@@ -27,27 +27,47 @@
 	position: absolute;
 	overflow: hidden;
 	display: flex;
-	gap: 8px;
-	bottom: 1rem;
-	left: 1rem;
-	flex-direction: column;
+	bottom: 0.5rem;
+	left: 0.5rem;
+	right: 0.5rem;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-end;
 	pointer-events: none;
+}
+
+.wrapper .bottom .leftLegends {
+	display: flex;
+	flex-direction: column;
+}
+
+.wrapper .bottom .rightLegends {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	gap: 20px;
 }
 
 .wrapper .bottom .pointSizeLegend {
 	width: fit-content;
+	padding-bottom: 20px;
 }
 
 .wrapper .bottom .linkWidthLegend {
 	width: fit-content;
+	padding-bottom: 20px;
 }
 
 .wrapper .bottom .pointColorLegend {
+	padding: 5px;
 	width: fit-content;
 }
 
 .wrapper .bottom .pointTypeColorLegend {
-	width: 100%;
+	padding: 6px;
+	border-radius: 5px;
+	backdrop-filter: blur(6px);
+	width: fit-content;
 }
 
 .wrapper .bottom .linkColorLegend {
@@ -68,14 +88,18 @@
 
 .wrapper .leftControls {
 	position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+	top: 0.25rem;
+	left: 0.25rem;
+	display: flex;
+  flex-direction: column;
 }
 
 .wrapper .rightControls {
 	position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+	top: 0.25rem;
+	right: 0.25rem;
+	display: flex;
+  flex-direction: row;
 }
 
 .wrapper .leftControls .selectAreaButton,
@@ -83,7 +107,7 @@
 .wrapper .controls .selectAreaButton {
 	width: 15px;
 	height: 15px;
-	margin-bottom: 0.5rem;
+	padding: 7px;
 }
 
 .wrapper .leftControls .fitViewButton,
@@ -91,6 +115,7 @@
 .wrapper .controls .fitViewButton {
 	width: 15px;
 	height: 15px;
+	padding: 7px;
 }
 
 .wrapper .leftControls .playButton,
@@ -98,7 +123,8 @@
 .wrapper .controls .playButton {
 	width: 15px;
 	height: 15px;
-	margin-bottom: 0.5rem;
+	padding: 7px;
+	/* margin-bottom: 0.5rem; */
 }
 
 .wrapper .leftControls .zoomInOutButton,
@@ -106,6 +132,7 @@
 .wrapper .controls .zoomInOutButton {
 	width: 15px;
 	height: 30px;
+	margin-right: 1rem;
 }
 
 /* Widget output div has a 8px left and right padding which looks off */
