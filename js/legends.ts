@@ -85,13 +85,6 @@ export class CosmographLegends {
       noDataMessage: false,
       loadingMessage: false,
     })
-
-    // Hide legends safely - workaround for cosmograph lib bug where _uiComponent might be undefined
-    this._safeHideLegend(this._pointSizeLegend)
-    this._safeHideLegend(this._pointRangeColorLegend)
-    this._safeHideLegend(this._pointTypeColorLegend)
-    this._safeHideLegend(this._linkWidthLegend)
-    this._safeHideLegend(this._linkRangeColorLegend)
   }
 
   public async update(
@@ -106,7 +99,7 @@ export class CosmographLegends {
     switch (`${type}_${property}`) {
       case 'point_size': {
         const activePointSizeStrategy = this.cosmograph.activePointSizeStrategy
-        this._updateVisibility(this._pointSizeLegend, hide || (
+        this._updateVisibility(this._pointSizeLegend, this.pointSizeLegendContainer, hide || (
           (activePointSizeStrategy === CosmographPointSizeStrategy.Auto || activePointSizeStrategy === CosmographPointSizeStrategy.Direct) && !column_by
         ))
         break
@@ -114,16 +107,16 @@ export class CosmographLegends {
 
       case 'point_color': {
         const colorType = getPointColorLegendType(this.cosmograph, column_by)
-        this._updateVisibility(this._pointRangeColorLegend, hide || colorType !== ColorType.Range)
-        this._updateVisibility(this._pointTypeColorLegend, hide || colorType !== ColorType.Type)
+        this._updateVisibility(this._pointRangeColorLegend, this.pointColorLegendContainer, hide || colorType !== ColorType.Range)
+        this._updateVisibility(this._pointTypeColorLegend, this.pointTypeColorLegendContainer, hide || colorType !== ColorType.Type)
         break
       }
       case 'link_width': {
-        this._updateVisibility(this._linkWidthLegend, hide || !column_by)
+        this._updateVisibility(this._linkWidthLegend, this.linkWidthLegendContainer, hide || !column_by)
         break
       }
       case 'link_color': {
-        this._updateVisibility(this._linkRangeColorLegend, hide || !column_by)
+        this._updateVisibility(this._linkRangeColorLegend, this.linkColorLegendContainer, hide || !column_by)
         break
       }
     }
@@ -157,13 +150,17 @@ export class CosmographLegends {
 
   private _updateVisibility(
     legend: CosmographSizeLegend | CosmographRangeColorLegend | CosmographTypeColorLegend | undefined,
+    container: HTMLDivElement,
     hide: boolean
   ): void {
     if (!legend) return
+
     if (hide) {
       this._safeHideLegend(legend)
+      container.style.display = 'none'
     } else {
       this._safeShowLegend(legend)
+      container.style.display = ''
     }
   }
 }
