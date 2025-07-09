@@ -4,24 +4,12 @@ import {
   CosmographSizeLegend,
   CosmographRangeColorLegend,
   CosmographTypeColorLegend,
+  CosmographPointColorStrategy,
+  CosmographPointSizeStrategy,
 } from '@cosmograph/cosmograph'
 
 import { createWidgetLegendElements } from './widget-elements'
 import { isDuckDBStringType, isDuckDBNumericType } from './helper'
-
-export enum PointColorStrategy {
-  Palette = 'palette',
-  InterpolatePalette = 'interpolatePalette',
-  Map = 'map',
-  Degree = 'degree',
-  Direct = 'direct'
-}
-
-export enum PointSizeStrategy {
-  Degree = 'degree',
-  Auto = 'auto',
-  Direct = 'direct'
-}
 
 export enum ColorType {
   Range = 'range',
@@ -32,8 +20,8 @@ export function getPointColorLegendType(cosmograph: Cosmograph, column_by: strin
   const pointsSummary = cosmograph.stats.pointsSummary
   const pointColorBy = column_by
   const activePointColorStrategy = cosmograph.activePointColorStrategy
-  if (activePointColorStrategy === PointColorStrategy.Degree) return ColorType.Range
-  if (activePointColorStrategy === PointColorStrategy.Direct) return undefined
+  if (activePointColorStrategy === CosmographPointColorStrategy.Degree) return ColorType.Range
+  if (activePointColorStrategy === CosmographPointColorStrategy.Direct) return undefined
 
   const pointColorInfo = pointsSummary?.find(d => d.column_name === pointColorBy)
   if (pointColorInfo && isDuckDBNumericType(pointColorInfo.column_type)) return ColorType.Range
@@ -72,19 +60,30 @@ export class CosmographLegends {
     this.cosmograph = cosmograph
 
     this._pointSizeLegend = new CosmographSizeLegend(this.cosmograph, this.pointSizeLegendContainer, {
-      label: d => `points by ${d}`,
+      label: d => `points · ${d}`,
+      noDataMessage: false,
+      loadingMessage: false,
     })
     this._pointRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.pointColorLegendContainer, {
-      label: d => `points by ${d}`,
+      label: d => `points · ${d}`,
+      noDataMessage: false,
+      loadingMessage: false,
     })
-    this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer, {})
+    this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer, {
+      noDataMessage: false,
+      loadingMessage: false,
+    })
     this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, this.linkWidthLegendContainer, {
       useLinksData: true,
-      label: d => `links by ${d}`,
+      label: d => `links · ${d}`,
+      noDataMessage: false,
+      loadingMessage: false,
     })
     this._linkRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.linkColorLegendContainer, {
       useLinksData: true,
-      label: d => `links by ${d}`,
+      label: d => `links · ${d}`,
+      noDataMessage: false,
+      loadingMessage: false,
     })
 
     // Hide legends safely - workaround for cosmograph lib bug where _uiComponent might be undefined
@@ -108,7 +107,7 @@ export class CosmographLegends {
       case 'point_size': {
         const activePointSizeStrategy = this.cosmograph.activePointSizeStrategy
         this._updateVisibility(this._pointSizeLegend, hide || (
-          (activePointSizeStrategy === PointSizeStrategy.Auto || activePointSizeStrategy === PointSizeStrategy.Direct) && !column_by
+          (activePointSizeStrategy === CosmographPointSizeStrategy.Auto || activePointSizeStrategy === CosmographPointSizeStrategy.Direct) && !column_by
         ))
         break
       }

@@ -24,25 +24,35 @@ export function createWidgetLegendElements(el: HTMLElement): Record<string, HTML
   bottomContainer.classList.add('bottom')
   el.appendChild(bottomContainer)
 
-  const pointSizeLegendContainer = document.createElement('div')
-  pointSizeLegendContainer.classList.add('pointSizeLegend')
-  bottomContainer.appendChild(pointSizeLegendContainer)
-
-  const linkWidthLegendContainer = document.createElement('div')
-  linkWidthLegendContainer.classList.add('linkWidthLegend')
-  bottomContainer.appendChild(linkWidthLegendContainer)
+  // Left side container for color legends
+  const leftLegendsContainer = document.createElement('div')
+  leftLegendsContainer.classList.add('leftLegends')
+  bottomContainer.appendChild(leftLegendsContainer)
 
   const pointColorLegendContainer = document.createElement('div')
   pointColorLegendContainer.classList.add('pointColorLegend')
-  bottomContainer.appendChild(pointColorLegendContainer)
+  leftLegendsContainer.appendChild(pointColorLegendContainer)
 
   const pointTypeColorLegendContainer = document.createElement('div')
   pointTypeColorLegendContainer.classList.add('pointTypeColorLegend')
-  bottomContainer.appendChild(pointTypeColorLegendContainer)
+  leftLegendsContainer.appendChild(pointTypeColorLegendContainer)
 
   const linkColorLegendContainer = document.createElement('div')
   linkColorLegendContainer.classList.add('linkColorLegend')
-  bottomContainer.appendChild(linkColorLegendContainer)
+  leftLegendsContainer.appendChild(linkColorLegendContainer)
+
+  // Right side container for size/width legends
+  const rightLegendsContainer = document.createElement('div')
+  rightLegendsContainer.classList.add('rightLegends')
+  bottomContainer.appendChild(rightLegendsContainer)
+
+  const pointSizeLegendContainer = document.createElement('div')
+  pointSizeLegendContainer.classList.add('pointSizeLegend')
+  rightLegendsContainer.appendChild(pointSizeLegendContainer)
+
+  const linkWidthLegendContainer = document.createElement('div')
+  linkWidthLegendContainer.classList.add('linkWidthLegend')
+  rightLegendsContainer.appendChild(linkWidthLegendContainer)
 
   return {
     pointSizeLegendContainer,
@@ -59,6 +69,10 @@ export function createWidgetControlElements(el: HTMLElement): Record<string, HTM
   leftControlsContainer.classList.add('leftControls')
   el.appendChild(leftControlsContainer)
 
+  const playButtonContainer = document.createElement('div')
+  playButtonContainer.classList.add('playButton')
+  leftControlsContainer.appendChild(playButtonContainer)
+
   const fitViewButtonContainer = document.createElement('div')
   fitViewButtonContainer.classList.add('fitViewButton')
   leftControlsContainer.appendChild(fitViewButtonContainer)
@@ -71,10 +85,6 @@ export function createWidgetControlElements(el: HTMLElement): Record<string, HTM
   const rightControlsContainer = document.createElement('div')
   rightControlsContainer.classList.add('rightControls')
   el.appendChild(rightControlsContainer)
-
-  const playButtonContainer = document.createElement('div')
-  playButtonContainer.classList.add('playButton')
-  rightControlsContainer.appendChild(playButtonContainer)
 
   const zoomInOutButtonContainer = document.createElement('div')
   zoomInOutButtonContainer.classList.add('zoomInOutButton')
