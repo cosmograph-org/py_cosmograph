@@ -153,6 +153,64 @@ Zooming in a bit:
 
 ![image](https://github.com/user-attachments/assets/e988950d-9f53-40c2-8b77-18cfb92efb50)
 
+## 🔑 API Key Setup and Project Export
+
+### Setting up API Key
+
+If you have a Cosmograph API key, you can set it globally to authenticate with Cosmograph services:
+
+```python
+from cosmograph import set_api_key
+
+# Set your API key globally (this will apply to all cosmograph instances)
+set_api_key("your-api-key-here")
+```
+
+Once set, all cosmograph widgets will automatically use this API key for authentication.
+
+### Exporting Projects to Cosmograph Platform
+
+You can export your cosmograph visualization as a project to the [Cosmograph platform](https://run.cosmograph.app), making it accessible via a web interface for sharing and further collaboration.
+
+```python
+import pandas as pd
+from cosmograph import cosmo, set_api_key
+
+# Set your API key first
+set_api_key("your-api-key-here")
+
+# Create your visualization
+points = pd.DataFrame({
+    'id': [1, 2, 3, 4, 5],
+    'label': ['Node A', 'Node B', 'Node C', 'Node D', 'Node E'],
+    'value': [10, 20, 15, 25, 30],
+    'category': ['A', 'B', 'A', 'B', 'A']
+})
+
+links = pd.DataFrame({
+    'source': [1, 2, 3, 1, 2],
+    'target': [2, 3, 4, 5, 4],
+    'value': [1.0, 2.0, 1.5, 0.5, 1.8]
+})
+
+graph = cosmo(
+    points=points,
+    links=links,
+    point_id_by='id',
+    link_source_by='source',
+    link_target_by='target',
+    point_color_by='category',
+    point_label_by='label',
+    point_size_by='value'
+)
+
+# Export to Cosmograph platform
+graph.export_project_by_name("My Network Visualization")
+```
+
+The exported project will be available on the [Cosmograph platform](https://run.cosmograph.app).
+
+
 ## 🎉 More Examples
 
 Try out the Cosmograph widget in Google Colab with these example notebooks:
