@@ -294,12 +294,23 @@ class Cosmograph(anywidget.AnyWidget):
         self.send({"type": "capture_screenshot"})
 
     def export_project_by_name(self, project_name: str):
-        export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config)
+        if not self.api_key:
+            raise ValueError("API key is required for project export")
+        if not project_name or not project_name.strip():
+            raise ValueError("Project name is required and cannot be empty")
+        try:
+            return export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config)
+        except Exception as e:
+            raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Register this instance to receive API key updates
-        register_instance(self)
+        try:
+            register_instance(self)
+        except Exception as e:
+            # Log warning but don't fail initialization
+            print(f"Warning: Failed to register instance for API key updates: {e}")
 
         # If no API key was provided but global one exists, use it
         if self.api_key is None:
@@ -309,5 +320,11 @@ class Cosmograph(anywidget.AnyWidget):
 
     def __del__(self):
         # Clean up by unregistering when the instance is deleted
-        unregister_instance(self)
-        super().__del__()
+        try:
+            unregister_instance(self)
+        except Exception:
+            # Ignore errors during cleanup
+            pass
+        # Only call super().__del__() if it exists
+        if hasattr(super(), '__del__'):
+            super().__del__()
