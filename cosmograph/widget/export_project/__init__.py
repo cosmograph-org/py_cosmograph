@@ -39,17 +39,15 @@ def export_project(
     logger.error("❌ %s", error_msg)
     raise ValueError(error_msg)
 
-  logger.info("🚀 Starting export process for project: %s", project_name)
-  logger.info("📊 Data summary: %s points and %s links to be exported",
+  logger.info("🚀 Exporting project: %s (%s points, %s links)",
+    project_name,
     len(points) if points is not None else 0,
     len(links) if links is not None else 0)
 
   # Step 1: Create empty project first
-  logger.info("🔨 Creating empty project '%s'...", project_name)
   try:
     project_result = create_empty_project(api_key, project_name)
     project_id = project_result["result"]["data"]["json"]["id"]
-    logger.info("✅ Empty project created with ID: %s", project_id)
   except Exception as e:
     logger.error("❌ Failed to create empty project: %s", e)
     raise ValueError(f"Failed to create empty project: {e}") from e
@@ -58,7 +56,6 @@ def export_project(
   points_data = None
   links_data = None
   if points is not None and not points.empty:
-    logger.info("📦 Converting points data to parquet format...")
     try:
       points_data = prepare_parquet_data(points, f"{project_name}_points.parquet")
       points_data = upload_file(api_key, points_data, project_id)
@@ -67,7 +64,6 @@ def export_project(
       raise ValueError(f"Failed to process points data: {e}") from e
 
   if links is not None and not links.empty:
-    logger.info("📦 Converting links data to parquet format...")
     try:
       links_data = prepare_parquet_data(links, f"{project_name}_links.parquet")
       links_data = upload_file(api_key, links_data, project_id)
@@ -77,7 +73,6 @@ def export_project(
 
   # Step 3: Update project with uploaded files and configuration
   if points_data or links_data or cosmograph_config:
-    logger.info("🔧 Updating project with uploaded files and configuration...")
     try:
       result = create_project(
         api_key=api_key,
@@ -91,6 +86,7 @@ def export_project(
       logger.error("❌ Failed to update project: %s", e)
       raise ValueError(f"Failed to update project: {e}") from e
 
-  logger.info("🎉 Project export completed successfully! Project ID: %s", project_id)
+  project_url = f"https://run.cosmograph.app/project/{project_id}"
+  logger.info("✅ Project ready: %s", project_url)
 
   return project_id

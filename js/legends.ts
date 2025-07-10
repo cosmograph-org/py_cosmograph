@@ -72,6 +72,7 @@ export class CosmographLegends {
     this._pointTypeColorLegend = new CosmographTypeColorLegend(this.cosmograph, this.pointTypeColorLegendContainer, {
       noDataMessage: false,
       loadingMessage: false,
+      maxDisplayedItems: 8,
     })
     this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, this.linkWidthLegendContainer, {
       useLinksData: true,
