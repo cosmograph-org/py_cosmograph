@@ -234,6 +234,11 @@ class Cosmograph(anywidget.AnyWidget):
         self.send({"type": "deactivate_polygonal_selection"})
 
     def select_points_in_polygon(self, polygon):
+        if not isinstance(polygon, list) or len(polygon) < 3:
+            raise ValueError("Polygon must be a list of at least 3 coordinate pairs")
+        for point in polygon:
+            if not isinstance(point, (list, tuple)) or len(point) != 2:
+                raise ValueError("Each polygon point must be a coordinate pair [x, y]")
         self.send({"type": "select_points_in_polygon", "polygon": polygon})
 
     def unselect_points_by_indices(self, indices):
