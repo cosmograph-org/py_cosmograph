@@ -17,7 +17,7 @@ export enum ColorType {
 }
 
 export function getPointColorLegendType(cosmograph: Cosmograph, column_by: string | null): ColorType | undefined {
-  const pointsSummary = cosmograph.stats.pointsSummary
+  const pointsSummary = cosmograph.stats?.pointsSummary
   const pointColorBy = column_by
   const activePointColorStrategy = cosmograph.activePointColorStrategy
   if (activePointColorStrategy === CosmographPointColorStrategy.Degree) return ColorType.Range
