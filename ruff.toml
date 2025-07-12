@@ -41,7 +41,7 @@ target-version = "py39"
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-select = ["E3", "E4", "E7", "E9", "F", "D100", "W"]
+select = ["E3", "E4", "E7", "E9", "F", "D100", "W", "E111", "E114", "E117"]
 ignore = [
     # (Thor): Keeping all imports at the top: Sure, best in most cases, but keeping imports close to the functions,
     # or within the functions themselves has it's place (especially when the location and dependencies of things are still shifting).
