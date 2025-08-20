@@ -6,16 +6,28 @@
         "description":"Prevents the simulation from running, merely rendering the graph."
     },
     {
+        "name":"polygonal_selector_stroke_color",
+        "default":null,
+        "annotation":"str",
+        "description":"Stroke color for the lasso selection"
+    },
+    {
+        "name":"polygonal_selector_line_width",
+        "default":1,
+        "annotation":"float",
+        "description":"Line width for the lasso selection"
+    },
+    {
         "name":"select_point_on_click",
         "default": null,
-        "annotation":"bool",
-        "description":"Controls whether to select a clicked point with the connected points."
+        "annotation":"typing.Union[bool, str]",
+        "description":"Controls whether to select a clicked point with the connected points. When `true`: Selects the clicked point and all connected points to it. When `'single'`: Selects only the clicked point. Will also focus (render ring around) the clicked point if `focusPointOnClick` is `undefined`."
     },
     {
         "name":"select_point_on_label_click",
         "default": null,
-        "annotation":"bool",
-        "description":"Controls whether to select a point with the connected points when the point's label is clicked."
+        "annotation":"typing.Union[bool, str]",
+        "description":"Controls whether to select a point with the connected points when the point's label is clicked. When `true`: Selects the clicked point and all connected points to it. When `'single'`: Selects only the clicked point. Will also focus (render ring around) the clicked point if `focusPointOnClick` is `undefined`."
     },
     {
         "name":"focus_point_on_click",
@@ -32,13 +44,21 @@
     {
         "name":"components_display_state_mode",
         "default": null,
-        "annotation":"bool",
-        "description":"Controls display state messages behavior for all Cosmograph components."
+        "annotation":"typing.Union[str, bool]",
+        "description":"Controls display state messages behavior for all Cosmograph components. When `undefined`: Show all state messages (loading, no data). When `'loading'`: Show only loading state message, hide no data message. When `false`: Disable all state messages. This will be applied to all components unless explicitly overridden in component-specific configuration. @default `undefined`"
     },
-    
-    
-    
-
+    {
+        "name":"status_indicator_mode",
+        "default": null,
+        "annotation":"typing.Union[str, bool]",
+        "description":"Chooses which kind of status indicator to show during loading or errors. - `'spinner'` (default): show a spinner during loading, falling back to text on errors. - `'text'`: always show descriptive messages. - `false`: hide the status indicator entirely. @default 'spinner'"
+    },
+    {
+        "name":"preserve_point_positions_on_data_update",
+        "default": null,
+        "annotation":"bool",
+        "description":"Preserve positions for points with same ids (`pointIdBy`) during point data update. When `true`: - Points with same ids will stay where they were instead of generating new positions - New points get new positions (or positions from `pointXBy`/`pointYBy` if set) - Preserved positions take priority over new coordinates from `pointXBy`/`pointYBy` for existing points @default false"
+    },
     {
         "name":"simulation_decay",
         "default":1000,
@@ -286,6 +306,12 @@
         "description":"Scales point sizes when zooming."
     },
     {
+        "name":"scale_links_on_zoom",
+        "default":true,
+        "annotation":"bool",
+        "description":"Increase or decrease the size of the links when zooming in or out."
+    },
+    {
         "name":"initial_zoom_level",
         "default":3,
         "annotation":"float",
@@ -434,6 +460,12 @@
         "default":null,
         "annotation":"str",
         "description":""
+    },
+    {
+        "name":"cluster_positions_map",
+        "default":null,
+        "annotation":"typing.Dict[str, list[float]]",
+        "description":"Mapping of cluster keys to [x, y] coordinate positions. Keys should match values from the pointClusterBy column. Missing cluster keys will be automatically positioned using the centermass. Won't take effect if point positions are provided by pointXBy or pointYBy. @example Object mapping cluster keys to coordinates: clusterPositionsMap: { 'Rock': [10, 20], 'Rap': [30, 40] }"
     },
     {
         "name":"point_include_columns",
@@ -596,6 +628,18 @@
         "default":[6.5, 4.5, 6.5, 4.5],
         "annotation":"list[float]",
         "description":"Specifies the [left, top, right, bottom] padding of the label element."
+    },
+    {
+        "name":"use_point_color_strategy_for_cluster_labels",
+        "default":null,
+        "annotation":"bool",
+        "description":"If `true`, cluster labels will acquire colors from the current point coloring strategy (`pointColorStrategy`). This can be useful when `pointClusterBy` and `pointColorBy` refer to the same data. Default: `false`"
+    },
+    {
+        "name":"select_cluster_on_label_click",
+        "default":null,
+        "annotation":"bool",
+        "description":"Controls whether to select points of a cluster when its label is clicked."
     },
     {
         "name":"show_hovered_point_label",

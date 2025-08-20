@@ -88,16 +88,7 @@ async function render({ model, el }: RenderProps) {
   })
 
   const cosmographConfig: CosmographConfig = {
-    pointLabelClassName: 'pointLabelClassName',
     onClick: async (index) => {
-      if (index === undefined) {
-        model.set('clicked_point_id', null)
-        cosmograph?.selectPoint()
-      } else {
-        const indices = await cosmograph?.getPointIdsByIndices([index])
-        model.set('clicked_point_id', indices?.[0] ?? null)
-        cosmograph?.selectPoint(index)
-      }
       model.set('clicked_point_index', index ?? null)
       model.save_changes()
     },
@@ -212,6 +203,14 @@ async function render({ model, el }: RenderProps) {
   }
 
   updatePythonCosmographConfig()
+  /**
+   * Remove all props from `cosmographConfig` if they are `undefined`
+   */
+  Object.keys(cosmographConfig).forEach((key) => {
+    if (cosmographConfig[key as keyof CosmographConfig] === undefined) {
+      delete cosmographConfig[key as keyof CosmographConfig]
+    }
+  })
 
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
