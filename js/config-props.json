@@ -97,7 +97,6 @@
   "show_top_labels": "showTopLabels",
   "show_top_labels_limit": "showTopLabelsLimit",
   "show_cluster_labels": "showClusterLabels",
-  "show_focused_point_label": "showFocusedPointLabel",
   "point_label_color": "pointLabelColor",
   "point_label_font_size": "pointLabelFontSize",
   "cluster_label_font_size": "clusterLabelFontSize",

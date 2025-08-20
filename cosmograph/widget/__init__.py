@@ -46,7 +46,7 @@ class Cosmograph(anywidget.AnyWidget):
     ).tag(sync=True)
     simulation_repulsion_from_mouse = Float(None, allow_none=True).tag(sync=True)
     simulation_friction = Float(None, allow_none=True).tag(sync=True)
-    simulation_cluster = Float(None, allow_none=True).tag(sync=True)
+    simulation_cluster_strength = Float(None, allow_none=True).tag(sync=True)
 
     background_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
@@ -67,6 +67,7 @@ class Cosmograph(anywidget.AnyWidget):
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
     ).tag(sync=True)
     focused_point_index = Int(None, allow_none=True).tag(sync=True)
+    show_focused_point_label = Bool(None, allow_none=True).tag(sync=True)
     render_links = Bool(None, allow_none=True).tag(sync=True)
     link_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
@@ -105,9 +106,7 @@ class Cosmograph(anywidget.AnyWidget):
     point_sampling_distance = Int(None, allow_none=True).tag(sync=True)
 
     # Polygonal selection configuration
-    polygonal_selector_stroke_color = Union(
-        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
-    ).tag(sync=True)
+    polygonal_selector_stroke_color = Unicode(None, allow_none=True).tag(sync=True)
     polygonal_selector_line_width = Float(None, allow_none=True).tag(sync=True)
 
     # Parameters based on parameters from Cosmograph library
@@ -119,7 +118,7 @@ class Cosmograph(anywidget.AnyWidget):
         sync=True
     )
     point_color_by_map = Dict(
-        Unicode(), Union([Unicode(), List(Float())]), default_value=None, allow_none=True
+        key_trait=Unicode(), value_trait=Union([Unicode(), List(Float())]), default_value=None, allow_none=True
     ).tag(sync=True)
     point_color_strategy = Unicode(None, allow_none=True).tag(sync=True)
 
@@ -132,6 +131,9 @@ class Cosmograph(anywidget.AnyWidget):
     point_y_by = Unicode(None, allow_none=True).tag(sync=True)
     point_cluster_by = Unicode(None, allow_none=True).tag(sync=True)
     point_cluster_strength_by = Unicode(None, allow_none=True).tag(sync=True)
+    cluster_positions_map = Dict(
+        key_trait=Unicode(), value_trait=List(Float()), default_value=None, allow_none=True
+    ).tag(sync=True)
     point_include_columns = List(Unicode, default_value=None, allow_none=True).tag(
         sync=True
     )
@@ -157,20 +159,36 @@ class Cosmograph(anywidget.AnyWidget):
     show_labels_for = List(Unicode, default_value=None, allow_none=True).tag(sync=True)
     show_top_labels = Bool(None, allow_none=True).tag(sync=True)
     show_top_labels_limit = Int(None, allow_none=True).tag(sync=True)
-    show_top_labels_by = Unicode(None, allow_none=True).tag(sync=True)
     static_label_weight = Float(None, allow_none=True).tag(sync=True)
     dynamic_label_weight = Float(None, allow_none=True).tag(sync=True)
     label_margin = Float(None, allow_none=True).tag(sync=True)
+    show_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
+    point_label_color = Unicode(None, allow_none=True).tag(sync=True)
+    point_label_font_size = Float(None, allow_none=True).tag(sync=True)
+    cluster_label_font_size = Float(None, allow_none=True).tag(sync=True)
+    scale_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
 
-    # TODO: add padding when it will be as a List of numbers
-    # label_padding = Float(None, allow_none=True).tag(sync=True)
+    label_padding = List(Float, default_value=None, allow_none=True).tag(sync=True)
 
     show_hovered_point_label = Bool(None, allow_none=True).tag(sync=True)
     use_point_color_strategy_for_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
     select_cluster_on_label_click = Bool(None, allow_none=True).tag(sync=True)
+    select_point_on_click = Union(
+        [Bool(None, allow_none=True), Unicode(None, allow_none=True)]
+    ).tag(sync=True)
+    select_point_on_label_click = Union(
+        [Bool(None, allow_none=True), Unicode(None, allow_none=True)]
+    ).tag(sync=True)
+    focus_point_on_click = Bool(None, allow_none=True).tag(sync=True)
+    focus_point_on_label_click = Bool(None, allow_none=True).tag(sync=True)
+    components_display_state_mode = Union(
+        [Unicode(None, allow_none=True), Bool(None, allow_none=True)]
+    ).tag(sync=True)
 
     # Advanced configuration options
-    status_indicator_mode = Unicode(None, allow_none=True).tag(sync=True)
+    status_indicator_mode = Union(
+        [Unicode(None, allow_none=True), Bool(None, allow_none=True)]
+    ).tag(sync=True)
     preserve_point_positions_on_data_update = Bool(None, allow_none=True).tag(sync=True)
 
     # Not related to Cosmograph configuration settings
