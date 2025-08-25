@@ -108,7 +108,9 @@ async function render({ model, el }: RenderProps) {
   const updatePythonCosmographConfig = (): void => {
     const camelCaseConfigProps = new Set(Object.values(snakeToCamelConfigProps))
     const filteredConfig = Object.fromEntries(
-      Object.entries(cosmographConfig).filter(([camelCasePropKey]) => camelCaseConfigProps.has(camelCasePropKey))
+      Object.entries(cosmographConfig).filter(([camelCasePropKey, value]) =>
+        camelCaseConfigProps.has(camelCasePropKey) && value !== undefined
+      )
     )
     model.set('cosmograph_config', filteredConfig)
     model.save_changes()
@@ -143,7 +145,7 @@ async function render({ model, el }: RenderProps) {
     modelChangeHandlers[snakeCaseProp] = async () => {
       const value = model.get(snakeCaseProp)
 
-      if (value === null) {
+      if (value === null || value === undefined) {
         delete cosmographConfig[camelCaseProp as keyof CosmographConfig]
       } else {
         cosmographConfig[camelCaseProp as keyof CosmographConfig] = value
