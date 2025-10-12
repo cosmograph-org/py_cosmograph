@@ -16,12 +16,10 @@ export async function prepareCosmographDataAndMutate(config: WidgetConfig): Prom
     points: {
       pointLabelBy: config.pointLabelBy,
       pointLabelWeightBy: config.pointLabelWeightBy,
-      pointColor: config.pointColor,
       pointColorBy: config.pointColorBy,
       pointColorPalette: config.pointColorPalette,
       pointColorByMap: config.pointColorByMap,
       pointColorStrategy: config.pointColorStrategy,
-      pointSize: config.pointSize,
       pointSizeBy: config.pointSizeBy,
       pointSizeStrategy: config.pointSizeStrategy,
       pointXBy: config.pointXBy,
