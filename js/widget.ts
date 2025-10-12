@@ -74,6 +74,41 @@ async function render({ model, el }: RenderProps) {
     if (msg.type === 'capture_screenshot') {
       cosmograph?.captureScreenshot()
     }
+    if (msg.type === 'capture_screenshot_data') {
+      console.log('capture_screenshot_data message received')
+      // Capture canvas data and send back to Python
+      // Find the canvas element in the container
+      const canvas = graphContainer.querySelector('canvas') as HTMLCanvasElement
+      console.log('Canvas found:', canvas)
+      
+      if (canvas) {
+        console.log('Canvas dimensions:', canvas.width, 'x', canvas.height)
+        console.log('Canvas context:', canvas.getContext('2d') || canvas.getContext('webgl') || canvas.getContext('webgl2'))
+        
+        // Use requestAnimationFrame to ensure we capture after rendering
+        requestAnimationFrame(() => {
+          try {
+            console.log('Attempting to capture canvas data...')
+            const dataURL = canvas.toDataURL('image/png')
+            console.log('Captured data URL length:', dataURL.length)
+            console.log('Data URL start:', dataURL.substring(0, 50))
+            
+            model.set('screenshot_data', dataURL)
+            model.save_changes()
+            console.log('Screenshot data sent to Python')
+          } catch (error) {
+            console.error('Error capturing screenshot:', error)
+            const errorMsg = error instanceof Error ? error.message : String(error)
+            model.set('screenshot_data', 'error:capture_failed - ' + errorMsg)
+            model.save_changes()
+          }
+        })
+      } else {
+        console.error('Canvas not found in graph container')
+        model.set('screenshot_data', 'error:no_canvas')
+        model.save_changes()
+      }
+    }
   })
 
   const cosmographConfig: CosmographConfig = {

@@ -175,6 +175,9 @@ class Cosmograph(anywidget.AnyWidget):
     selected_point_indices = List(Int, allow_none=True).tag(sync=True)
     selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
 
+    # Screenshot data for capturing widget content
+    screenshot_data = Unicode(None, allow_none=True).tag(sync=True)
+
     # Convert a Pandas DataFrame into a binary format and then write it to an IPC (Inter-Process Communication) stream.
     # The `with` statement ensures that the IPC stream is properly closed after writing the data.
     def get_buffered_arrow_table(self, df):
@@ -273,3 +276,8 @@ class Cosmograph(anywidget.AnyWidget):
 
     def capture_screenshot(self):
         self.send({"type": "capture_screenshot"})
+
+    def capture_screenshot_data(self):
+        """Capture screenshot and return the image data via traitlet."""
+        self.screenshot_data = None  # Clear previous data
+        self.send({"type": "capture_screenshot_data"})
