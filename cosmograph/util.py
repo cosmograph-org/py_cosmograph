@@ -25,7 +25,7 @@ import pandas as pd
 # --------------------------------------------------------------------------------------
 # type annotations
 
-CosmoKwargs = Dict[str, Any]
+CosmoKwargs = dict[str, Any]
 
 # --------------------------------------------------------------------------------------
 # Constants and data access
@@ -65,7 +65,8 @@ class Pipeline(Pipe):
 # Extracting the interface from the data
 
 import typing
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 from i2 import Sig, Param, params_to_docstring
 
 PARAMS_SSOT_PATH = data_dir / "params_ssot.json"

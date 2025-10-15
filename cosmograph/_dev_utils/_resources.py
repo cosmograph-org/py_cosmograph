@@ -276,7 +276,7 @@ EXCLUDE_PARAMS = ("_ipc_points", "_ipc_links")
 
 
 def get_module_from_url(
-    url, __file__: Optional[str] = None, module_name="remote_module"
+    url, __file__: str | None = None, module_name="remote_module"
 ):
     """
     Get a (loaded) module from a url.
@@ -305,7 +305,7 @@ def get_module_from_url(
 
 
 def get_cosmograph_widget_class(
-    cosmograph_widget_source: Optional[Union[str, type]] = None,
+    cosmograph_widget_source: str | type | None = None,
 ):
 
     if cosmograph_widget_source is None:
@@ -368,7 +368,7 @@ class ConfigsDacc:
         config_files_dir=DFLT_CONFIG_FILES_DIR,
         prep_dir=None,
         *,
-        cosmograph_widget_source: Optional[Union[str, type]] = None,
+        cosmograph_widget_source: str | type | None = None,
     ) -> None:
         self.config_files_dir = os.path.abspath(os.path.expanduser(config_files_dir))
         self.prep_dir = prep_dir or os.path.join(self.config_files_dir, "config_prep")
@@ -443,7 +443,7 @@ class ConfigsDacc:
                 for prop in interface["properties"]:
                     assert set(prop).issuperset(
                         {"description", "name", "type"}
-                    ), f"missing fields: {set(['description', 'name', 'type']) - set(prop)=})"
+                    ), f"missing fields: {{'description', 'name', 'type'} - set(prop)=})"
                     prop["py_name"] = camel_to_snake(prop["name"])
                     prop["origin_name"] = interface["name"]
                     yield prop
@@ -1083,7 +1083,7 @@ def dataframes_to_markdown(
 
 # -------------------------------------------------------------------------------------
 from functools import partial, cached_property
-from typing import Callable
+from collections.abc import Callable
 from collections import defaultdict
 
 
@@ -1194,7 +1194,7 @@ class ConfigSourceDicts:
                     for prop in interface["properties"]:
                         assert set(prop).issuperset(
                             {"description", "name", "type"}
-                        ), f"missing fields: {set(['description', 'name', 'type']) - set(prop)=})"
+                        ), f"missing fields: {{'description', 'name', 'type'} - set(prop)=})"
                         prop["py_name"] = camel_to_snake(prop["name"])
                         prop["origin_name"] = interface["name"]
                         yield prop

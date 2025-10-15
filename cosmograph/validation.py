@@ -1,7 +1,8 @@
 """Validation"""
 
 import json
-from typing import Iterable, Any, Optional
+from typing import Any, Optional
+from collections.abc import Iterable
 from itertools import islice
 
 DFLT_JSON_INDENT = None  # TODO: should we put an indent (easier to read but many lines)
@@ -15,12 +16,12 @@ def is_valid_json_str(obj: str) -> bool:
         return False
 
 
-def _verify_array_elements(iterable, condition, max_to_verify: Optional[int] = None):
+def _verify_array_elements(iterable, condition, max_to_verify: int | None = None):
     elements_to_verify = islice(iterable, max_to_verify)
     return all(map(condition, elements_to_verify))
 
 
-def is_nodes(nodes: Iterable[dict], max_to_verify: Optional[int] = 1) -> bool:
+def is_nodes(nodes: Iterable[dict], max_to_verify: int | None = 1) -> bool:
     return isinstance(nodes, Iterable) and _verify_array_elements(
         nodes, is_node, max_to_verify
     )
@@ -30,7 +31,7 @@ def is_node(node: dict) -> bool:
     return isinstance(node, dict) and "id" in node
 
 
-def is_links(links: Iterable[dict], max_to_verify: Optional[int] = 1) -> bool:
+def is_links(links: Iterable[dict], max_to_verify: int | None = 1) -> bool:
     return (
         isinstance(links, Iterable)
         and _verify_array_elements(links, is_link, max_to_verify)

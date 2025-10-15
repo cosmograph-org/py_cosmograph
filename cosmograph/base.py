@@ -1,6 +1,7 @@
 """Base functionality of cosmograph"""
 
-from typing import Dict, Any, Union, Callable, Sequence
+from typing import Dict, Any, Union
+from collections.abc import Callable, Sequence
 from functools import cached_property, partial
 from i2.doc_mint import inject_docstring_content
 
@@ -133,10 +134,10 @@ def cosmo(
     point_size_by: str = None,
     point_color_by: str = None,
     point_color_palette: list[str] = None,
-    point_color_by_map: list[list[Union[str, list[float]]]] = None,
+    point_color_by_map: list[list[str | list[float]]] = None,
     point_color_strategy: str = None,
     point_label_by: str = None,
-    point_color: Union[str, list[float]] = None,
+    point_color: str | list[float] = None,
     point_greyout_opacity: float = None,
     point_size: float = None,
     point_size_scale: float = None,
@@ -149,7 +150,7 @@ def cosmo(
     point_cluster_strength_by: str = None,
     point_include_columns: list[str] = None,
     point_timeline_by: str = None,
-    link_color: Union[str, list[float]] = None,
+    link_color: str | list[float] = None,
     link_greyout_opacity: float = None,
     link_width: float = None,
     link_width_scale: float = None,
@@ -180,12 +181,12 @@ def cosmo(
     simulation_repulsion_from_mouse: float = None,
     simulation_friction: float = None,
     simulation_cluster: float = None,
-    background_color: Union[str, list[float]] = None,
+    background_color: str | list[float] = None,
     space_size: int = None,
     hovered_point_cursor: str = None,
     render_hovered_point_ring: bool = None,
-    hovered_point_ring_color: Union[str, list[float]] = None,
-    focused_point_ring_color: Union[str, list[float]] = None,
+    hovered_point_ring_color: str | list[float] = None,
+    focused_point_ring_color: str | list[float] = None,
     focused_point_index: int = None,
     render_links: bool = None,
     curved_links: bool = None,
@@ -204,7 +205,7 @@ def cosmo(
     fit_view_padding: float = None,
     fit_view_duration: float = None,
     fit_view_by_points_in_rect: list[list[float]] = None,
-    random_seed: Union[int, str] = None,
+    random_seed: int | str = None,
     show_labels: bool = None,
     show_dynamic_labels: bool = None,
     show_labels_for: list[str] = None,
@@ -223,8 +224,8 @@ def cosmo(
     clicked_point_id: str = None,
     selected_point_indices: list[int] = None,
     selected_point_ids: list[str] = None,
-    changePoints: Callable[[Dict[str, Any]], Any] = None,
-    changeLinks: Callable[[Dict[str, Any]], Any] = None,
+    changePoints: Callable[[dict[str, Any]], Any] = None,
+    changeLinks: Callable[[dict[str, Any]], Any] = None,
     # extra params ---------------------------------------------------------------------
     copy_before_ingress: bool = True,  # whether to make a copy the points and links before applying ingress
     data_resolution: Callable[
@@ -408,8 +409,8 @@ class Link(BaseModel):
 
 
 # TODO: Find a way to make these have a .validate (with pydantic)
-Nodes = List[Node]
-Links = List[Link]
+Nodes = list[Node]
+Links = list[Link]
 
 
 class GraphJson(BaseModel):

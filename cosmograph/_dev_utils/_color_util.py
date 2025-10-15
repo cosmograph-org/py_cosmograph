@@ -1,7 +1,8 @@
 """Utils for color"""
 
 import re
-from typing import Any, Callable, Sequence, Union
+from typing import Any, Union
+from collections.abc import Callable, Sequence
 from numbers import Number
 
 import pandas as pd
@@ -40,7 +41,7 @@ def is_valid_color(x: Any) -> bool:
 
 
 def get_matplotlib_palette(
-    palette: Union[str, Callable], categorical: bool = True
+    palette: str | Callable, categorical: bool = True
 ) -> Callable:
     """
     Get a palette function from Matplotlib.
@@ -87,7 +88,7 @@ def get_matplotlib_palette(
 
 def map_values_to_colors(
     values: Sequence[Any],
-    palette: Union[str, Callable],
+    palette: str | Callable,
     get_palette_func: Callable,
 ) -> Sequence[Any]:
     """
@@ -133,7 +134,7 @@ def resolve_colors(
     color: Any = None,
     *,
     color_spec_kind: str = None,
-    palette: Union[str, Callable] = None,
+    palette: str | Callable = None,
     default_color: Any = "blue",
     get_palette_func: Callable = None,
     is_valid_color_func: Callable = None,

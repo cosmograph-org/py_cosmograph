@@ -8,13 +8,14 @@ Utils for traitlets
 import traitlets
 from traitlets import TraitType
 import typing
-from typing import Union, Type, Any, Callable, Dict
+from typing import Union, Type, Any, Dict
+from collections.abc import Callable
 
 import enum
 import re
 import collections.abc
 
-ObserveHandlerPyType = Callable[[Dict[str, Any]], Any]
+ObserveHandlerPyType = Callable[[dict[str, Any]], Any]
 
 # Mapping from traitlets types to Python types (as defined previously)
 py_type_for_traitlet_type = {
@@ -61,7 +62,7 @@ py_type_for_traitlet_type = {
 }
 
 
-def trait_to_py(trait: Union[TraitType, Type[TraitType]]) -> Union[object, type]:
+def trait_to_py(trait: TraitType | type[TraitType]) -> object | type:
     """
     Convert a traitlets trait (instance or type) to a Python object (instance or type)
 
@@ -96,9 +97,9 @@ def trait_to_py(trait: Union[TraitType, Type[TraitType]]) -> Union[object, type]
         elif trait_type is traitlets.Type:
             # For Type traits, return Type[class]
             if isinstance(trait.klass, type):
-                return typing.Type[trait.klass]
+                return type[trait.klass]
             else:
-                return typing.Type[typing.Any]
+                return type[typing.Any]
         else:
             # Get the base Python type
             py_type = trait_to_py(trait_type)
