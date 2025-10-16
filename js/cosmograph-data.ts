@@ -2,6 +2,7 @@ import { CosmographConfig, CosmographDataPrepConfig, prepareCosmographData, Cosm
 
 export type WidgetConfig = CosmographConfig & {
   pointTimelineBy?: string;
+  linkTargetBy?: string | string[];
 }
 
 /**
@@ -38,13 +39,17 @@ export async function prepareCosmographDataAndMutate(config: WidgetConfig): Prom
     cosmographDataPrepConfig.points.pointIdBy = config.pointIdBy
   } else if (hasLinks) {
     cosmographDataPrepConfig.points.linkSourceBy = config.linkSourceBy
-    cosmographDataPrepConfig.points.linkTargetsBy = [config.linkTargetBy as string]
+    cosmographDataPrepConfig.points.linkTargetsBy = Array.isArray(config.linkTargetBy)
+      ? config.linkTargetBy
+      : [config.linkTargetBy as string]
   }
 
   if (hasLinks) {
     cosmographDataPrepConfig.links = {
       linkSourceBy: config.linkSourceBy as string,
-      linkTargetsBy: [config.linkTargetBy as string],
+      linkTargetsBy: Array.isArray(config.linkTargetBy)
+        ? config.linkTargetBy
+        : [config.linkTargetBy as string],
       linkColorBy: config.linkColorBy,
       linkWidthBy: config.linkWidthBy,
       linkArrowBy: config.linkArrowBy,
