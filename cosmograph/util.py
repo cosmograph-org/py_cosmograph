@@ -3,6 +3,7 @@ Utils to prepare data for cosmos
 """
 
 import json
+import inspect
 from typing import Dict, Any
 from functools import partial
 import re
@@ -105,6 +106,33 @@ def cosmograph_base_docs(param_names=None, take_name_of_types=True):
     """Get the params information part of a docstring"""
     params_ssot = _params_ssot(param_names)
     return params_to_docstring(params_ssot)
+
+
+def add_cosmo_param_descriptions(func, param_names=None):
+    """
+    Decorator to add parameter descriptions from SSOT data to cosmo function.
+
+    Simply appends SSOT parameter descriptions to the existing Args section.
+
+    Args:
+        func: The cosmo function to decorate.
+        param_names: Optional list of param names to filter SSOT (uses _params_ssot).
+    """
+    params_ssot = _params_ssot(param_names)
+    param_docs = {p["name"]: p for p in params_ssot}
+
+    sig = inspect.signature(func)
+    relevant_params = [
+        p for name, p in param_docs.items()
+        if name in sig.parameters and p["description"]
+    ]
+
+    if relevant_params:
+        # Simply append SSOT parameters to the existing docstring
+        ssot_docs = "\n".join(f"        {p['name']}: {p['description']}" for p in relevant_params)
+        func.__doc__ = func.__doc__.rstrip() + "\n" + ssot_docs + "\n"
+
+    return func
 
 
 def is_parameterized_type(obj):
