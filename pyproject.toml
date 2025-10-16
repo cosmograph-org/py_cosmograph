@@ -17,10 +17,10 @@ dependencies = [
     "pandas",
     "numpy",
     "traitlets",
-    "i2>=0.1.45",
-    "dol>=0.3.7",
-    "tabled>=0.1.17",
-    "ju>=0.1.16",
+    "i2>=0.1.58",
+    "dol>=0.3.30",
+    "tabled>=0.1.26",
+    "ju>=0.1.31",
     "joblib",
 ]
 dynamic = ["version"]
