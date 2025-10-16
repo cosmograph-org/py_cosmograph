@@ -477,7 +477,7 @@
         "name":"point_timeline_by",
         "default":null,
         "annotation":"str",
-        "description":"Column to determine values for the timeline. Shows a timeline if set."
+        "description":"Column to determine values for the point timeline. Shows a point timeline if set."
     },
     {
         "name":"link_source_by",
@@ -538,6 +538,12 @@
         "default":null,
         "annotation":"list[str]",
         "description":"An array of additional column names to include in link data."
+    },
+    {
+        "name":"link_timeline_by",
+        "default":null,
+        "annotation":"str",
+        "description":"Column to determine values for the link timeline. Shows a timeline for links if set."
     },
     {
         "name":"show_labels",

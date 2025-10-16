@@ -2,6 +2,7 @@ import { CosmographConfig, CosmographDataPrepConfig, prepareCosmographData, Cosm
 
 export type WidgetConfig = CosmographConfig & {
   pointTimelineBy?: string;
+  linkTimelineBy?: string;
   linkTargetBy?: string | string[];
 }
 
@@ -55,6 +56,12 @@ export async function prepareCosmographDataAndMutate(config: WidgetConfig): Prom
       linkArrowBy: config.linkArrowBy,
       linkStrengthBy: config.linkStrengthBy,
       linkIncludeColumns: config.linkIncludeColumns,
+    }
+
+    // Add link timeline column to include columns if specified
+    if (config.linkTimelineBy) {
+      if (!cosmographDataPrepConfig.links.linkIncludeColumns) cosmographDataPrepConfig.links.linkIncludeColumns = []
+      cosmographDataPrepConfig.links.linkIncludeColumns.push(config.linkTimelineBy)
     }
   }
 
