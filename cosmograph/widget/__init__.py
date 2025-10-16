@@ -141,7 +141,7 @@ class Cosmograph(anywidget.AnyWidget):
 
     link_source_by = Unicode(None, allow_none=True).tag(sync=True)
     link_source_index_by = Unicode(None, allow_none=True).tag(sync=True)
-    link_target_by = Unicode(None, allow_none=True).tag(sync=True)
+    link_target_by = Union([Unicode(), List(Unicode())], default_value=None, allow_none=True).tag(sync=True)
     link_target_index_by = Unicode(None, allow_none=True).tag(sync=True)
     link_color_by = Unicode(None, allow_none=True).tag(sync=True)
     link_width_by = Unicode(None, allow_none=True).tag(sync=True)
