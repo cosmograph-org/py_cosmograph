@@ -30,6 +30,7 @@
   "hovered_point_ring_color": "hoveredPointRingColor",
   "focused_point_ring_color": "focusedPointRingColor",
   "focused_point_index": "focusedPointIndex",
+  "show_focused_point_label": "showFocusedPointLabel",
   "render_links": "renderLinks",
   "link_color": "linkColor",
   "link_greyout_opacity": "linkGreyoutOpacity",

@@ -11,6 +11,7 @@ from cosmograph.util import (
     snake_to_camel_case,
     cosmograph_base_docs,
     cosmograph_base_signature,
+    add_cosmo_param_descriptions,
 )
 
 from cosmograph.config import get_api_key
@@ -29,6 +30,160 @@ def base_cosmo(**kwargs):
     The only difference between this and the cosmograph object is that this one has
     an actual signature, with argument names, defaults, and type annotations.
     """
+    return Cosmograph(**kwargs)
+
+
+@add_cosmo_param_descriptions
+def cosmo(
+    data=None,
+    *,
+    # base cosmograph widget params ---------------------------------------------------
+    points: object = None,
+    links: object = None,
+    point_x_by: str = None,
+    point_y_by: str = None,
+    point_size_by: str = None,
+    point_color_by: str = None,
+    point_color_palette: list[str] = None,
+    point_color_by_map: Dict[str, Union[str, list[float]]] = None,
+    point_color_strategy: str = None,
+    point_label_by: str = None,
+    point_color: Union[str, list[float]] = None,
+    point_greyout_opacity: float = None,
+    point_size: float = None,
+    point_size_scale: float = None,
+    point_sampling_distance: int = None,
+    polygonal_selector_stroke_color: str = None,
+    polygonal_selector_line_width: float = None,
+    point_id_by: str = None,
+    point_index_by: str = None,
+    point_size_range: list[float] = None,
+    point_size_strategy: str = None,
+    point_label_weight_by: str = None,
+    point_cluster_by: str = None,
+    point_cluster_strength_by: str = None,
+    cluster_positions_map: Dict[str, list[float]] = None,
+    point_include_columns: list[str] = None,
+    point_timeline_by: str = None,
+    link_color: Union[str, list[float]] = None,
+    link_greyout_opacity: float = None,
+    link_width: float = None,
+    link_width_scale: float = None,
+    link_arrows: bool = None,
+    link_arrows_size_scale: float = None,
+    link_visibility_distance_range: list[float] = None,
+    link_visibility_min_transparency: float = None,
+    link_source_by: str = None,
+    link_source_index_by: str = None,
+    link_target_by: str = None,
+    link_target_index_by: str = None,
+    link_color_by: str = None,
+    link_width_by: str = None,
+    link_arrow_by: str = None,
+    link_strength_by: str = None,
+    link_strength_range: list[float] = None,
+    link_include_columns: list[str] = None,
+    disable_simulation: bool = None,
+    simulation_decay: float = None,
+    simulation_gravity: float = None,
+    simulation_center: float = None,
+    simulation_repulsion: float = None,
+    simulation_repulsion_theta: float = None,
+    simulation_repulsion_quadtree_levels: float = None,
+    simulation_link_spring: float = None,
+    simulation_link_distance: float = None,
+    simulation_link_dist_random_variation_range: list[Any] = None,
+    simulation_repulsion_from_mouse: float = None,
+    simulation_friction: float = None,
+    simulation_cluster_strength: float = None,
+    background_color: Union[str, list[float]] = None,
+    space_size: int = None,
+    hovered_point_cursor: str = None,
+    render_hovered_point_ring: bool = None,
+    hovered_point_ring_color: Union[str, list[float]] = None,
+    focused_point_ring_color: Union[str, list[float]] = None,
+    focused_point_index: int = None,
+    render_links: bool = None,
+    curved_links: bool = None,
+    curved_link_segments: int = None,
+    curved_link_weight: float = None,
+    curved_link_control_point_distance: float = None,
+    use_quadtree: bool = None,
+    show_fps_monitor: bool = None,
+    pixel_ratio: float = None,
+    scale_points_on_zoom: bool = None,
+    scale_links_on_zoom: bool = None,
+    initial_zoom_level: float = None,
+    disable_zoom: bool = None,
+    enable_drag: bool = None,
+    fit_view_on_init: bool = None,
+    fit_view_delay: float = None,
+    fit_view_padding: float = None,
+    fit_view_duration: float = None,
+    fit_view_by_points_in_rect: list[list[float]] = None,
+    random_seed: Union[int, str] = None,
+    show_labels: bool = None,
+    show_dynamic_labels: bool = None,
+    show_labels_for: list[str] = None,
+    show_top_labels: bool = None,
+    show_top_labels_limit: int = None,
+    static_label_weight: float = None,
+    dynamic_label_weight: float = None,
+    label_margin: float = None,
+    show_hovered_point_label: bool = None,
+    show_cluster_labels: bool = None,
+    point_label_color: str = None,
+    point_label_font_size: float = None,
+    cluster_label_font_size: float = None,
+    scale_cluster_labels: bool = None,
+    label_padding: list[float] = None,
+    use_point_color_strategy_for_cluster_labels: bool = None,
+    select_cluster_on_label_click: bool = None,
+    select_point_on_click: Union[bool, str] = None,
+    select_point_on_label_click: Union[bool, str] = None,
+    focus_point_on_click: bool = None,
+    focus_point_on_label_click: bool = None,
+    components_display_state_mode: Union[str, bool] = None,
+    status_indicator_mode: Union[str, bool] = None,
+    preserve_point_positions_on_data_update: bool = None,
+    disable_point_size_legend: bool = None,
+    disable_link_width_legend: bool = None,
+    disable_point_color_legend: bool = None,
+    disable_link_color_legend: bool = None,
+    api_key: str = None,
+    clicked_point_index: int = None,
+    clicked_point_id: str = None,
+    selected_point_indices: list[int] = None,
+    selected_point_ids: list[str] = None,
+):
+    """
+    Create an interactive network visualization with Cosmograph.
+
+    Args:
+        data: Convenience argument whose value will be used for either the points
+    """
+    # Get the arguments as a dictionary
+    kwargs = locals().copy()
+
+    # Remove data from kwargs as we'll handle it separately
+    data = kwargs.pop("data")
+
+    # Handle data assignment to points or links
+    kwargs = prioritize_points(kwargs, data)
+
+    # Remove None values
+    kwargs = remove_none_values(kwargs)
+
+    # Validate kwargs
+    kwargs = validate_kwargs(kwargs)
+
+    # If api_key is None, use the global one if available
+    if kwargs.get('api_key') is None:
+        global_api_key = get_api_key()
+        if global_api_key is not None:
+            kwargs['api_key'] = global_api_key
+
+    # Make a Cosmograph widget instance with these kwargs
     return Cosmograph(**kwargs)
 
 
@@ -123,7 +278,7 @@ def __extra_cosmo_params(
 # @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
 # @cosmo_base_sig.inject_into_keyword_variadic
 @inject_docstring_content(cosmo_base_params_doc_str, position=-1)
-def cosmo(
+def cosmo_advanced(
     data=None,
     *,
     ingress: Sequence[CosmoKwargsTrans] = (),
@@ -193,6 +348,7 @@ def cosmo(
     hovered_point_ring_color: Union[str, list[float]] = None,
     focused_point_ring_color: Union[str, list[float]] = None,
     focused_point_index: int = None,
+    show_focused_point_label: bool = None,
     render_links: bool = None,
     curved_links: bool = None,
     curved_link_segments: int = None,
@@ -262,6 +418,9 @@ def cosmo(
     comprising some data processing, argument aliasing and validation, error handling,
     etc.
 
+    .. deprecated:: 1.0.0
+        This function is deprecated. Use the simpler `cosmo` function instead.
+
     :param data: Convenience argument whose value will be used for either the points
         or links argument.
     :param ingress: A function or sequence of functions that will be applied to the
@@ -276,6 +435,14 @@ def cosmo(
         before they are passed to the Cosmograph constructor.
 
     """
+    import warnings
+    warnings.warn(
+        "cosmo_advanced is deprecated and will be removed in a future version. "
+        "Use the simpler 'cosmo' function instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+
     # Get the arguments as a dictionary
     kwargs = locals().copy()
 
