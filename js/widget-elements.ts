@@ -73,10 +73,6 @@ export function createWidgetControlElements(el: HTMLElement): Record<string, HTM
   playButtonContainer.classList.add('playButton')
   leftControlsContainer.appendChild(playButtonContainer)
 
-  const fitViewButtonContainer = document.createElement('div')
-  fitViewButtonContainer.classList.add('fitViewButton')
-  leftControlsContainer.appendChild(fitViewButtonContainer)
-
   const selectAreaButtonContainer = document.createElement('div')
   selectAreaButtonContainer.classList.add('selectAreaButton')
   leftControlsContainer.appendChild(selectAreaButtonContainer)
@@ -85,6 +81,10 @@ export function createWidgetControlElements(el: HTMLElement): Record<string, HTM
   const rightControlsContainer = document.createElement('div')
   rightControlsContainer.classList.add('rightControls')
   el.appendChild(rightControlsContainer)
+
+  const fitViewButtonContainer = document.createElement('div')
+  fitViewButtonContainer.classList.add('fitViewButton')
+  rightControlsContainer.appendChild(fitViewButtonContainer)
 
   const zoomInOutButtonContainer = document.createElement('div')
   zoomInOutButtonContainer.classList.add('zoomInOutButton')

@@ -95,7 +95,7 @@
 	top: 0.25rem;
 	right: 0.25rem;
 	display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .wrapper .leftControls .selectAreaButton,
@@ -128,7 +128,10 @@
 .wrapper .controls .zoomInOutButton {
 	width: 15px;
 	height: 30px;
-	margin-right: 1rem;
+}
+
+.wrapper .controls .zoomInOutButton div {
+  padding: 7px;
 }
 
 /* Widget output div has a 8px left and right padding which looks off */
