@@ -79,6 +79,7 @@
   "point_cluster_by": "pointClusterBy",
   "point_cluster_strength_by": "pointClusterStrengthBy",
   "point_include_columns": "pointIncludeColumns",
+  "point_timeline_by": "pointTimelineBy",
   "link_source_by": "linkSourceBy",
   "link_source_index_by": "linkSourceIndexBy",
   "link_target_by": "linkTargetBy",
@@ -89,6 +90,7 @@
   "link_strength_by": "linkStrengthBy",
   "link_strength_range": "linkStrengthRange",
   "link_include_columns": "linkIncludeColumns",
+  "link_timeline_by": "linkTimelineBy",
 
   "cluster_positions_map": "clusterPositionsMap",
 
@@ -111,7 +113,5 @@
   "select_cluster_on_label_click": "selectClusterOnLabelClick",
 
   "status_indicator_mode": "statusIndicatorMode",
-  "preserve_point_positions_on_data_update": "preservePointPositionsOnDataUpdate",
-
-  "point_timeline_by": "pointTimelineBy"
+  "preserve_point_positions_on_data_update": "preservePointPositionsOnDataUpdate"
 }

@@ -153,6 +153,7 @@ class Cosmograph(anywidget.AnyWidget):
     link_include_columns = List(Unicode, default_value=None, allow_none=True).tag(
         sync=True
     )
+    link_timeline_by = Unicode(None, allow_none=True).tag(sync=True)
 
     show_labels = Bool(None, allow_none=True).tag(sync=True)
     show_dynamic_labels = Bool(None, allow_none=True).tag(sync=True)

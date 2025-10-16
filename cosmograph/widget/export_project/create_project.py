@@ -160,10 +160,10 @@ def create_project(
             if link_color_by:
                 links_columns["color"] = link_color_by
 
-            # Note: Link time mapping could be added here if supported in the future
-            # link_timeline_by = cosmograph_config.get("linkTimelineBy")
-            # if link_timeline_by:
-            #   links_columns["time"] = link_timeline_by
+            # Link timeline support
+            link_timeline_by = cosmograph_config.get("linkTimelineBy")
+            if link_timeline_by:
+                links_columns["time"] = link_timeline_by
 
             column_mapping["links"] = {
                 "columns": links_columns,

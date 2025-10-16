@@ -6,6 +6,7 @@ import { createWidgetContainer } from './widget-elements'
 import { prepareCosmographDataAndMutate } from './cosmograph-data'
 import { CosmographLegends } from './legends'
 import { PointTimeline } from './components/point-timeline'
+import { LinkTimeline } from './components/link-timeline'
 import { ControlButtonsComponent } from './components/control-buttons'
 import snakeToCamelConfigProps from './config-props.json'
 
@@ -15,6 +16,7 @@ async function render({ model, el }: RenderProps) {
   const { graphContainer, timelineContainer, controlsContainer } = createWidgetContainer(el)
   let cosmograph: Cosmograph | undefined = undefined
   let pointTimeline: PointTimeline | undefined = undefined
+  let linkTimeline: LinkTimeline | undefined = undefined
   const legends = new CosmographLegends(graphContainer, model)
 
   model.on('msg:custom', async (msg: { [key: string]: never }) => {
@@ -188,6 +190,13 @@ async function render({ model, el }: RenderProps) {
       if (snakeCaseProp === 'point_timeline_by') {
         pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
       }
+
+      // `link_timeline_by` can be initialized once with first provided property
+      // In order to update accessor need to re-prepare the data for cosmograph
+      // or provide column name in `link_include_columns` array
+      if (snakeCaseProp === 'link_timeline_by') {
+        linkTimeline?.setConfig({ accessor: model.get('link_timeline_by') })
+      }
     }))
 
   // Initializes the Cosmograph with the configured settings
@@ -201,7 +210,17 @@ async function render({ model, el }: RenderProps) {
     legends.update('point', 'color')
     legends.update('link', 'width')
     legends.update('link', 'color')
-    pointTimeline?.setConfig({ accessor: model.get('point_timeline_by') })
+
+    const pointTimelineBy = model.get('point_timeline_by')
+    const linkTimelineBy = model.get('link_timeline_by')
+
+    if (pointTimelineBy && pointTimeline) {
+      pointTimeline.setConfig({ accessor: pointTimelineBy })
+    }
+
+    if (linkTimelineBy && linkTimeline) {
+      linkTimeline.setConfig({ accessor: linkTimelineBy })
+    }
   }
 
   updatePythonCosmographConfig()
@@ -216,9 +235,22 @@ async function render({ model, el }: RenderProps) {
 
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
-  pointTimeline = new PointTimeline(cosmograph, timelineContainer, {
-    accessor: model.get('point_timeline_by'),
-  })
+
+  // Create timeline components based on which parameters are set
+  const pointTimelineBy = model.get('point_timeline_by')
+  const linkTimelineBy = model.get('link_timeline_by')
+
+  if (pointTimelineBy) {
+    pointTimeline = new PointTimeline(cosmograph, timelineContainer, {
+      accessor: pointTimelineBy,
+    })
+  }
+
+  if (linkTimelineBy) {
+    linkTimeline = new LinkTimeline(cosmograph, timelineContainer, {
+      accessor: linkTimelineBy,
+    })
+  }
 
   new ControlButtonsComponent(cosmograph, controlsContainer)
 
