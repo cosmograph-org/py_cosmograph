@@ -57,6 +57,13 @@ dependencies = [
   "pytest",
 ]
 
+[tool.hatch.envs.dev_3_12]
+features = ["dev"]
+python = "3.12"
+dependencies = [
+  "pandas",
+]
+
 [tool.hatch.build]
 only-packages = true
 artifacts = ["cosmograph/widget/static/*", "cosmograph/data/*"]
