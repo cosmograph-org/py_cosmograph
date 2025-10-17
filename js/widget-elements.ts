@@ -19,6 +19,46 @@ export function createWidgetContainer(el: HTMLElement): Record<string, HTMLDivEl
   }
 }
 
+export function createLoadingOverlay(el: HTMLElement): HTMLDivElement {
+  const loadingOverlay = document.createElement('div')
+  loadingOverlay.classList.add('loading-overlay')
+
+  const spinner = document.createElement('div')
+  spinner.classList.add('loading-spinner')
+
+  loadingOverlay.appendChild(spinner)
+  el.appendChild(loadingOverlay)
+
+  return loadingOverlay
+}
+
+export function showLoadingOverlay(loadingOverlay: HTMLDivElement): void {
+  loadingOverlay.style.display = 'flex'
+  loadingOverlay.style.opacity = '1'
+}
+
+export function hideLoadingOverlay(loadingOverlay: HTMLDivElement): void {
+  loadingOverlay.style.opacity = '0'
+  setTimeout(() => {
+    loadingOverlay.style.display = 'none'
+  }, 300) // Match the CSS transition duration
+}
+
+export function setLoadingOverlayBackgroundColor(loadingOverlay: HTMLDivElement, color: string | number[] | undefined): void {
+  if (!color) return
+
+  if (typeof color === 'string') {
+    loadingOverlay.style.backgroundColor = color
+  } else if (Array.isArray(color) && color.length >= 3) {
+    // Convert RGB array to CSS color
+    const r = Math.round(color[0] * 255)
+    const g = Math.round(color[1] * 255)
+    const b = Math.round(color[2] * 255)
+    const a = color.length > 3 ? color[3] : 1
+    loadingOverlay.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${a})`
+  }
+}
+
 export function createWidgetLegendElements(el: HTMLElement): Record<string, HTMLDivElement> {
   const bottomContainer = document.createElement('div')
   bottomContainer.classList.add('bottom')

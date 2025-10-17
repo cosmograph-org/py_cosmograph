@@ -2,7 +2,7 @@ import type { RenderProps } from '@anywidget/types'
 import { Cosmograph, CosmographConfig } from '@cosmograph/cosmograph'
 
 import { subscribe } from './helper'
-import { createWidgetContainer } from './widget-elements'
+import { createWidgetContainer, createLoadingOverlay, showLoadingOverlay, hideLoadingOverlay, setLoadingOverlayBackgroundColor } from './widget-elements'
 import { prepareCosmographDataAndMutate } from './cosmograph-data'
 import { CosmographLegends } from './legends'
 import { PointTimeline } from './components/point-timeline'
@@ -14,6 +14,16 @@ import './widget.css'
 
 async function render({ model, el }: RenderProps) {
   const { graphContainer, timelineContainer, controlsContainer } = createWidgetContainer(el)
+
+  // Create and show loading overlay
+  const loadingOverlay = createLoadingOverlay(el)
+  showLoadingOverlay(loadingOverlay)
+  let isOverlayVisible = true
+  const backgroundColor = model.get('background_color')
+  if (backgroundColor) {
+    setLoadingOverlayBackgroundColor(loadingOverlay, backgroundColor)
+  }
+
   let cosmograph: Cosmograph | undefined = undefined
   let pointTimeline: PointTimeline | undefined = undefined
   let linkTimeline: LinkTimeline | undefined = undefined
@@ -221,6 +231,13 @@ async function render({ model, el }: RenderProps) {
     if (linkTimelineBy && linkTimeline) {
       linkTimeline.setConfig({ accessor: linkTimelineBy })
     }
+  }
+
+  cosmographConfig.onGraphDataUpdated = () => {
+    if (isOverlayVisible) {
+      hideLoadingOverlay(loadingOverlay)
+    }
+    isOverlayVisible = false
   }
 
   updatePythonCosmographConfig()
