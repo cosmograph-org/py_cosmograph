@@ -112,7 +112,8 @@ def cosmo(
     use_quadtree: bool = None,
     show_fps_monitor: bool = None,
     pixel_ratio: float = None,
-    scale_points_on_zoom: bool = None,
+    # Set to True by default until it becomes the default in Cosmograph library
+    scale_points_on_zoom: bool = True,
     scale_links_on_zoom: bool = None,
     initial_zoom_level: float = None,
     disable_zoom: bool = None,
@@ -359,7 +360,8 @@ def cosmo_advanced(
     use_quadtree: bool = None,
     show_FPS_monitor: bool = None,
     pixel_ratio: float = None,
-    scale_points_on_zoom: bool = None,
+    # Set to True by default until it becomes the default in Cosmograph library
+    scale_points_on_zoom: bool = True,
     scale_links_on_zoom: bool = None,
     initial_zoom_level: float = None,
     disable_zoom: bool = None,
