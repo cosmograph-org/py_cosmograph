@@ -8,6 +8,8 @@ import { CosmographLegends } from './legends'
 import { PointTimeline } from './components/point-timeline'
 import { LinkTimeline } from './components/link-timeline'
 import { ControlButtonsComponent } from './components/control-buttons'
+import { SettingsPanel } from './components/settings-panel'
+import { PointInfoPanel } from './components/point-info'
 import snakeToCamelConfigProps from './config-props.json'
 
 import './widget.css'
@@ -27,6 +29,8 @@ async function render({ model, el }: RenderProps) {
   let cosmograph: Cosmograph | undefined = undefined
   let pointTimeline: PointTimeline | undefined = undefined
   let linkTimeline: LinkTimeline | undefined = undefined
+  let settingsPanel: SettingsPanel | undefined = undefined
+  let pointInfoPanel: PointInfoPanel | undefined = undefined
   const legends = new CosmographLegends(graphContainer, model)
 
   model.on('msg:custom', async (msg: { [key: string]: never }) => {
@@ -103,6 +107,8 @@ async function render({ model, el }: RenderProps) {
     onClick: async (index) => {
       model.set('clicked_point_index', index ?? null)
       model.save_changes()
+      // Show point info panel
+      pointInfoPanel?.showPointInfo(index ?? null)
     },
     onPointsFiltered: async () => {
       const indices = cosmograph?.getSelectedPointIndices()
@@ -253,6 +259,9 @@ async function render({ model, el }: RenderProps) {
   cosmograph = new Cosmograph(graphContainer, cosmographConfig)
   legends.setCosmograph(cosmograph)
 
+  // Create point info panel
+  pointInfoPanel = new PointInfoPanel(cosmograph, graphContainer)
+
   // Create timeline components based on which parameters are set
   const pointTimelineBy = model.get('point_timeline_by')
   const linkTimelineBy = model.get('link_timeline_by')
@@ -269,11 +278,17 @@ async function render({ model, el }: RenderProps) {
     })
   }
 
-  new ControlButtonsComponent(cosmograph, controlsContainer)
+  const controlButtons = new ControlButtonsComponent(cosmograph, controlsContainer)
+
+  // Create settings panel at top of graph container with button in right controls
+  const settingsButtonContainer = controlButtons.settingsButtonContainer
+  settingsPanel = new SettingsPanel(cosmograph, graphContainer, settingsButtonContainer, model)
 
   return (): void => {
     unsubscribes.forEach(unsubscribe => unsubscribe())
     cosmograph?.destroy()
+    settingsPanel?.destroy()
+    pointInfoPanel?.destroy()
   }
 }
 

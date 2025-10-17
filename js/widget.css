@@ -131,6 +131,16 @@
   padding: 7px;
 }
 
+.wrapper .leftControls .settingsButton,
+.wrapper .rightControls .settingsButton,
+.wrapper .controls .settingsButton {
+	margin-top: 1.9rem;
+	pointer-events: auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 /* Loading indicator styles */
 .loading-overlay {
 	position: absolute;
@@ -167,4 +177,299 @@
 /* Widget output div has a 8px left and right padding which looks off */
 .cell-output-ipywidget-background {
 	padding: 0 !important;
+}
+
+/* Settings Panel Styles */
+.settings-panel {
+	position: absolute;
+	top: 0.5rem;
+	right: 3rem;
+	z-index: 100;
+	pointer-events: auto;
+	display: none;
+	width: 280px;
+	max-height: calc(100% - 1rem);
+	overflow-y: auto;
+	overflow-x: hidden;
+	background: rgba(45, 49, 58, 0.95);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Custom scrollbar styling for webkit browsers */
+.settings-panel::-webkit-scrollbar {
+	width: 8px;
+}
+
+.settings-panel::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	margin: 4px 0;
+}
+
+.settings-panel::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.3);
+	border-radius: 4px;
+	transition: background 0.2s ease;
+}
+
+.settings-panel::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.5);
+}
+
+/* Scrollbar styling for Firefox */
+.settings-panel {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+.settings-panel-toggle {
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	border: none;
+	border-radius: 6px;
+	color: #fff;
+	cursor: pointer;
+	width: 29px;
+	height: 29px;
+	min-width: 29px;
+	min-height: 29px;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+	flex-shrink: 0;
+}
+
+.settings-panel-toggle:hover {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+.settings-panel-content {
+	padding: 1rem;
+}
+
+.settings-control {
+	margin-bottom: 0.875rem;
+}
+
+.settings-control:last-child {
+	margin-bottom: 0;
+}
+
+.settings-label {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 0.4rem;
+	font-size: 12px;
+	color: #ccc;
+	font-weight: 500;
+}
+
+.settings-value {
+	color: #fff;
+	font-weight: 600;
+}
+
+.settings-slider {
+	width: 100%;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+	outline: none;
+	appearance: none;
+	-webkit-appearance: none;
+}
+
+.settings-slider::-webkit-slider-thumb {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+	background: #fff;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.settings-slider::-webkit-slider-thumb:hover {
+	transform: scale(1.2);
+	box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.settings-slider::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	background: #fff;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.settings-slider::-moz-range-thumb:hover {
+	transform: scale(1.2);
+	box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.settings-toggle-label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 12px;
+	color: #ccc;
+	font-weight: 500;
+	user-select: none;
+}
+
+.settings-checkbox {
+	margin-right: 0.5rem;
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+.settings-checkbox:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.settings-section {
+	margin-top: 0.875rem;
+	padding-top: 0.875rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-section-title {
+	font-size: 10px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.5);
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.625rem;
+}
+
+/* Point Info Panel */
+.point-info-panel {
+	position: absolute;
+	top: 0.5rem;
+	left: 3rem;
+	z-index: 100;
+	pointer-events: auto;
+	display: none;
+	width: 240px;
+	max-height: calc(100% - 1rem);
+	background: rgba(45, 49, 58, 0.95);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.point-info-content {
+	padding: 1rem;
+	padding-top: 0.75rem;
+	flex-shrink: 0;
+}
+
+.point-info-header {
+	font-size: 13px;
+	font-weight: 600;
+	color: #fff;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.point-info-items {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 1rem;
+	padding-top: 0.75rem;
+	max-height: calc(100vh - 10rem);
+}
+
+/* Custom scrollbar styling for point info items */
+.point-info-items::-webkit-scrollbar {
+	width: 8px;
+}
+
+.point-info-items::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	margin: 4px 0;
+}
+
+.point-info-items::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.3);
+	border-radius: 4px;
+	transition: background 0.2s ease;
+}
+
+.point-info-items::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.5);
+}
+
+/* Scrollbar styling for Firefox */
+.point-info-items {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+.point-info-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.point-info-label {
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.point-info-value {
+	color: #fff;
+	font-size: 13px;
+	font-weight: 500;
+	word-break: break-word;
+}
+
+.point-info-close {
+	position: absolute;
+	top: 0.75rem;
+	right: 0.75rem;
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	border-radius: 4px;
+	color: #fff;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+	padding: 0;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	opacity: 0.7;
+}
+
+.point-info-close:hover {
+	background: rgba(255, 255, 255, 0.15);
+	opacity: 1;
 }

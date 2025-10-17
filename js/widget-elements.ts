@@ -130,10 +130,15 @@ export function createWidgetControlElements(el: HTMLElement): Record<string, HTM
   zoomInOutButtonContainer.classList.add('zoomInOutButton')
   rightControlsContainer.appendChild(zoomInOutButtonContainer)
 
+  const settingsButtonContainer = document.createElement('div')
+  settingsButtonContainer.classList.add('settingsButton')
+  rightControlsContainer.appendChild(settingsButtonContainer)
+
   return {
     fitViewButtonContainer,
     zoomInOutButtonContainer,
     playButtonContainer,
     selectAreaButtonContainer,
+    settingsButtonContainer,
   }
 }
