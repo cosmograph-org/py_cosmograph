@@ -8,14 +8,16 @@ export class ControlButtonsComponent {
   public zoomInOutButton: CosmographButtonZoomInOut
   public playButton: CosmographButtonPlayPause
   public selectAreaButton: CosmographButtonPolygonalSelection
+  public settingsButtonContainer: HTMLDivElement
 
   constructor(cosmograph: Cosmograph, element: HTMLElement) {
     this.cosmograph = cosmograph
     this.element = element
-    const { fitViewButtonContainer, zoomInOutButtonContainer, playButtonContainer, selectAreaButtonContainer } = createWidgetControlElements(element)
+    const { fitViewButtonContainer, zoomInOutButtonContainer, playButtonContainer, selectAreaButtonContainer, settingsButtonContainer } = createWidgetControlElements(element)
     this.fitViewButton = new CosmographButtonFitView(cosmograph, fitViewButtonContainer)
     this.zoomInOutButton = new CosmographButtonZoomInOut(cosmograph, zoomInOutButtonContainer)
     this.playButton = new CosmographButtonPlayPause(cosmograph, playButtonContainer)
     this.selectAreaButton = new CosmographButtonPolygonalSelection(cosmograph, selectAreaButtonContainer, {})
+    this.settingsButtonContainer = settingsButtonContainer
   }
 }
