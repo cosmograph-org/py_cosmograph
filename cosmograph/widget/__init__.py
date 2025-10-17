@@ -88,7 +88,8 @@ class Cosmograph(anywidget.AnyWidget):
     use_quadtree = Bool(None, allow_none=True).tag(sync=True)
     show_FPS_monitor = Bool(None, allow_none=True).tag(sync=True)
     pixel_ratio = Float(None, allow_none=True).tag(sync=True)
-    scale_points_on_zoom = Bool(None, allow_none=True).tag(sync=True)
+    # Set to True by default until it becomes the default in Cosmograph library
+    scale_points_on_zoom = Bool(True, allow_none=True).tag(sync=True)
     scale_links_on_zoom = Bool(None, allow_none=True).tag(sync=True)
     initial_zoom_level = Float(None, allow_none=True).tag(sync=True)
     disable_zoom = Bool(None, allow_none=True).tag(sync=True)
