@@ -1,3 +1,3 @@
 """Package metadata for cosmograph"""
 
-__version__ = "1.0.0b1"
+__version__ = "0.5.0b0"
