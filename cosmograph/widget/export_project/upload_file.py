@@ -1,5 +1,6 @@
 """Module for handling file uploads to Cosmograph server."""
 from typing import Any
+import time
 
 import requests
 import json
@@ -7,7 +8,7 @@ import json
 from .config import API_BASE, logger
 
 
-def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str, Any]:
+def upload_file(api_key: str, data: dict[str, Any], project_id: str, debug: bool = False) -> dict[str, Any]:
     """Generate signed URL and upload file to Cosmograph server.
 
     Args:
@@ -24,6 +25,7 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str
     """
 
     try:
+        start_time = time.perf_counter() if debug else None
         response = requests.post(
             f"{API_BASE}/publicApi.generateSignedUploadUrl",
             json={
@@ -37,6 +39,8 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str
             },
         )
         response.raise_for_status()
+        if debug:
+            logger.info("⏱️    - Generate signed URL API request took: %.3f seconds", time.perf_counter() - start_time)
         # logger.info("Response: %s", json.dumps(response.json(), indent=4))
         response_json = response.json()
         try:
@@ -51,6 +55,7 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str
         raise ValueError(msg) from e
 
     try:
+        start_time = time.perf_counter() if debug else None
         upload_response = requests.put(
             upload_url,
             data=data["content"],
@@ -58,6 +63,10 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str) -> dict[str
         )
         upload_response.raise_for_status()
         logger.info("✅ File '%s' upload completed successfully", data["file_name"])
+        if debug:
+            upload_time = time.perf_counter() - start_time
+            file_size_mb = data["content_length"] / (1024 * 1024)
+            logger.info("⏱️    - File upload (%.2f MB) took: %.3f seconds", file_size_mb, upload_time)
     except requests.RequestException as e:
         logger.error("❌ Failed to upload file '%s': %s", data["file_name"], e)
         msg = f"Failed to upload file: {e}"

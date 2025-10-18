@@ -319,13 +319,13 @@ class Cosmograph(anywidget.AnyWidget):
     def capture_screenshot(self):
         self.send({"type": "capture_screenshot"})
 
-    def export_project_by_name(self, project_name: str):
+    def export_project_by_name(self, project_name: str, debug: bool = False):
         if not self.api_key:
             raise ValueError("API key is required for project export")
         if not project_name or not project_name.strip():
             raise ValueError("Project name is required and cannot be empty")
         try:
-            return export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config)
+            return export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config, debug=debug)
         except Exception as e:
             raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
