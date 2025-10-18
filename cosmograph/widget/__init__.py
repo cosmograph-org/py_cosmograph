@@ -172,7 +172,8 @@ class Cosmograph(anywidget.AnyWidget):
 
     label_padding = List(Float, default_value=None, allow_none=True).tag(sync=True)
 
-    show_hovered_point_label = Bool(None, allow_none=True).tag(sync=True)
+    # Set to True by default until it becomes the default in cosmograph
+    show_hovered_point_label = Bool(True, allow_none=True).tag(sync=True)
     use_point_color_strategy_for_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
     select_cluster_on_label_click = Bool(None, allow_none=True).tag(sync=True)
     select_point_on_click = Union(

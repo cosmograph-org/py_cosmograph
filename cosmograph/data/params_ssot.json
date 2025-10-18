@@ -649,7 +649,7 @@
     },
     {
         "name":"show_hovered_point_label",
-        "default":false,
+        "default":true,
         "annotation":"bool",
         "description":"Whether to show a hovered point label."
     },
