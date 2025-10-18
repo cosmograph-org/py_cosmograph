@@ -132,7 +132,7 @@ def cosmo(
     static_label_weight: float = None,
     dynamic_label_weight: float = None,
     label_margin: float = None,
-    show_hovered_point_label: bool = None,
+    show_hovered_point_label: bool = True,  # Set to True by default until it becomes the default in cosmograph
     show_cluster_labels: bool = None,
     point_label_color: str = None,
     point_label_font_size: float = None,
@@ -380,7 +380,7 @@ def cosmo_advanced(
     static_label_weight: float = None,
     dynamic_label_weight: float = None,
     label_margin: float = None,
-    show_hovered_point_label: bool = None,
+    show_hovered_point_label: bool = True,  # Set to True by default until it becomes the default in cosmograph
     show_cluster_labels: bool = None,
     point_label_color: str = None,
     point_label_font_size: float = None,
