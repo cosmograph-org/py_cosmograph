@@ -1,6 +1,7 @@
 """Module for creating Cosmograph projects with uploaded data files."""
 
 from typing import Any, Optional
+import time
 import requests
 import json
 
@@ -11,6 +12,7 @@ def create_empty_project(
     api_key: str,
     project_name: str,
     description: str = "Project created via API",
+    debug: bool = False,
 ) -> dict[str, Any]:
     """Create an empty Cosmograph project.
 
@@ -36,11 +38,14 @@ def create_empty_project(
             },
         }
         # logger.info("Creating empty project with config: %s", json.dumps(config_json, indent=4))
+        start_time = time.perf_counter() if debug else None
         response = requests.post(
             f"{API_BASE}/publicApi.createProject",
             json=config_json,
         )
         response.raise_for_status()
+        if debug:
+            logger.info("⏱️    - createProject API request took: %.3f seconds", time.perf_counter() - start_time)
 
         result = response.json()
         # logger.info("✅ Empty project created successfully: %s", json.dumps(result, indent=4))
@@ -57,6 +62,7 @@ def create_project(
     points_data: Optional[dict[str, Any]] = None,
     links_data: Optional[dict[str, Any]] = None,
     cosmograph_config: Optional[dict[str, Any]] = None,
+    debug: bool = False,
 ) -> dict[str, Any]:
     """Create a new Cosmograph project with the uploaded files.
 
@@ -182,12 +188,23 @@ def create_project(
                 },
             },
         }
-        # logger.info("Config JSON: %s", json.dumps(config_json, indent=4))
+        # Create a version without API key for logging
+        if debug:
+            config_for_logging = {
+                "json": {
+                    "apiKey": "***",
+                    "config": config_json["json"]["config"]
+                }
+            }
+            logger.info("📋 Full project config being sent: %s", json.dumps(config_for_logging, indent=2))
+        start_time = time.perf_counter() if debug else None
         response = requests.post(
             f"{API_BASE}/publicApi.upsertProjectByName",
             json=config_json,
         )
         response.raise_for_status()
+        if debug:
+            logger.info("⏱️    - upsertProjectByName API request took: %.3f seconds", time.perf_counter() - start_time)
 
         return response.json()
     except requests.RequestException as e:
