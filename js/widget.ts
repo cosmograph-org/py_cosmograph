@@ -103,6 +103,15 @@ async function render({ model, el }: RenderProps) {
     }
   })
 
+  const updateSelectedIndices = async (selectedPointIndices?: number[] | null, selectedLinkIndices?: number[]): Promise<void> => {
+    const indices = selectedPointIndices ?? cosmograph?.getSelectedPointIndices()
+    const linkIndices = selectedLinkIndices ?? cosmograph?.getSelectedLinkIndices()
+    model.set('selected_point_indices', indices ?? [])
+    model.set('selected_point_ids', indices && indices.length > 0 ? await cosmograph?.getPointIdsByIndices(indices) : [])
+    model.set('selected_link_indices', linkIndices ?? [])
+    model.save_changes()
+  }
+
   const cosmographConfig: CosmographConfig = {
     onClick: async (index) => {
       model.set('clicked_point_index', index ?? null)
@@ -110,11 +119,11 @@ async function render({ model, el }: RenderProps) {
       // Show point info panel
       pointInfoPanel?.showPointInfo(index ?? null)
     },
-    onPointsFiltered: async () => {
-      const indices = cosmograph?.getSelectedPointIndices()
-      model.set('selected_point_indices', indices ?? [])
-      model.set('selected_point_ids', indices ? await cosmograph?.getPointIdsByIndices(indices) : [])
-      model.save_changes()
+    onPointsFiltered: async (_filteredPoints, selectedPointIndices, selectedLinkIndices) => {
+      await updateSelectedIndices(selectedPointIndices, selectedLinkIndices)
+    },
+    onLinksFiltered: async (_filteredLinks, selectedPointIndices, selectedLinkIndices) => {
+      await updateSelectedIndices(selectedPointIndices, selectedLinkIndices)
     },
     onClusterLabelClick: async (cluster) => {
       // Handle cluster label click event

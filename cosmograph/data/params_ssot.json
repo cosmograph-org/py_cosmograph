@@ -30,6 +30,12 @@
         "description":"Controls whether to select a point with the connected points when the point's label is clicked. When `true`: Selects the clicked point and all connected points to it. When `'single'`: Selects only the clicked point. Will also focus (render ring around) the clicked point if `focusPointOnClick` is `undefined`."
     },
     {
+        "name":"reset_selection_on_empty_canvas_click",
+        "default": null,
+        "annotation":"bool",
+        "description":"Reset selection on empty canvas click. When `true`: Resets the selection when the canvas is clicked and no points are selected. Default value: `true`."
+    },
+    {
         "name":"focus_point_on_click",
         "default": null,
         "annotation":"bool",
@@ -129,10 +135,10 @@
         "description":"Sets simulation friction."
     },
     {
-        "name":"simulation_cluster_strength",
+        "name":"simulation_cluster",
         "default":null,
         "annotation":"float",
-        "description":"Coefficient of simulation cluster strength from 0 to 1. If `undefined`, the graph will not apply any clustering force to the simulation."
+        "description":"Cluster coefficient. Default value: `0.1`."
     },
     {
         "name":"background_color",
@@ -393,7 +399,7 @@
         "name":"point_color_palette",
         "default":null,
         "annotation":"list[str]",
-        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'palette'`, `'interpolatePalette'`, or `'degree'`."
+        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'palette'`, `'interpolatePalette'`, `'degree'`, or `'linkDirection'`."
     },
     {
         "name":"point_color_by_map",
@@ -405,7 +411,7 @@
         "name":"point_color_strategy",
         "default":null,
         "annotation":"str",
-        "description":"Specifies the strategy for coloring points based on data from the point_color_by column."
+        "description":"Specifies the strategy for coloring points based on data from the point_color_by column. Available strategies: `undefined` (default): Automatically uses the optimal strategy based on input configuration and color data type. Current strategy can be acquired with cosmograph.activePointColorStrategy. `'palette'`: Uses colors from point_color_palette without interpolation. For numeric data: Creates equal-width buckets mapped to point_color_palette colors. For categorical data: Assigns colors from point_color_palette in order, cycling when unique values exceed palette length. `'interpolatePalette'`: Interpolates colors from point_color_palette. For numeric data: Creates continuous color scale between point_color_palette colors. For categorical data: Creates evenly-spaced color scale by interpolating between point_color_palette colors to match the number of unique values so every value is a unique color. `'map'`: Uses color mapping from point_color_by_map to values in point_color_by. Applies exact color from point_color_by_map for matching values. Falls back to point_color when value is not found in map or invalid. `'degree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette with quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Has effect only if links provided. `'linkDirection'`: Colors points based on their link direction (in, out, bidirectional, isolated) using point_color_palette. Has effect only if links provided. `'direct'`: Directly uses point_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If point_color_by_fn exists, applies it to transform point_color_by values into custom colors. Falls back to point_color if invalid color. If neither point_color_by nor point_color_by_fn exist, colors all points with point_color."
     },
     {
         "name":"point_size_by",
@@ -580,12 +586,6 @@
         "default":false,
         "annotation":"bool",
         "description":"Show labels for the clusters based on the `pointClusterBy` column. When any point is selected, cluster labels will be hidden until the selection is cleared."
-    },
-    {
-        "name":"show_focused_point_label",
-        "default":null,
-        "annotation":"bool",
-        "description":"Controls whether to show the label for the focused point."
     },
     {
         "name":"point_label_color",

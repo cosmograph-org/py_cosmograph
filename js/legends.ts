@@ -21,6 +21,7 @@ export function getPointColorLegendType(cosmograph: Cosmograph, column_by: strin
   const pointColorBy = column_by
   const activePointColorStrategy = cosmograph.activePointColorStrategy
   if (activePointColorStrategy === CosmographPointColorStrategy.Degree) return ColorType.Range
+  if (activePointColorStrategy === CosmographPointColorStrategy.LinkDirection) return ColorType.Type
   if (activePointColorStrategy === CosmographPointColorStrategy.Direct) return undefined
 
   const pointColorInfo = pointsSummary?.find(d => d.column_name === pointColorBy)

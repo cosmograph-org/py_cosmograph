@@ -46,7 +46,7 @@ class Cosmograph(anywidget.AnyWidget):
     ).tag(sync=True)
     simulation_repulsion_from_mouse = Float(None, allow_none=True).tag(sync=True)
     simulation_friction = Float(None, allow_none=True).tag(sync=True)
-    simulation_cluster_strength = Float(None, allow_none=True).tag(sync=True)
+    simulation_cluster = Float(None, allow_none=True).tag(sync=True)
 
     background_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
@@ -67,7 +67,6 @@ class Cosmograph(anywidget.AnyWidget):
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
     ).tag(sync=True)
     focused_point_index = Int(None, allow_none=True).tag(sync=True)
-    show_focused_point_label = Bool(None, allow_none=True).tag(sync=True)
     render_links = Bool(None, allow_none=True).tag(sync=True)
     link_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
@@ -182,6 +181,7 @@ class Cosmograph(anywidget.AnyWidget):
     select_point_on_label_click = Union(
         [Bool(None, allow_none=True), Unicode(None, allow_none=True)]
     ).tag(sync=True)
+    reset_selection_on_empty_canvas_click = Bool(None, allow_none=True).tag(sync=True)
     focus_point_on_click = Bool(None, allow_none=True).tag(sync=True)
     focus_point_on_label_click = Bool(None, allow_none=True).tag(sync=True)
     components_display_state_mode = Union(
@@ -214,6 +214,7 @@ class Cosmograph(anywidget.AnyWidget):
     clicked_cluster = Any(None, allow_none=True).tag(sync=True)
     selected_point_indices = List(Int, allow_none=True).tag(sync=True)
     selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
+    selected_link_indices = List(Int, allow_none=True).tag(sync=True)
     cosmograph_config = Dict(default_value={}, allow_none=True).tag(sync=True)
 
     api_key = Unicode(None, allow_none=True)
