@@ -70,15 +70,91 @@ from typing import Any, Callable
 from i2 import Sig, Param, params_to_docstring
 
 PARAMS_SSOT_PATH = data_dir / "params_ssot.json"
+PARAMS_SSOT_EDITS_PATH = data_dir / "params_ssot_edits.json"
+
 
 # TODO: add ssot validation
+def _deep_merge_dicts(base: dict, override: dict) -> dict:
+    """
+    Recursively merge two dictionaries, with override taking priority.
+
+    For nested dictionaries, merges recursively. For other types or when
+    override value is not a dict, the override value replaces the base value.
+
+    Args:
+        base: The base dictionary
+        override: The override dictionary (takes priority)
+
+    Returns:
+        A new merged dictionary
+
+    >>> base = {'a': 1, 'b': {'c': 2, 'd': 3}}
+    >>> override = {'b': {'d': 4, 'e': 5}, 'f': 6}
+    >>> result = _deep_merge_dicts(base, override)
+    >>> result == {'a': 1, 'b': {'c': 2, 'd': 4, 'e': 5}, 'f': 6}
+    True
+    """
+    result = base.copy()
+
+    for key, override_value in override.items():
+        if (
+            key in result
+            and isinstance(result[key], dict)
+            and isinstance(override_value, dict)
+        ):
+            # Recursively merge nested dictionaries
+            result[key] = _deep_merge_dicts(result[key], override_value)
+        else:
+            # Override with the new value
+            result[key] = override_value
+
+    return result
 
 
 def _params_ssot(param_names=None):
+    """
+    Get the Single Source of Truth for cosmograph parameters.
+
+    Rationale: https://github.com/cosmograph-org/py_cosmograph/discussions/32#discussioncomment-14764648
+
+    This function loads the base params_ssot (automatically generated from
+    JS/TS sources via ETL) and merges it with manual edits from params_ssot_edits.
+
+    The params_ssot.json file is auto-generated and should be treated as read-only
+    to avoid losing changes on regeneration. Any manual corrections or overrides
+    should be placed in params_ssot_edits.json, which is recursively merged with
+    the base params, with edits taking priority.
+
+    Args:
+        param_names: Optional list of parameter names to filter the result
+
+    Returns:
+        List of parameter dictionaries, potentially filtered by param_names
+    """
     params_ssot = json.loads(PARAMS_SSOT_PATH.read_text())
+    params_ssot_edits = json.loads(PARAMS_SSOT_EDITS_PATH.read_text())
+
+    # Build a lookup dict for easier merging
+    params_by_name = {p['name']: p for p in params_ssot}
+    edits_by_name = {p['name']: p for p in params_ssot_edits}
+
+    # Merge edits into base params (recursively for nested fields)
+    for name, edit_param in edits_by_name.items():
+        if name in params_by_name:
+            # Deep merge: edit fields override base fields
+            params_by_name[name] = _deep_merge_dicts(params_by_name[name], edit_param)
+        else:
+            # New parameter from edits
+            params_by_name[name] = edit_param
+
+    # Convert back to list
+    merged_params = list(params_by_name.values())
+
+    # Filter by param_names if specified
     if param_names is not None:
-        params_ssot = [d for d in params_ssot if d["name"] in param_names]
-    return params_ssot
+        merged_params = [p for p in merged_params if p['name'] in param_names]
+
+    return merged_params
 
 
 def cosmograph_base_signature(param_names=None):
@@ -123,13 +199,16 @@ def add_cosmo_param_descriptions(func, param_names=None):
 
     sig = inspect.signature(func)
     relevant_params = [
-        p for name, p in param_docs.items()
+        p
+        for name, p in param_docs.items()
         if name in sig.parameters and p["description"]
     ]
 
     if relevant_params:
         # Simply append SSOT parameters to the existing docstring
-        ssot_docs = "\n".join(f"        {p['name']}: {p['description']}" for p in relevant_params)
+        ssot_docs = "\n".join(
+            f"        {p['name']}: {p['description']}" for p in relevant_params
+        )
         func.__doc__ = func.__doc__.rstrip() + "\n" + ssot_docs + "\n"
 
     return func
@@ -252,7 +331,6 @@ def str_to_annotation(string, is_safe: Callable[[str], bool] = default_is_safe):
 # General/Misc utils
 
 
-
 def move_to_front(df: pd.DataFrame, cols) -> pd.DataFrame:
     """
     Move the columns in `cols` to the front of the DataFrame
@@ -346,6 +424,7 @@ def _postprocess(func, egress):
 def postprocess(egress):
     return partial(_postprocess, egress=egress)
 
+
 display_output = postprocess(ipython_display)
 to_html_obj = postprocess(HTML)
 to_js_obj = postprocess(Javascript)
@@ -385,5 +464,3 @@ def _nodes_from_links(links):
             yield link["target"]
 
     return [{"id": x} for x in ordered_unique(_yield_nodes_from_links(links))]
-
-
