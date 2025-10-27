@@ -220,12 +220,40 @@ class Cosmograph(anywidget.AnyWidget):
     api_key = Unicode(None, allow_none=True)
 
     @observe("points")
-    def changePoints(self, change):
+    def _on_points_changed(self, change):
+        """
+        Internal observer method that reacts to changes in the `points` trait.
+
+        This is NOT a user-configurable parameter but rather an internal lifecycle hook
+        automatically triggered by the traitlets framework whenever the `points` attribute
+        is modified (e.g., via `widget.points = dataframe`).
+
+        Purpose:
+        - Converts pandas DataFrame to Apache Arrow IPC format for efficient binary transfer
+        - Updates the `_ipc_points` trait which is synced to the JavaScript widget
+        - Enables high-performance data communication between Python and JavaScript
+
+        The @observe decorator registers this callback - users never call this method directly.
+        """
         points = change.new
         self._ipc_points = get_buffered_arrow_table(points)
 
     @observe("links")
-    def changeLinks(self, change):
+    def _on_links_changed(self, change):
+        """
+        Internal observer method that reacts to changes in the `links` trait.
+
+        This is NOT a user-configurable parameter but rather an internal lifecycle hook
+        automatically triggered by the traitlets framework whenever the `links` attribute
+        is modified (e.g., via `widget.links = dataframe`).
+
+        Purpose:
+        - Converts pandas DataFrame to Apache Arrow IPC format for efficient binary transfer
+        - Updates the `_ipc_links` trait which is synced to the JavaScript widget
+        - Enables high-performance data communication between Python and JavaScript
+
+        The @observe decorator registers this callback - users never call this method directly.
+        """
         links = change.new
         self._ipc_links = get_buffered_arrow_table(links)
 
