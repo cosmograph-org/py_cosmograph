@@ -201,7 +201,7 @@ def cosmo(
     curved_link_weight: float = None,
     curved_link_control_point_distance: float = None,
     use_quadtree: bool = None,
-    show_FPS_monitor: bool = None,
+    show_fps_monitor: bool = None,
     pixel_ratio: float = None,
     # Set to True by default until it becomes the default in Cosmograph library
     scale_points_on_zoom: bool = True,
