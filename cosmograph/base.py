@@ -249,8 +249,6 @@ def cosmo(
     clicked_point_id: str = None,
     selected_point_indices: list[int] = None,
     selected_point_ids: list[str] = None,
-    changePoints: Callable[[Dict[str, Any]], Any] = None,
-    changeLinks: Callable[[Dict[str, Any]], Any] = None,
     # extra params ---------------------------------------------------------------------
     copy_before_ingress: bool = True,  # whether to make a copy the points and links before applying ingress
     data_resolution: Callable[
