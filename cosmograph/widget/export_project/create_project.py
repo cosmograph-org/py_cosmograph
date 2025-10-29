@@ -61,7 +61,7 @@ def create_project(
     project_name: str,
     points_data: Optional[dict[str, Any]] = None,
     links_data: Optional[dict[str, Any]] = None,
-    cosmograph_config: Optional[dict[str, Any]] = None,
+    export_config: Optional[dict[str, Any]] = None,
     debug: bool = False,
 ) -> dict[str, Any]:
     """Create a new Cosmograph project with the uploaded files.
@@ -74,14 +74,14 @@ def create_project(
         project_name: Name for the project
         points_data: Data for points table
         links_data: Data for links table
-        cosmograph_config: Cosmograph config
+        export_config: Cosmograph configuration for export
 
     Returns:
         dict: API response from project creation
 
     """
 
-    cosmograph_config = cosmograph_config or {}
+    export_config = export_config or {}
     data_sources = []
     column_mapping = {
         "points": {"columns": {}},
@@ -100,36 +100,36 @@ def create_project(
         points_columns = {}
 
         # Required columns
-        point_id_by = cosmograph_config.get("pointIdBy")
+        point_id_by = export_config.get("pointIdBy")
         if point_id_by:
             points_columns["id"] = point_id_by
 
         # Optional columns - map only if present in config
-        point_label_by = cosmograph_config.get("pointLabelBy")
+        point_label_by = export_config.get("pointLabelBy")
         if point_label_by:
             points_columns["label"] = point_label_by
 
-        point_color_by = cosmograph_config.get("pointColorBy")
+        point_color_by = export_config.get("pointColorBy")
         if point_color_by:
             points_columns["color"] = point_color_by
 
-        point_size_by = cosmograph_config.get("pointSizeBy")
+        point_size_by = export_config.get("pointSizeBy")
         if point_size_by:
             points_columns["size"] = point_size_by
 
-        point_x_by = cosmograph_config.get("pointXBy")
+        point_x_by = export_config.get("pointXBy")
         if point_x_by:
             points_columns["x"] = point_x_by
 
-        point_y_by = cosmograph_config.get("pointYBy")
+        point_y_by = export_config.get("pointYBy")
         if point_y_by:
             points_columns["y"] = point_y_by
 
-        point_cluster_by = cosmograph_config.get("pointClusterBy")
+        point_cluster_by = export_config.get("pointClusterBy")
         if point_cluster_by:
             points_columns["cluster"] = point_cluster_by
 
-        point_timeline_by = cosmograph_config.get("pointTimelineBy")
+        point_timeline_by = export_config.get("pointTimelineBy")
         if point_timeline_by:
             points_columns["time"] = point_timeline_by
 
@@ -151,23 +151,23 @@ def create_project(
         links_columns = {}
 
         # Required columns
-        link_source_by = cosmograph_config.get("linkSourceBy")
-        link_target_by = cosmograph_config.get("linkTargetBy")
+        link_source_by = export_config.get("linkSourceBy")
+        link_target_by = export_config.get("linkTargetBy")
         if link_source_by and link_target_by:
             links_columns["source"] = link_source_by
             links_columns["target"] = link_target_by
 
             # Optional columns - map only if present in config
-            link_width_by = cosmograph_config.get("linkWidthBy")
+            link_width_by = export_config.get("linkWidthBy")
             if link_width_by:
                 links_columns["width"] = link_width_by
 
-            link_color_by = cosmograph_config.get("linkColorBy")
+            link_color_by = export_config.get("linkColorBy")
             if link_color_by:
                 links_columns["color"] = link_color_by
 
             # Link timeline support
-            link_timeline_by = cosmograph_config.get("linkTimelineBy")
+            link_timeline_by = export_config.get("linkTimelineBy")
             if link_timeline_by:
                 links_columns["time"] = link_timeline_by
 
@@ -184,7 +184,7 @@ def create_project(
                     "title": project_name,
                     "dataSources": data_sources,
                     "columnMapping": column_mapping,
-                    "cosmographConfig": cosmograph_config,
+                    "cosmographConfig": export_config,
                 },
             },
         }
