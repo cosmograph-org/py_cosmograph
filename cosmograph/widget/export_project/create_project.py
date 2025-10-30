@@ -7,6 +7,63 @@ import json
 
 from .config import API_BASE, logger
 
+# Column mapping configuration: maps export config keys to API column keys
+POINT_COLUMN_MAPPING = {
+    "pointIdBy": "id",
+    "pointLabelBy": "label",
+    "pointColorBy": "color",
+    "pointSizeBy": "size",
+    "pointXBy": "x",
+    "pointYBy": "y",
+    "pointClusterBy": "cluster",
+    "pointClusterStrengthBy": "cluster_strength",  # ⚠️ Needs attribute
+    "pointLabelWeightBy": "label_weight",  # ⚠️ Needs attribute
+    "pointTimelineBy": "time",  # ⚠️ Needs attribute
+}
+
+LINK_COLUMN_MAPPING = {
+    "linkSourceBy": "source",
+    "linkTargetBy": "target",
+    "linkColorBy": "color",
+    "linkWidthBy": "width",
+    "linkArrowBy": "arrow",        # ⚠️ Needs attribute
+    "linkStrengthBy": "strength",  # ⚠️ Needs attribute
+    "linkTimelineBy": "time",  # ⚠️ Needs attribute
+}
+
+# Columns that need to be added as attributes (not core columns)
+POINT_ATTRIBUTES_COLUMNS = [
+    "pointClusterStrengthBy",
+    "pointLabelWeightBy",
+    "pointTimelineBy",
+]
+
+LINK_ATTRIBUTES_COLUMNS = [
+    "linkArrowBy",
+    "linkStrengthBy",
+    "linkTimelineBy",
+]
+
+# Core columns that map directly to the columns object
+POINT_CORE_COLUMNS = [
+    "pointIdBy",
+    "pointLabelBy",
+    "pointColorBy",
+    "pointSizeBy",
+    "pointClusterBy",
+    "pointXBy",
+    "pointYBy",
+    "pointTimelineBy",
+]
+
+LINK_CORE_COLUMNS = [
+    "linkSourceBy",
+    "linkTargetBy",
+    "linkColorBy",
+    "linkWidthBy",
+    "linkTimelineBy",
+]
+
 
 def create_empty_project(
     api_key: str,
@@ -99,45 +156,35 @@ def create_project(
         # Map points columns according to API specifications
         points_columns = {}
 
-        # Required columns
-        point_id_by = export_config.get("pointIdBy")
-        if point_id_by:
-            points_columns["id"] = point_id_by
-
-        # Optional columns - map only if present in config
-        point_label_by = export_config.get("pointLabelBy")
-        if point_label_by:
-            points_columns["label"] = point_label_by
-
-        point_color_by = export_config.get("pointColorBy")
-        if point_color_by:
-            points_columns["color"] = point_color_by
-
-        point_size_by = export_config.get("pointSizeBy")
-        if point_size_by:
-            points_columns["size"] = point_size_by
-
-        point_x_by = export_config.get("pointXBy")
-        if point_x_by:
-            points_columns["x"] = point_x_by
-
-        point_y_by = export_config.get("pointYBy")
-        if point_y_by:
-            points_columns["y"] = point_y_by
-
-        point_cluster_by = export_config.get("pointClusterBy")
-        if point_cluster_by:
-            points_columns["cluster"] = point_cluster_by
-
-        point_timeline_by = export_config.get("pointTimelineBy")
-        if point_timeline_by:
-            points_columns["time"] = point_timeline_by
+        # Apply column mappings only for core columns
+        for config_key in POINT_CORE_COLUMNS:
+            value = export_config.get(config_key)
+            if value:
+                column_key = POINT_COLUMN_MAPPING[config_key]
+                points_columns[column_key] = value
 
         if points_columns:
+            # Build attributes array for columns that need them
+            points_attributes = []
+            for config_key in POINT_ATTRIBUTES_COLUMNS:
+                value = export_config.get(config_key)
+                if value:
+                    # Get the API column key from the mapping
+                    column_key = POINT_COLUMN_MAPPING[config_key]
+                    # Create a readable label from the config key
+                    label = config_key.replace("point", "").replace("By", "").replace("Weight", " Weight").replace("Strength", " Strength").strip()
+                    points_attributes.append({
+                        "column": value,
+                        "label": label,
+                        "expression": value,
+                    })
+
             column_mapping["points"] = {
                 "columns": points_columns,
                 "tableName": "point_table",
             }
+            if points_attributes:
+                column_mapping["points"]["attributes"] = points_attributes
 
     # Configure links data source and column mapping
     if links_data:
@@ -150,31 +197,36 @@ def create_project(
         # Map links columns according to API specifications
         links_columns = {}
 
-        # Required columns
-        link_source_by = export_config.get("linkSourceBy")
-        link_target_by = export_config.get("linkTargetBy")
-        if link_source_by and link_target_by:
-            links_columns["source"] = link_source_by
-            links_columns["target"] = link_target_by
+        # Apply column mappings only for core columns
+        for config_key in LINK_CORE_COLUMNS:
+            value = export_config.get(config_key)
+            if value:
+                column_key = LINK_COLUMN_MAPPING[config_key]
+                links_columns[column_key] = value
 
-            # Optional columns - map only if present in config
-            link_width_by = export_config.get("linkWidthBy")
-            if link_width_by:
-                links_columns["width"] = link_width_by
-
-            link_color_by = export_config.get("linkColorBy")
-            if link_color_by:
-                links_columns["color"] = link_color_by
-
-            # Link timeline support
-            link_timeline_by = export_config.get("linkTimelineBy")
-            if link_timeline_by:
-                links_columns["time"] = link_timeline_by
+        # Only proceed if we have at least source and target
+        if "source" in links_columns and "target" in links_columns:
+            # Build attributes array for columns that need them
+            links_attributes = []
+            for config_key in LINK_ATTRIBUTES_COLUMNS:
+                value = export_config.get(config_key)
+                if value:
+                    # Get the API column key from the mapping
+                    column_key = LINK_COLUMN_MAPPING[config_key]
+                    # Create a readable label from the config key
+                    label = config_key.replace("link", "").replace("By", "").replace("Strength", " Strength").strip()
+                    links_attributes.append({
+                        "column": value,
+                        "label": label,
+                        "expression": value,
+                    })
 
             column_mapping["links"] = {
                 "columns": links_columns,
                 "tableName": "link_table",
             }
+            if links_attributes:
+                column_mapping["links"]["attributes"] = links_attributes
 
     try:
         config_json = {
