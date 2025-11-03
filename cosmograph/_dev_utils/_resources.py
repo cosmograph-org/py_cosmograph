@@ -792,6 +792,54 @@ class ConfigsDacc:
         name_and_value_pairs = ((x[key_field], x) for x in self._interfaces())
         return find_duplicates(name_and_value_pairs, val_filt=lambda x: len(x) > 1)
 
+    def signature_diffs(self, other: 'ConfigsDacc'):
+        """
+        Compare signatures between this ConfigsDacc instance and another.
+
+        Args:
+            other: Another ConfigsDacc instance to compare with
+
+        Returns:
+            Dictionary of differences
+        """
+        return signature_diffs(
+            self.traitlets_sig,
+            other.traitlets_sig,
+            sig1_name="current",
+            sig2_name="staged",
+        )
+
+    def info_dfs(self, other: 'ConfigsDacc'):
+        """
+        Compare info dataframes between this ConfigsDacc instance and another.
+
+        Args:
+            other: Another ConfigsDacc instance to compare with
+
+        Returns:
+            Comparison information (implementation depends on needs)
+        """
+        # For now, just return a summary string
+        current_params = set(self.matched_info_df.index)
+        other_params = set(other.matched_info_df.index)
+
+        added = other_params - current_params
+        removed = current_params - other_params
+
+        result = []
+        if added:
+            result.append(
+                f"Added parameters ({len(added)}): {', '.join(sorted(added))}"
+            )
+        if removed:
+            result.append(
+                f"Removed parameters ({len(removed)}): {', '.join(sorted(removed))}"
+            )
+        if not added and not removed:
+            result.append("No parameters added or removed")
+
+        return "\n".join(result)
+
 
 configs_dacc = ConfigsDacc()
 
@@ -853,7 +901,6 @@ def transform_defaults_keys(flat_defaults):
         transformed[key_snake] = value
 
     return transformed
-
 
 
 # Compiled regex to handle camel case to snake case conversions, including acronyms
@@ -1085,7 +1132,6 @@ def dataframes_to_markdown(
 from functools import partial, cached_property
 from typing import Callable
 from collections import defaultdict
-
 
 
 def gather_items(pairs, *, val_filt: Callable = lambda x: True):
