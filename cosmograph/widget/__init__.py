@@ -294,8 +294,14 @@ class Cosmograph(anywidget.AnyWidget):
     def unselect_points_by_indices(self, indices):
         self.send({"type": "unselect_points_by_indices", "indices": indices})
 
-    def fit_view(self):
-        self.send({"type": "fit_view"})
+    def fit_view(self, duration=None, padding=None):
+        self.send(
+            {
+                "type": "fit_view",
+                "duration": duration,
+                "padding": padding,
+            }
+        )
 
     def fit_view_by_indices(self, indices, duration=None, padding=None):
         self.send(

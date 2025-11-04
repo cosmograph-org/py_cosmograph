@@ -67,7 +67,7 @@ async function render({ model, el }: RenderProps) {
       cosmograph?.unselectPointsByIndicies(msg.indices)
     }
     if (msg.type === 'fit_view') {
-      cosmograph?.fitView()
+      cosmograph?.fitView(msg.duration, msg.padding)
     }
     if (msg.type === 'fit_view_by_indices') {
       cosmograph?.fitViewByIndices(msg.indices, msg.duration, msg.padding)
@@ -83,8 +83,12 @@ async function render({ model, el }: RenderProps) {
       cosmograph?.setFocusedPoint(msg.index ?? undefined)
     }
     if (msg.type === 'focus_point') {
-      const index = (await cosmograph?.getPointIndicesByIds([msg.id]))?.[0]
-      cosmograph?.setFocusedPoint(index)
+      if (msg.id == null || msg.id === undefined) {
+        cosmograph?.setFocusedPoint(undefined)
+      } else {
+        const index = (await cosmograph?.getPointIndicesByIds([msg.id]))?.[0]
+        cosmograph?.setFocusedPoint(index)
+      }
     }
     if (msg.type === 'start') {
       cosmograph?.start(msg.alpha ?? undefined)
