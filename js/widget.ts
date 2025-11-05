@@ -136,14 +136,33 @@ async function render({ model, el }: RenderProps) {
     },
   }
 
-  const updatePythonCosmographConfig = (): void => {
-    const camelCaseConfigProps = new Set(Object.values(snakeToCamelConfigProps))
-    const filteredConfig = Object.fromEntries(
-      Object.entries(cosmographConfig).filter(([camelCasePropKey, value]) =>
-        camelCaseConfigProps.has(camelCasePropKey) && value !== undefined
-      )
-    )
-    model.set('cosmograph_config', filteredConfig)
+  /**
+   * Updates the Python export_config with clean, unmutated configuration for project export.
+   *
+   * This function builds the export configuration by reading directly from the model.
+   *
+   * Only includes properties defined in config-props.json (Cosmograph configuration properties)
+   * and converts them from snake_case (Python) to camelCase (JavaScript) format.
+   *
+   * The resulting config is synced to Python's export_config property and used when
+   * exporting projects to Cosmograph App.
+   *
+   * @remarks
+   * - Filters out undefined/null values
+   * - Automatically syncs to Python widget via model.set()
+   */
+  const updatePythonExportConfig = (): void => {
+    // Build export config from model values (not mutated cosmographConfig)
+    const exportConfig: Record<string, any> = {}
+
+    for (const [snakeCaseProp, camelCaseProp] of Object.entries(snakeToCamelConfigProps)) {
+      const value = model.get(snakeCaseProp)
+      if (value !== undefined && value !== null) {
+        exportConfig[camelCaseProp] = value
+      }
+    }
+
+    model.set('export_config', exportConfig)
     model.save_changes()
   }
 
@@ -193,7 +212,7 @@ async function render({ model, el }: RenderProps) {
         cosmograph?.setConfig(cosmographConfig)
         // await when config is set
         await cosmograph?.getConfig()
-        updatePythonCosmographConfig()
+        updatePythonExportConfig()
       }
 
       // If color associated properties change, update the color legend after setting the config to cosmograph
@@ -231,6 +250,8 @@ async function render({ model, el }: RenderProps) {
   // Initializes the Cosmograph with the configured settings
   Object.values(modelChangeHandlers).forEach(callback => callback())
 
+  updatePythonExportConfig()
+
   await prepareCosmographDataAndMutate(cosmographConfig)
 
   cosmographConfig.onGraphRebuilt = () => {
@@ -259,7 +280,6 @@ async function render({ model, el }: RenderProps) {
     isOverlayVisible = false
   }
 
-  updatePythonCosmographConfig()
   /**
    * Remove all props from `cosmographConfig` if they are `undefined`
    */

@@ -12,67 +12,12 @@ from .create_project import create_project, create_empty_project
 from .config import logger
 
 
-def _filter_config_by_existing_columns(
-    config: dict[str, Any],
-    points: Optional[pd.DataFrame],
-    links: Optional[pd.DataFrame],
-    debug: bool = False
-) -> dict[str, Any]:
-    """Filter out config fields that reference columns that don't exist in the data.
-
-    Args:
-        config: Cosmograph configuration dictionary
-        points: Points DataFrame
-        links: Links DataFrame
-
-    Returns:
-        Filtered configuration dictionary
-    """
-    if not config:
-        return config
-
-    filtered_config = config.copy()
-    point_columns = set(points.columns) if points is not None else set()
-    link_columns = set(links.columns) if links is not None else set()
-
-    # Mapping of config keys to the columns they reference and which DataFrame to check
-    column_references = {
-        'pointIdBy': ('points', point_columns),
-        'pointIndexBy': ('points', point_columns),
-        'pointLabelBy': ('points', point_columns),
-        'pointColorBy': ('points', point_columns),
-        'pointSizeBy': ('points', point_columns),
-        'pointXBy': ('points', point_columns),
-        'pointYBy': ('points', point_columns),
-        'pointClusterBy': ('points', point_columns),
-        'pointTimelineBy': ('points', point_columns),
-        'linkSourceBy': ('links', link_columns),
-        'linkTargetBy': ('links', link_columns),
-        'linkColorBy': ('links', link_columns),
-        'linkWidthBy': ('links', link_columns),
-        'linkTimelineBy': ('links', link_columns),
-    }
-
-    removed_fields = []
-    for config_key, (data_type, available_columns) in column_references.items():
-        if config_key in filtered_config:
-            column_name = filtered_config[config_key]
-            if column_name and column_name not in available_columns:
-                removed_fields.append(f"{config_key}='{column_name}'")
-                del filtered_config[config_key]
-
-    if removed_fields and debug:
-        logger.info("📋 Removed config fields with non-existent columns: %s", ", ".join(removed_fields))
-
-    return filtered_config
-
-
 def export_project(
     api_key: Optional[str] = None,
     project_name: str = "Cosmograph Project",
     points: Optional[pd.DataFrame] = None,
     links: Optional[pd.DataFrame] = None,
-    cosmograph_config: Optional[dict[str, Any]] = None,
+    export_config: Optional[dict[str, Any]] = None,
     debug: bool = False,
 ) -> dict[str, Any]:
     """Export data to a Cosmograph project.
@@ -82,7 +27,7 @@ def export_project(
         project_name: Name for the project
         points: DataFrame containing point data
         links: DataFrame containing link data
-        cosmograph_config: Cosmograph configuration
+        export_config: Cosmograph configuration for export (column mappings and visual settings)
         debug: If True, show detailed timing and configuration logs (default: False)
 
     Returns:
@@ -103,13 +48,8 @@ def export_project(
         len(points) if points is not None else 0,
         len(links) if links is not None else 0)
 
-    # Filter out config fields that reference non-existent columns
-    if cosmograph_config:
-        if debug:
-            logger.info("📋 Original Cosmograph config: %s", json.dumps(cosmograph_config, indent=2))
-        cosmograph_config = _filter_config_by_existing_columns(cosmograph_config, points, links, debug=debug)
-        if debug:
-            logger.info("📋 Filtered Cosmograph config: %s", json.dumps(cosmograph_config, indent=2))
+    if debug and export_config:
+        logger.info("📋 Export config: %s", json.dumps(export_config, indent=2))
 
     # Step 1: Create empty project first
     try:
@@ -164,7 +104,7 @@ def export_project(
             raise ValueError(f"Failed to process links data: {e}") from e
 
     # Step 3: Update project with uploaded files and configuration
-    if points_data or links_data or cosmograph_config:
+    if points_data or links_data or export_config:
         try:
             step_start = time.perf_counter() if debug else None
             create_project(
@@ -172,7 +112,7 @@ def export_project(
                 project_name=project_name,
                 points_data=points_data,
                 links_data=links_data,
-                cosmograph_config=cosmograph_config,
+                export_config=export_config,
                 debug=debug,
             )
             if debug:

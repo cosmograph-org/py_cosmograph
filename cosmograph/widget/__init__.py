@@ -215,7 +215,7 @@ class Cosmograph(anywidget.AnyWidget):
     selected_point_indices = List(Int, allow_none=True).tag(sync=True)
     selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
     selected_link_indices = List(Int, allow_none=True).tag(sync=True)
-    cosmograph_config = Dict(default_value={}, allow_none=True).tag(sync=True)
+    export_config = Dict(default_value={}, allow_none=True).tag(sync=True)
 
     api_key = Unicode(None, allow_none=True)
 
@@ -360,7 +360,7 @@ class Cosmograph(anywidget.AnyWidget):
         if not project_name or not project_name.strip():
             raise ValueError("Project name is required and cannot be empty")
         try:
-            return export_project(self.api_key, project_name, self.points, self.links, self.cosmograph_config, debug=debug)
+            return export_project(self.api_key, project_name, self.points, self.links, self.export_config, debug=debug)
         except Exception as e:
             raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
