@@ -7,10 +7,11 @@
 }
 
 .wrapper .graph {
-	flex: 1;
-	/* height: 100%; */
-	min-height: 0;
-	display: flex;
+        flex: 1;
+        /* height: 100%; */
+        min-height: 0;
+        display: flex;
+        position: relative;
 }
 
 .wrapper .timeline {
@@ -131,14 +132,15 @@
   padding: 7px;
 }
 
-.wrapper .leftControls .settingsButton,
-.wrapper .rightControls .settingsButton,
-.wrapper .controls .settingsButton {
-	margin-top: 1.9rem;
-	pointer-events: auto;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+.settings-toggle-wrapper {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 110;
 }
 
 /* Loading indicator styles */
@@ -181,15 +183,14 @@
 
 /* Settings Panel Styles */
 .settings-panel {
-	position: absolute;
-	top: 0.5rem;
-	right: 3rem;
-	z-index: 100;
-	pointer-events: auto;
-	display: none;
-	width: 280px;
-	max-height: calc(100% - 1rem);
-	overflow-y: auto;
+        position: absolute;
+        top: 0.5rem;
+        right: 3rem;
+        z-index: 100;
+        pointer-events: auto;
+        width: 280px;
+        max-height: calc(100% - 1rem);
+        overflow-y: auto;
 	overflow-x: hidden;
 	background: rgba(45, 49, 58, 0.95);
 	backdrop-filter: blur(10px);
@@ -357,15 +358,14 @@
 
 /* Point Info Panel */
 .point-info-panel {
-	position: absolute;
-	top: 0.5rem;
-	left: 3rem;
-	z-index: 100;
-	pointer-events: auto;
-	display: none;
-	width: 240px;
-	max-height: calc(100% - 1rem);
-	background: rgba(45, 49, 58, 0.95);
+        position: absolute;
+        top: 0.5rem;
+        left: 3rem;
+        z-index: 100;
+        pointer-events: auto;
+        width: 240px;
+        max-height: calc(100% - 1rem);
+        background: rgba(45, 49, 58, 0.95);
 	backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 8px;
