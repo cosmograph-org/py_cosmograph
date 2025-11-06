@@ -2,9 +2,9 @@
 	"type": "module",
 	"scripts": {
 		"clean": "rm -rf cosmograph/widget/static",
-		"build:esbuild": "esbuild js/widget.ts --minify --bundle --splitting --entry-names=[name]-[hash] --metafile=meta.json --format=esm --outdir=cosmograph/widget/static",
-		"build:meta": "node create-meta-file.cjs",
-		"dev": "npm run clean && esbuild js/widget.ts --format=esm --bundle --outdir=cosmograph/widget/static --sourcemap=inline --watch",
+                "build:esbuild": "esbuild js/widget.tsx --minify --bundle --splitting --entry-names=[name]-[hash] --metafile=meta.json --format=esm --outdir=cosmograph/widget/static --alias:preact=./js/vendor/preact/index.ts --alias:preact/hooks=./js/vendor/preact/hooks.ts --alias:preact/jsx-runtime=./js/vendor/preact/jsx-runtime.ts",
+                "build:meta": "node create-meta-file.cjs",
+                "dev": "npm run clean && esbuild js/widget.tsx --format=esm --bundle --outdir=cosmograph/widget/static --sourcemap=inline --watch --alias:preact=./js/vendor/preact/index.ts --alias:preact/hooks=./js/vendor/preact/hooks.ts --alias:preact/jsx-runtime=./js/vendor/preact/jsx-runtime.ts",
 		"build": "npm run clean && npm run build:esbuild && npm run build:meta",
 		"typecheck": "tsc --noEmit",
 		"lint": "eslint --cache ./js"

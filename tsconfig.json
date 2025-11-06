@@ -16,10 +16,15 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"noEmit": true,
-		"jsx": "react",
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true
-	}
+                "jsx": "react-jsx",
+                "jsxImportSource": "preact",
+                "strict": true,
+                "noUnusedLocals": true,
+                "noUnusedParameters": true,
+                "noFallthroughCasesInSwitch": true,
+                "paths": {
+                        "preact": ["./js/vendor/preact/index.ts"],
+                        "preact/*": ["./js/vendor/preact/*"]
+                }
+        }
 }

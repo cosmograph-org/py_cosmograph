@@ -8,8 +8,14 @@ import {
   CosmographPointSizeStrategy,
 } from '@cosmograph/cosmograph'
 
-import { createWidgetLegendElements } from './widget-elements'
 import { isDuckDBStringType, isDuckDBNumericType } from './helper'
+export interface LegendContainers {
+  pointSizeLegendContainer: HTMLDivElement;
+  linkWidthLegendContainer: HTMLDivElement;
+  pointColorLegendContainer: HTMLDivElement;
+  pointTypeColorLegendContainer: HTMLDivElement;
+  linkColorLegendContainer: HTMLDivElement;
+}
 
 export enum ColorType {
   Range = 'range',
@@ -46,13 +52,12 @@ export class CosmographLegends {
   private _pointTypeColorLegend: CosmographTypeColorLegend | undefined
   private _linkRangeColorLegend: CosmographRangeColorLegend | undefined
 
-  constructor(container: HTMLElement, model: AnyModel) {
-    const { pointSizeLegendContainer, linkWidthLegendContainer, pointColorLegendContainer, pointTypeColorLegendContainer, linkColorLegendContainer } = createWidgetLegendElements(container)
-    this.pointSizeLegendContainer = pointSizeLegendContainer
-    this.linkWidthLegendContainer = linkWidthLegendContainer
-    this.pointColorLegendContainer = pointColorLegendContainer
-    this.pointTypeColorLegendContainer = pointTypeColorLegendContainer
-    this.linkColorLegendContainer = linkColorLegendContainer
+  constructor(containers: LegendContainers, model: AnyModel) {
+    this.pointSizeLegendContainer = containers.pointSizeLegendContainer
+    this.linkWidthLegendContainer = containers.linkWidthLegendContainer
+    this.pointColorLegendContainer = containers.pointColorLegendContainer
+    this.pointTypeColorLegendContainer = containers.pointTypeColorLegendContainer
+    this.linkColorLegendContainer = containers.linkColorLegendContainer
 
     this.model = model
   }
