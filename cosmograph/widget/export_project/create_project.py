@@ -18,7 +18,7 @@ POINT_COLUMN_MAPPING = {
     "pointClusterBy": "cluster",
     "pointClusterStrengthBy": "cluster_strength",  # ⚠️ Needs attribute
     "pointLabelWeightBy": "label_weight",  # ⚠️ Needs attribute
-    "pointTimelineBy": "time",  # ⚠️ Needs attribute
+    "pointTimelineBy": "time",  # Core column only - API handles automatically
 }
 
 LINK_COLUMN_MAPPING = {
@@ -28,20 +28,18 @@ LINK_COLUMN_MAPPING = {
     "linkWidthBy": "width",
     "linkArrowBy": "arrow",        # ⚠️ Needs attribute
     "linkStrengthBy": "strength",  # ⚠️ Needs attribute
-    "linkTimelineBy": "time",  # ⚠️ Needs attribute
+    "linkTimelineBy": "time",  # Core column only - API handles automatically
 }
 
 # Columns that need to be added as attributes (not core columns)
 POINT_ATTRIBUTES_COLUMNS = [
     "pointClusterStrengthBy",
     "pointLabelWeightBy",
-    "pointTimelineBy",
 ]
 
 LINK_ATTRIBUTES_COLUMNS = [
     "linkArrowBy",
     "linkStrengthBy",
-    "linkTimelineBy",
 ]
 
 # Core columns that map directly to the columns object
