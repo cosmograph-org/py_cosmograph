@@ -167,8 +167,6 @@ def create_project(
             for config_key in POINT_ATTRIBUTES_COLUMNS:
                 value = export_config.get(config_key)
                 if value:
-                    # Get the API column key from the mapping
-                    column_key = POINT_COLUMN_MAPPING[config_key]
                     # Create a readable label from the config key
                     label = config_key.replace("point", "").replace("By", "").replace("Weight", " Weight").replace("Strength", " Strength").strip()
                     points_attributes.append({
@@ -209,8 +207,6 @@ def create_project(
             for config_key in LINK_ATTRIBUTES_COLUMNS:
                 value = export_config.get(config_key)
                 if value:
-                    # Get the API column key from the mapping
-                    column_key = LINK_COLUMN_MAPPING[config_key]
                     # Create a readable label from the config key
                     label = config_key.replace("link", "").replace("By", "").replace("Strength", " Strength").strip()
                     links_attributes.append({
