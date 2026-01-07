@@ -64,7 +64,7 @@ async function render({ model, el }: RenderProps) {
       cosmograph?.selectPointsInPolygon(msg.polygon)
     }
     if (msg.type === 'unselect_points_by_indices') {
-      cosmograph?.unselectPointsByIndicies(msg.indices)
+      cosmograph?.unselectPointsByIndices(msg.indices)
     }
     if (msg.type === 'fit_view') {
       cosmograph?.fitView(msg.duration, msg.padding)
@@ -93,11 +93,21 @@ async function render({ model, el }: RenderProps) {
     if (msg.type === 'start') {
       cosmograph?.start(msg.alpha ?? undefined)
     }
+    if (msg.type === 'stop') {
+      cosmograph?.stop()
+    }
     if (msg.type === 'pause') {
       cosmograph?.pause()
     }
+    if (msg.type === 'unpause') {
+      cosmograph?.unpause()
+    }
     if (msg.type === 'restart') {
-      cosmograph?.restart()
+      // Deprecated: use unpause instead
+      cosmograph?.unpause()
+    }
+    if (msg.type === 'set_pinned_points') {
+      cosmograph?.setPinnedPoints(msg.indices)
     }
     if (msg.type === 'step') {
       cosmograph?.step()
@@ -224,7 +234,7 @@ async function render({ model, el }: RenderProps) {
         legends.update('point', 'size')
       }
 
-      if (snakeCaseProp === 'link_color_by') {
+      if (snakeCaseProp === 'link_color_by' || snakeCaseProp === 'link_color_strategy') {
         legends.update('link', 'color')
       }
 
