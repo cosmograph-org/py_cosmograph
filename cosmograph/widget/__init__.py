@@ -31,7 +31,7 @@ class Cosmograph(anywidget.AnyWidget):
     # List of all configuration parameters that JS side support can be found in ./js/config-props.ts
 
     # Parameters based on parameters from Cosmos (https://github.com/cosmograph-org/cosmos/blob/main/src/config.ts)
-    disable_simulation = Bool(None, allow_none=True).tag(sync=True)
+    enable_simulation = Bool(None, allow_none=True).tag(sync=True)
 
     simulation_decay = Float(None, allow_none=True).tag(sync=True)
     simulation_gravity = Float(None, allow_none=True).tag(sync=True)
@@ -45,6 +45,7 @@ class Cosmograph(anywidget.AnyWidget):
         None, default_value=None, allow_none=True
     ).tag(sync=True)
     simulation_repulsion_from_mouse = Float(None, allow_none=True).tag(sync=True)
+    enable_right_click_repulsion = Bool(None, allow_none=True).tag(sync=True)
     simulation_friction = Float(None, allow_none=True).tag(sync=True)
     simulation_cluster = Float(None, allow_none=True).tag(sync=True)
 
@@ -52,12 +53,16 @@ class Cosmograph(anywidget.AnyWidget):
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
     ).tag(sync=True)
     space_size = Int(None, allow_none=True).tag(sync=True)
-    point_color = Union(
+    point_default_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
     ).tag(sync=True)
     point_greyout_opacity = Float(None, allow_none=True).tag(sync=True)
-    point_size = Float(None, allow_none=True).tag(sync=True)
+    point_greyout_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    ).tag(sync=True)
+    point_default_size = Float(None, allow_none=True).tag(sync=True)
     point_size_scale = Float(None, allow_none=True).tag(sync=True)
+    point_opacity = Float(None, allow_none=True).tag(sync=True)
     hovered_point_cursor = Unicode(None, allow_none=True).tag(sync=True)
     render_hovered_point_ring = Bool(None, allow_none=True).tag(sync=True)
     hovered_point_ring_color = Union(
@@ -68,30 +73,37 @@ class Cosmograph(anywidget.AnyWidget):
     ).tag(sync=True)
     focused_point_index = Int(None, allow_none=True).tag(sync=True)
     render_links = Bool(None, allow_none=True).tag(sync=True)
-    link_color = Union(
+    link_default_color = Union(
         [Unicode(None, allow_none=True), List(Float, allow_none=True)]
     ).tag(sync=True)
     link_greyout_opacity = Float(None, allow_none=True).tag(sync=True)
-    link_width = Float(None, allow_none=True).tag(sync=True)
+    link_default_width = Float(None, allow_none=True).tag(sync=True)
     link_width_scale = Float(None, allow_none=True).tag(sync=True)
+    link_opacity = Float(None, allow_none=True).tag(sync=True)
+    hovered_link_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    ).tag(sync=True)
+    hovered_link_width_increase = Float(None, allow_none=True).tag(sync=True)
+    hovered_link_cursor = Unicode(None, allow_none=True).tag(sync=True)
     curved_links = Bool(None, allow_none=True).tag(sync=True)
     curved_link_segments = Int(None, allow_none=True).tag(sync=True)
     curved_link_weight = Float(None, allow_none=True).tag(sync=True)
     curved_link_control_point_distance = Float(None, allow_none=True).tag(sync=True)
-    link_arrows = Bool(None, allow_none=True).tag(sync=True)
+    link_default_arrows = Bool(None, allow_none=True).tag(sync=True)
     link_arrows_size_scale = Float(None, allow_none=True).tag(sync=True)
     link_visibility_distance_range = List(
         Float, default_value=None, allow_none=True
     ).tag(sync=True)
     link_visibility_min_transparency = Float(None, allow_none=True).tag(sync=True)
-    use_quadtree = Bool(None, allow_none=True).tag(sync=True)
+    use_classic_quadtree = Bool(None, allow_none=True).tag(sync=True)
     show_fps_monitor = Bool(None, allow_none=True).tag(sync=True)
     pixel_ratio = Float(None, allow_none=True).tag(sync=True)
     # Set to True by default until it becomes the default in Cosmograph library
     scale_points_on_zoom = Bool(True, allow_none=True).tag(sync=True)
     scale_links_on_zoom = Bool(None, allow_none=True).tag(sync=True)
     initial_zoom_level = Float(None, allow_none=True).tag(sync=True)
-    disable_zoom = Bool(None, allow_none=True).tag(sync=True)
+    enable_zoom = Bool(None, allow_none=True).tag(sync=True)
+    enable_simulation_during_zoom = Bool(None, allow_none=True).tag(sync=True)
     enable_drag = Bool(None, allow_none=True).tag(sync=True)
     fit_view_on_init = Bool(None, allow_none=True).tag(sync=True)
     fit_view_delay = Float(None, allow_none=True).tag(sync=True)
@@ -100,10 +112,12 @@ class Cosmograph(anywidget.AnyWidget):
     fit_view_by_points_in_rect = List(
         List(Float), default_value=None, allow_none=True
     ).tag(sync=True)
+    fit_view_by_point_indices = List(Int, default_value=None, allow_none=True).tag(sync=True)
     random_seed = Union(
         [Int(None, allow_none=True), Unicode(None, allow_none=True)]
     ).tag(sync=True)
     point_sampling_distance = Int(None, allow_none=True).tag(sync=True)
+    rescale_positions = Bool(None, allow_none=True).tag(sync=True)
 
     # Polygonal selection configuration
     polygonal_selector_stroke_color = Unicode(None, allow_none=True).tag(sync=True)
@@ -121,6 +135,7 @@ class Cosmograph(anywidget.AnyWidget):
         key_trait=Unicode(), value_trait=Union([Unicode(), List(Float())]), default_value=None, allow_none=True
     ).tag(sync=True)
     point_color_strategy = Unicode(None, allow_none=True).tag(sync=True)
+    unknown_color = Unicode(None, allow_none=True).tag(sync=True)
 
     point_size_by = Unicode(None, allow_none=True).tag(sync=True)
     point_size_range = List(Float, default_value=None, allow_none=True).tag(sync=True)
@@ -144,7 +159,11 @@ class Cosmograph(anywidget.AnyWidget):
     link_target_by = Union([Unicode(), List(Unicode())], default_value=None, allow_none=True).tag(sync=True)
     link_target_index_by = Unicode(None, allow_none=True).tag(sync=True)
     link_color_by = Unicode(None, allow_none=True).tag(sync=True)
+    link_color_palette = List(Unicode(), default_value=None, allow_none=True).tag(sync=True)
+    link_color_strategy = Unicode(None, allow_none=True).tag(sync=True)
     link_width_by = Unicode(None, allow_none=True).tag(sync=True)
+    link_width_strategy = Unicode(None, allow_none=True).tag(sync=True)
+    link_width_range = List(Float, default_value=None, allow_none=True).tag(sync=True)
     link_arrow_by = Unicode(None, allow_none=True).tag(sync=True)
     link_strength_by = Unicode(None, allow_none=True).tag(sync=True)
     link_strength_range = List(Float, default_value=None, allow_none=True).tag(
@@ -170,6 +189,7 @@ class Cosmograph(anywidget.AnyWidget):
     scale_cluster_labels = Bool(None, allow_none=True).tag(sync=True)
 
     label_padding = List(Float, default_value=None, allow_none=True).tag(sync=True)
+    custom_labels = List(Any, default_value=None, allow_none=True).tag(sync=True)
 
     # Set to True by default until it becomes the default in cosmograph
     show_hovered_point_label = Bool(True, allow_none=True).tag(sync=True)
@@ -192,6 +212,7 @@ class Cosmograph(anywidget.AnyWidget):
     status_indicator_mode = Union(
         [Unicode(None, allow_none=True), Bool(None, allow_none=True)]
     ).tag(sync=True)
+    disable_logging = Bool(None, allow_none=True).tag(sync=True)
     preserve_point_positions_on_data_update = Bool(None, allow_none=True).tag(sync=True)
 
     # Not related to Cosmograph configuration settings
@@ -212,12 +233,113 @@ class Cosmograph(anywidget.AnyWidget):
     clicked_point_index = Int(None, allow_none=True).tag(sync=True)
     clicked_point_id = Unicode(None, allow_none=True).tag(sync=True)
     clicked_cluster = Any(None, allow_none=True).tag(sync=True)
-    selected_point_indices = List(Int, allow_none=True).tag(sync=True)
-    selected_point_ids = List(Unicode, allow_none=True).tag(sync=True)
-    selected_link_indices = List(Int, allow_none=True).tag(sync=True)
+    selected_point_indices = List(Int, default_value=None, allow_none=True).tag(sync=True)
+    selected_point_ids = List(Unicode, default_value=None, allow_none=True).tag(sync=True)
+    selected_link_indices = List(Int, default_value=None, allow_none=True).tag(sync=True)
     export_config = Dict(default_value={}, allow_none=True).tag(sync=True)
 
     api_key = Unicode(None, allow_none=True)
+
+    # ============================================================================
+    # DEPRECATED PROPERTIES - These will be removed in a future version
+    # ============================================================================
+    # These properties are kept for backward compatibility only.
+    # They automatically map to the new property names internally.
+    # Please update your code to use the new property names:
+    # - disable_simulation → enable_simulation (inverted logic)
+    # - point_color → point_default_color
+    # - point_size → point_default_size
+    # - link_color → link_default_color
+    # - link_width → link_default_width
+    # - link_arrows → link_default_arrows
+    # - use_quadtree → use_classic_quadtree
+    # - disable_zoom → enable_zoom (inverted logic)
+    # ============================================================================
+
+    # DEPRECATED: Use enable_simulation instead (with inverted logic)
+    # Setting disable_simulation=True is equivalent to enable_simulation=False
+    # Setting disable_simulation=False is equivalent to enable_simulation=True
+    disable_simulation = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use point_default_color instead
+    point_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    )
+
+    # DEPRECATED: Use point_default_size instead
+    point_size = Float(None, allow_none=True)
+
+    # DEPRECATED: Use link_default_color instead
+    link_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    )
+
+    # DEPRECATED: Use link_default_width instead
+    link_width = Float(None, allow_none=True)
+
+    # DEPRECATED: Use link_default_arrows instead
+    link_arrows = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use use_classic_quadtree instead
+    use_quadtree = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use enable_zoom instead (with inverted logic)
+    # Setting disable_zoom=True is equivalent to enable_zoom=False
+    # Setting disable_zoom=False is equivalent to enable_zoom=True
+    disable_zoom = Bool(None, allow_none=True)
+
+    # ============================================================================
+    # OBSERVERS FOR DEPRECATED PROPERTIES
+    # ============================================================================
+    # Simple one-way mapping: deprecated property → new property
+    # These observers automatically sync deprecated properties to their new equivalents.
+    # ============================================================================
+
+    @observe("disable_simulation")
+    def _on_disable_simulation_changed(self, change):
+        """DEPRECATED: Maps disable_simulation to enable_simulation with inverted logic."""
+        if change.new is not None:
+            self.enable_simulation = not change.new
+
+    @observe("point_color")
+    def _on_point_color_changed(self, change):
+        """DEPRECATED: Maps point_color to point_default_color."""
+        self.point_default_color = change.new
+
+    @observe("point_size")
+    def _on_point_size_changed(self, change):
+        """DEPRECATED: Maps point_size to point_default_size."""
+        self.point_default_size = change.new
+
+    @observe("link_color")
+    def _on_link_color_changed(self, change):
+        """DEPRECATED: Maps link_color to link_default_color."""
+        self.link_default_color = change.new
+
+    @observe("link_width")
+    def _on_link_width_changed(self, change):
+        """DEPRECATED: Maps link_width to link_default_width."""
+        self.link_default_width = change.new
+
+    @observe("link_arrows")
+    def _on_link_arrows_changed(self, change):
+        """DEPRECATED: Maps link_arrows to link_default_arrows."""
+        self.link_default_arrows = change.new
+
+    @observe("use_quadtree")
+    def _on_use_quadtree_changed(self, change):
+        """DEPRECATED: Maps use_quadtree to use_classic_quadtree."""
+        self.use_classic_quadtree = change.new
+
+    @observe("disable_zoom")
+    def _on_disable_zoom_changed(self, change):
+        """DEPRECATED: Maps disable_zoom to enable_zoom with inverted logic."""
+        if change.new is not None:
+            self.enable_zoom = not change.new
+
+    # ============================================================================
+    # END OF DEPRECATED PROPERTIES
+    # ============================================================================
 
     @observe("points")
     def _on_points_changed(self, change):
@@ -340,16 +462,57 @@ class Cosmograph(anywidget.AnyWidget):
         self.send({"type": "focus_point", "id": id})
 
     def start(self, alpha=None):
+        """Start the simulation.
+
+        This only controls the simulation state, not rendering.
+
+        Args:
+            alpha: Optional value from 0 to 1. The higher the value,
+                   the more initial energy the simulation will get.
+        """
         self.send({"type": "start", "alpha": alpha})
+
+    def stop(self):
+        """Stop the simulation and reset its state.
+
+        This stops the simulation completely and resets its state.
+        Use :meth:`start` to begin a new simulation cycle.
+        """
+        self.send({"type": "stop"})
 
     def pause(self):
         self.send({"type": "pause"})
 
+    def unpause(self):
+        """Unpause the simulation."""
+        self.send({"type": "unpause"})
+
     def restart(self):
-        self.send({"type": "restart"})
+        """Restart the simulation.
+
+        .. deprecated:: 2.0.1
+            Use :meth:`unpause` instead. This method will be removed in a future version.
+        """
+        import warnings
+        warnings.warn(
+            "restart() is deprecated. Use unpause() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        self.unpause()
 
     def step(self):
         self.send({"type": "step"})
+
+    def set_pinned_points(self, indices):
+        """Set which points should be pinned (fixed in position) during simulation.
+
+        Args:
+            indices: List of point indices to pin, or None/empty list to unpin all points.
+                    Example: [0, 5] pins points at indices 0 and 5.
+                    Example: [] or None unpins all points.
+        """
+        self.send({"type": "set_pinned_points", "indices": indices})
 
     def capture_screenshot(self):
         self.send({"type": "capture_screenshot"})

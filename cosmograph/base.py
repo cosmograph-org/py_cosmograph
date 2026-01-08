@@ -80,6 +80,62 @@ def prioritize_points(kwargs, data=None):
     return kwargs
 
 
+def handle_deprecated_properties(kwargs: CosmoKwargs) -> CosmoKwargs:
+    """
+    Handle deprecated properties by mapping them to new property names.
+
+    This function:
+    1. Prioritizes new properties over deprecated ones (if both are set, deprecated is removed)
+    2. Converts deprecated properties to new ones (if only deprecated is provided)
+    3. Maps deprecated point_color_strategy values to new ones
+
+    This is called before validation to ensure deprecated properties are always handled,
+    even if users provide custom validators.
+
+    Args:
+        kwargs: Dictionary of keyword arguments
+
+    Returns:
+        Modified kwargs with deprecated properties converted to new ones
+    """
+    deprecated_to_new = {
+        "disable_simulation": "enable_simulation",
+        "point_color": "point_default_color",
+        "point_size": "point_default_size",
+        "link_color": "link_default_color",
+        "link_width": "link_default_width",
+        "link_arrows": "link_default_arrows",
+        "use_quadtree": "use_classic_quadtree",
+        "disable_zoom": "enable_zoom",
+    }
+
+    for deprecated, new_prop in deprecated_to_new.items():
+        if new_prop in kwargs and kwargs[new_prop] is not None:
+            # New property is explicitly set, remove deprecated one
+            kwargs.pop(deprecated, None)
+        elif deprecated in kwargs and kwargs[deprecated] is not None:
+            # Only deprecated property is set, convert it to new one
+            if deprecated in ("disable_simulation", "disable_zoom"):
+                # Inverted logic for these
+                kwargs[new_prop] = not kwargs[deprecated]
+            else:
+                # Direct mapping for others
+                kwargs[new_prop] = kwargs[deprecated]
+            kwargs.pop(deprecated, None)
+
+    # Map deprecated point_color_strategy values to new ones
+    if "point_color_strategy" in kwargs and kwargs["point_color_strategy"] is not None:
+        deprecated_strategy_map = {
+            "palette": "categorical",
+            "interpolatePalette": "continuous",
+        }
+        old_value = kwargs["point_color_strategy"]
+        if old_value in deprecated_strategy_map:
+            kwargs["point_color_strategy"] = deprecated_strategy_map[old_value]
+
+    return kwargs
+
+
 def validate_kwargs(kwargs):
     valid_names = set(cosmo_base_sig.names)
     invalid_keywords = kwargs.keys() - valid_names
@@ -138,11 +194,14 @@ def cosmo(
     point_color_palette: list[str] = None,
     point_color_by_map: Dict[str, Union[str, list[float]]] = None,
     point_color_strategy: str = None,
+    unknown_color: str = None,
     point_label_by: str = None,
-    point_color: Union[str, list[float]] = None,
+    point_default_color: Union[str, list[float]] = None,
     point_greyout_opacity: float = None,
-    point_size: float = None,
+    point_greyout_color: Union[str, list[float]] = None,
+    point_default_size: float = None,
     point_size_scale: float = None,
+    point_opacity: float = None,
     point_sampling_distance: int = None,
     polygonal_selector_stroke_color: str = None,
     polygonal_selector_line_width: float = None,
@@ -156,11 +215,15 @@ def cosmo(
     cluster_positions_map: Dict[str, list[float]] = None,
     point_include_columns: list[str] = None,
     point_timeline_by: str = None,
-    link_color: Union[str, list[float]] = None,
+    link_default_color: Union[str, list[float]] = None,
     link_greyout_opacity: float = None,
-    link_width: float = None,
+    link_default_width: float = None,
     link_width_scale: float = None,
-    link_arrows: bool = None,
+    link_opacity: float = None,
+    hovered_link_color: Union[str, list[float]] = None,
+    hovered_link_width_increase: float = None,
+    hovered_link_cursor: str = None,
+    link_default_arrows: bool = None,
     link_arrows_size_scale: float = None,
     link_visibility_distance_range: list[float] = None,
     link_visibility_min_transparency: float = None,
@@ -169,13 +232,17 @@ def cosmo(
     link_target_by: str = None,
     link_target_index_by: str = None,
     link_color_by: str = None,
+    link_color_palette: list[str] = None,
+    link_color_strategy: str = None,
     link_width_by: str = None,
+    link_width_strategy: str = None,
+    link_width_range: list[float] = None,
     link_arrow_by: str = None,
     link_strength_by: str = None,
     link_strength_range: list[float] = None,
     link_include_columns: list[str] = None,
     link_timeline_by: str = None,
-    disable_simulation: bool = None,
+    enable_simulation: bool = None,
     simulation_decay: float = None,
     simulation_gravity: float = None,
     simulation_center: float = None,
@@ -186,6 +253,7 @@ def cosmo(
     simulation_link_distance: float = None,
     simulation_link_dist_random_variation_range: list[Any] = None,
     simulation_repulsion_from_mouse: float = None,
+    enable_right_click_repulsion: bool = None,
     simulation_friction: float = None,
     simulation_cluster: float = None,
     background_color: Union[str, list[float]] = None,
@@ -200,21 +268,24 @@ def cosmo(
     curved_link_segments: int = None,
     curved_link_weight: float = None,
     curved_link_control_point_distance: float = None,
-    use_quadtree: bool = None,
+    use_classic_quadtree: bool = None,
     show_fps_monitor: bool = None,
     pixel_ratio: float = None,
     # Set to True by default until it becomes the default in Cosmograph library
     scale_points_on_zoom: bool = True,
     scale_links_on_zoom: bool = None,
     initial_zoom_level: float = None,
-    disable_zoom: bool = None,
+    enable_zoom: bool = None,
+    enable_simulation_during_zoom: bool = None,
     enable_drag: bool = None,
     fit_view_on_init: bool = None,
     fit_view_delay: float = None,
     fit_view_padding: float = None,
     fit_view_duration: float = None,
     fit_view_by_points_in_rect: list[list[float]] = None,
+    fit_view_by_point_indices: list[int] = None,
     random_seed: Union[int, str] = None,
+    rescale_positions: Union[bool, None] = None,
     show_labels: bool = None,
     show_dynamic_labels: bool = None,
     show_labels_for: list[str] = None,
@@ -230,6 +301,7 @@ def cosmo(
     cluster_label_font_size: float = None,
     scale_cluster_labels: bool = None,
     label_padding: list[float] = None,
+    custom_labels: list[dict] = None,
     use_point_color_strategy_for_cluster_labels: bool = None,
     select_cluster_on_label_click: bool = None,
     select_point_on_click: Union[bool, str] = None,
@@ -239,6 +311,7 @@ def cosmo(
     focus_point_on_label_click: bool = None,
     components_display_state_mode: Union[str, bool] = None,
     status_indicator_mode: Union[str, bool] = None,
+    disable_logging: bool = None,
     preserve_point_positions_on_data_update: bool = None,
     disable_point_size_legend: bool = None,
     disable_link_width_legend: bool = None,
@@ -249,6 +322,28 @@ def cosmo(
     clicked_point_id: str = None,
     selected_point_indices: list[int] = None,
     selected_point_ids: list[str] = None,
+    # DEPRECATED PROPERTIES - These will be removed in a future version
+    # ============================================================================
+    # These properties are kept for backward compatibility only.
+    # They automatically map to the new property names internally.
+    # Please update your code to use the new property names:
+    # - disable_simulation → enable_simulation (inverted logic)
+    # - point_color → point_default_color
+    # - point_size → point_default_size
+    # - link_color → link_default_color
+    # - link_width → link_default_width
+    # - link_arrows → link_default_arrows
+    # - use_quadtree → use_classic_quadtree
+    # - disable_zoom → enable_zoom (inverted logic)
+    # ============================================================================
+    disable_simulation: bool = None,  # DEPRECATED: Use enable_simulation instead (inverted logic)
+    point_color: Union[str, list[float]] = None,  # DEPRECATED: Use point_default_color instead
+    point_size: float = None,  # DEPRECATED: Use point_default_size instead
+    link_color: Union[str, list[float]] = None,  # DEPRECATED: Use link_default_color instead
+    link_width: float = None,  # DEPRECATED: Use link_default_width instead
+    link_arrows: bool = None,  # DEPRECATED: Use link_default_arrows instead
+    use_quadtree: bool = None,  # DEPRECATED: Use use_classic_quadtree instead
+    disable_zoom: bool = None,  # DEPRECATED: Use enable_zoom instead (inverted logic)
     # extra params ---------------------------------------------------------------------
     copy_before_ingress: bool = True,  # whether to make a copy the points and links before applying ingress
     data_resolution: Callable[
@@ -316,6 +411,9 @@ def cosmo(
 
     # remove all items that have None values
     kwargs = remove_none_values(kwargs)
+
+    # Handle deprecated properties (before validation, so they're converted to new ones)
+    kwargs = handle_deprecated_properties(kwargs)
 
     # validate the kwargs
     kwargs = validate_kwargs(kwargs)

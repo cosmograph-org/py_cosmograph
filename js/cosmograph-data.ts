@@ -15,12 +15,12 @@ export async function prepareCosmographDataAndMutate(config: WidgetConfig): Prom
     points: {
       pointLabelBy: config.pointLabelBy,
       pointLabelWeightBy: config.pointLabelWeightBy,
-      pointColor: config.pointColor,
+      pointDefaultColor: config.pointDefaultColor,
       pointColorBy: config.pointColorBy,
       pointColorPalette: config.pointColorPalette,
       pointColorByMap: config.pointColorByMap,
       pointColorStrategy: config.pointColorStrategy,
-      pointSize: config.pointSize,
+      pointDefaultSize: config.pointDefaultSize,
       pointSizeBy: config.pointSizeBy,
       pointSizeStrategy: config.pointSizeStrategy,
       pointXBy: config.pointXBy,
@@ -52,10 +52,13 @@ export async function prepareCosmographDataAndMutate(config: WidgetConfig): Prom
         ? config.linkTargetBy
         : [config.linkTargetBy as string],
       linkColorBy: config.linkColorBy,
+      linkColorPalette: config.linkColorPalette,
       linkWidthBy: config.linkWidthBy,
       linkArrowBy: config.linkArrowBy,
       linkStrengthBy: config.linkStrengthBy,
       linkIncludeColumns: config.linkIncludeColumns,
+      linkDefaultColor: config.linkDefaultColor,
+      linkDefaultWidth: config.linkDefaultWidth,
     }
 
     // Add link timeline column to include columns if specified

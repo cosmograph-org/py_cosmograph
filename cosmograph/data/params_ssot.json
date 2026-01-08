@@ -1,9 +1,9 @@
 [
     {
-        "name":"disable_simulation",
-        "default":false,
+        "name":"enable_simulation",
+        "default":true,
         "annotation":"bool",
-        "description":"Prevents the simulation from running, merely rendering the graph."
+        "description":"If set to false, the simulation will not run. This property will be applied only on component initialization and it can't be changed using the setConfig method. Default value: true"
     },
     {
         "name":"polygonal_selector_stroke_color",
@@ -58,6 +58,12 @@
         "default": null,
         "annotation":"typing.Union[str, bool]",
         "description":"Chooses which kind of status indicator to show during loading or errors. - `'spinner'` (default): show a spinner during loading, falling back to text on errors. - `'text'`: always show descriptive messages. - `false`: hide the status indicator entirely. @default 'spinner'"
+    },
+    {
+        "name":"disable_logging",
+        "default":false,
+        "annotation":"bool",
+        "description":"Disables logging of Cosmograph messages in the console. Default: `false`"
     },
     {
         "name":"preserve_point_positions_on_data_update",
@@ -129,6 +135,12 @@
         "description":"Mouse position repulsion coefficient, activated by right-click."
     },
     {
+        "name":"enable_right_click_repulsion",
+        "default":false,
+        "annotation":"bool",
+        "description":"Enable or disable the repulsion force from mouse when right-clicking. When set to `true`, holding the right mouse button will activate the mouse repulsion force. When set to `false`, right-clicking will not trigger any repulsion force. Default value: `false`"
+    },
+    {
         "name":"simulation_friction",
         "default":0.85,
         "annotation":"float",
@@ -153,10 +165,10 @@
         "description":"Size of the simulation space."
     },
     {
-        "name":"point_color",
+        "name":"point_default_color",
         "default":"#b3b3b3",
         "annotation":"typing.Union[str, list[float]]",
-        "description":"Column name for point colors."
+        "description":"The default color to use for points when no point colors are provided, or if the color value in the array is undefined or null. This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: '#b3b3b3'"
     },
     {
         "name":"point_greyout_opacity",
@@ -165,16 +177,28 @@
         "description":"Opacity of unselected nodes during selection."
     },
     {
-        "name":"point_size",
+        "name":"point_greyout_color",
+        "default":null,
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"The color to use for points when they are greyed out (when selection is active). This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. If not provided, the color will be the same as the point's original color, but darkened or lightened depending on the background color. If point_greyout_opacity is also defined, it will override the alpha/opacity component of this color. Default value: `undefined`"
+    },
+    {
+        "name":"point_default_size",
         "default":4,
         "annotation":"float",
-        "description":"Column name for point sizes."
+        "description":"The default size value to use for points when no point sizes are provided or if the size value in the array is undefined or null. Default value: 4"
     },
     {
         "name":"point_size_scale",
         "default":1,
         "annotation":"float",
         "description":"Scale factor for point sizes."
+    },
+    {
+        "name":"point_opacity",
+        "default":1.0,
+        "annotation":"float",
+        "description":"Universal opacity value applied to all points. This value multiplies with individual point alpha values (if set via setPointColors). Useful for dynamically controlling opacity of all points without updating individual RGBA arrays. Default value: `1.0`"
     },
     {
         "name":"hovered_point_cursor",
@@ -213,10 +237,10 @@
         "description":"Enables or disables link rendering."
     },
     {
-        "name":"link_color",
+        "name":"link_default_color",
         "default":"#666666",
         "annotation":"typing.Union[str, list[float]]",
-        "description":"Column name for link colors."
+        "description":"The default color to use for links when no link colors are provided, or if the color value in the array is undefined or null. This can be either a hex color string (e.g., '#666666') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: '#666666'"
     },
     {
         "name":"link_greyout_opacity",
@@ -225,16 +249,40 @@
         "description":"Opacity of unselected links during selection."
     },
     {
-        "name":"link_width",
+        "name":"link_default_width",
         "default":1,
         "annotation":"float",
-        "description":"Column name for link widths."
+        "description":"The default width value to use for links when no link widths are provided or if the width value in the array is undefined or null. Default value: 1"
     },
     {
         "name":"link_width_scale",
         "default":1,
         "annotation":"float",
         "description":"Scale factor for link widths."
+    },
+    {
+        "name":"link_opacity",
+        "default":1.0,
+        "annotation":"float",
+        "description":"Universal opacity value applied to all links. This value multiplies with individual link alpha values (if set via setLinkColors). Useful for dynamically controlling opacity of all links without updating individual RGBA arrays. Default value: `1.0`"
+    },
+    {
+        "name":"hovered_link_color",
+        "default":null,
+        "annotation":"typing.Union[str, list[float]]",
+        "description":"The color to use for links when they are hovered. This can be either a hex color string (e.g., '#ff3333') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: `undefined`"
+    },
+    {
+        "name":"hovered_link_width_increase",
+        "default":5,
+        "annotation":"float",
+        "description":"Number of pixels to add to the link width when hovered. The hovered width is calculated as: originalWidth + hoveredLinkWidthIncrease. Default value: `5`"
+    },
+    {
+        "name":"hovered_link_cursor",
+        "default":"auto",
+        "annotation":"str",
+        "description":"Cursor style to use when hovering over a link. Default value: `auto`"
     },
     {
         "name":"curved_links",
@@ -261,10 +309,10 @@
         "description":"Control point positioning for curves."
     },
     {
-        "name":"link_arrows",
+        "name":"link_default_arrows",
         "default":null,
         "annotation":"bool",
-        "description":""
+        "description":"The default value to use for link arrows when no link arrow data is provided. If set to `true`, all links will have arrows by default. If set to `false`, links will not have arrows unless specified via `link_arrow_by`. Default value: `false`"
     },
     {
         "name":"link_arrows_size_scale",
@@ -288,10 +336,10 @@
         "description":"Minimum transparency of links based on link_visibility_distance_range."
     },
     {
-        "name":"use_quadtree",
+        "name":"use_classic_quadtree",
         "default":false,
         "annotation":"bool",
-        "description":"Activates quadtree algorithm for Many-Body force when set to True."
+        "description":"Use the classic quadtree algorithm for the Many-Body force. This property will be applied only on component initialization and it can't be changed using the setConfig method. Default value: `false`"
     },
     {
         "name":"show_fps_monitor",
@@ -324,10 +372,16 @@
         "description":"Starting zoom level."
     },
     {
-        "name":"disable_zoom",
+        "name":"enable_zoom",
+        "default":true,
+        "annotation":"bool",
+        "description":"Enables or disables zooming in and out. Default: `true`"
+    },
+    {
+        "name":"enable_simulation_during_zoom",
         "default":false,
         "annotation":"bool",
-        "description":"Enables or disables zooming."
+        "description":"Controls whether the simulation remains active during zoom operations. When set to `true`, the simulation continues running while zooming. When set to `false`, the simulation pauses during zoom operations. Default value: `false`"
     },
     {
         "name":"enable_drag",
@@ -366,6 +420,12 @@
         "description":"Fits view to specified rectangle of points, active when fit_view_on_init is True."
     },
     {
+        "name":"fit_view_by_point_indices",
+        "default":null,
+        "annotation":"list[int]",
+        "description":"When `fit_view_on_init` is set to `true`, fits the view to show only the specified points by their indices. Takes precedence over `fit_view_by_points_in_rect` when both are provided. Default: `undefined`"
+    },
+    {
         "name":"random_seed",
         "default":null,
         "annotation":"typing.Union[int, str]",
@@ -376,6 +436,12 @@
         "default":150,
         "annotation":"int",
         "description":"Distance threshold for sampling points."
+    },
+    {
+        "name":"rescale_positions",
+        "default":null,
+        "annotation":"typing.Union[bool, None]",
+        "description":"Controls automatic position adjustment of points in the visible space. When `undefined` (default): If simulation is disabled (`enableSimulation: false`), points will be automatically repositioned to fit within the visible space. If simulation is enabled, points will not be rescaled. When explicitly set: `true`: Forces points positions to be rescaled. `false`: Forces points positions to not be rescaled."
     },
     {
         "name":"point_id_by",
@@ -399,7 +465,7 @@
         "name":"point_color_palette",
         "default":null,
         "annotation":"list[str]",
-        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'palette'`, `'interpolatePalette'`, `'degree'`, or `'linkDirection'`."
+        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'categorical'`, `'continuous'`, `'degree'`, `'preciseDegree'`, or `'linkDirection'`."
     },
     {
         "name":"point_color_by_map",
@@ -411,7 +477,13 @@
         "name":"point_color_strategy",
         "default":null,
         "annotation":"str",
-        "description":"Specifies the strategy for coloring points based on data from the point_color_by column. Available strategies: `undefined` (default): Automatically uses the optimal strategy based on input configuration and color data type. Current strategy can be acquired with cosmograph.activePointColorStrategy. `'palette'`: Uses colors from point_color_palette without interpolation. For numeric data: Creates equal-width buckets mapped to point_color_palette colors. For categorical data: Assigns colors from point_color_palette in order, cycling when unique values exceed palette length. `'interpolatePalette'`: Interpolates colors from point_color_palette. For numeric data: Creates continuous color scale between point_color_palette colors. For categorical data: Creates evenly-spaced color scale by interpolating between point_color_palette colors to match the number of unique values so every value is a unique color. `'map'`: Uses color mapping from point_color_by_map to values in point_color_by. Applies exact color from point_color_by_map for matching values. Falls back to point_color when value is not found in map or invalid. `'degree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette with quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Has effect only if links provided. `'linkDirection'`: Colors points based on their link direction (in, out, bidirectional, isolated) using point_color_palette. Has effect only if links provided. `'direct'`: Directly uses point_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If point_color_by_fn exists, applies it to transform point_color_by values into custom colors. Falls back to point_color if invalid color. If neither point_color_by nor point_color_by_fn exist, colors all points with point_color."
+        "description":"Specifies the strategy for coloring points based on data from the point_color_by column. Available strategies: `undefined` (default): Automatically uses the optimal strategy based on input configuration and color data type. Current strategy can be acquired with cosmograph.activePointColorStrategy. All strategies use `unknown_color` for nullish/unparseable values (null, undefined, 'null', '', 'undefined', 'nan'). `'categorical'`: Uses colors from point_color_palette without interpolation. For numeric data: Creates equal-width buckets mapped to point_color_palette colors. For categorical data: Assigns colors from point_color_palette in order, cycling when unique values exceed palette length. Uses unknown_color for nullish values. Has effect only if point_color_by provided. `'continuous'`: Interpolates colors from point_color_palette. For numeric data: Creates continuous color scale between point_color_palette colors. For categorical data: Creates evenly-spaced color scale by interpolating between point_color_palette colors to match the number of unique values so every value is a unique color. Uses unknown_color for nullish values. Has effect only if point_color_by provided. `'map'`: Uses color mapping from point_color_by_map to values in point_color_by. Applies exact color from point_color_by_map for matching values. Falls back to unknown_color when value is not found in map or invalid. Has effect only if point_color_by_map and point_color_by provided. `'degree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette with quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Minimum and maximum values are clamped to 5th and 95th percentiles of total degree distribution. Has effect only if links provided. `'preciseDegree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette without quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Has effect only if links provided. `'linkDirection'`: Colors points based on their link direction (in, out, bidirectional, isolated) using point_color_palette. Has effect only if links provided. `'direct'`: Directly uses point_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If point_color_by_fn exists, applies it to transform point_color_by values into custom colors. Falls back to unknown_color if invalid color. If neither point_color_by nor point_color_by_fn exist, colors all points with unknown_color. `'single'`: Colors all points uniformly to the same color specified by point_color."
+    },
+    {
+        "name":"unknown_color",
+        "default":null,
+        "annotation":"str",
+        "description":"The color to use for points and links when their data is unknown and the current coloring strategy cannot resolve it. Used for nullish/unparseable values (null, undefined, 'null', '', 'undefined', 'nan'), invalid color values, missing map entries, or when no color data is available. Default: 'rgba(205, 207, 213, 0.9)' (light gray with 90% opacity)."
     },
     {
         "name":"point_size_by",
@@ -516,10 +588,34 @@
         "description":""
     },
     {
+        "name":"link_color_palette",
+        "default":null,
+        "annotation":"typing.List[str]",
+        "description":"An optional array of color strings that can be used to color the links in the visualization. If provided, the links will be colored using the colors in this palette, cycling through the array as needed. Used when link_color_strategy is set to `'categorical'`, `'sum'`, `'average'`, or `'count'`."
+    },
+    {
+        "name":"link_color_strategy",
+        "default":null,
+        "annotation":"str",
+        "description":"Specifies the strategy for coloring links based on data from the link_color_by column. When `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with cosmograph.activeLinkColorStrategy. Available strategies: `'sum'`: Uses the sum of numeric values between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. Uses unknown_color for nullish values. Has effect only if link_color_by provided and contains numeric data. `'average'`: Uses the average of numeric values between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. Uses unknown_color for nullish values. Has effect only if link_color_by provided and contains numeric data. `'count'`: Uses the count of links between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. `'categorical'`: Uses colors from link_color_palette for link_color_by data without interpolation. For numeric data: Creates equal-width buckets mapped to link_color_palette colors. For categorical data: Assigns colors from link_color_palette in order, cycling when unique values exceed palette length. Uses unknown_color for nullish values. Has effect only if link_color_by provided. `'direct'`: Directly uses link_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If link_color_by_fn exists, applies it to transform link_color_by values into custom colors. Falls back to unknown_color if invalid color. If neither link_color_by nor link_color_by_fn exist, colors all links with unknown_color. `'single'`: Colors all links uniformly to the same color specified by link_default_color. This is the default strategy when no link_color_by is provided."
+    },
+    {
         "name":"link_width_by",
         "default":null,
         "annotation":"str",
         "description":""
+    },
+    {
+        "name":"link_width_strategy",
+        "default":null,
+        "annotation":"str",
+        "description":"Specifies the strategy for sizing links based on data from the link_width_by column. When `undefined` (default), will automatically use the optimal strategy based on the input configuration and width data type. Current strategy can be acquired with cosmograph.activeLinkWidthStrategy. Available strategies: `'sum'`: Uses the sum of numeric values between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. Has effect only if link_width_by provided and contains numeric data. `'average'`: Uses the average of numeric values between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. Has effect only if link_width_by provided and contains numeric data. `'count'`: Uses the count of links between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. `'direct'`: Directly uses link_width_by column values as widths. Treats numeric values in link_width_by as link widths in pixels 1:1 without interpolation if they are numbers. If link_width_by_fn exists, applies it to transform link_width_by values into custom widths. Falls back to link_default_width if invalid width. If neither link_width_by nor link_width_by_fn exist, sets all links width to link_default_width. `'single'`: Sets all links width to the same value specified by link_default_width. This is the default strategy when no link_width_by is provided."
+    },
+    {
+        "name":"link_width_range",
+        "default":null,
+        "annotation":"list[float]",
+        "description":"Defines the range for automatic link width scaling. Takes [min, max] values in pixels. When link_width_by column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no link_width_by_fn provided."
     },
     {
         "name":"link_arrow_by",
@@ -634,6 +730,12 @@
         "default":[6.5, 4.5, 6.5, 4.5],
         "annotation":"list[float]",
         "description":"Specifies the [left, top, right, bottom] padding of the label element."
+    },
+    {
+        "name":"custom_labels",
+        "default":null,
+        "annotation":"list[dict]",
+        "description":"Specifies an array of custom labels to be displayed on the Cosmograph canvas. Each custom label is a dictionary with the following optional properties: `text` (string, required): The label text. `position` (list[float] of length 2, required): The [x, y] position of the label in space coordinates. `className` (string, optional): CSS class name for the label. `color` (string, optional): CSS color for the label. `weight` (float, optional): Label weight between 0 and 1. `fontSize` (float, optional): Font size in pixels. `style` (string, optional): CSS style string. `padding` (dict, optional): Padding object with `left`, `top`, `right`, `bottom` properties. `maxWidth` (float, optional): Maximum width of the label in pixels."
     },
     {
         "name":"use_point_color_strategy_for_cluster_labels",

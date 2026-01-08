@@ -61,12 +61,12 @@ export class CosmographLegends {
     this.cosmograph = cosmograph
 
     this._pointSizeLegend = new CosmographSizeLegend(this.cosmograph, this.pointSizeLegendContainer, {
-      label: d => `points · ${d}`,
+      labelResolver: d => `points · ${d}`,
       noDataMessage: false,
       loadingMessage: false,
     })
     this._pointRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.pointColorLegendContainer, {
-      label: d => `points · ${d}`,
+      labelResolver: d => `points · ${d}`,
       noDataMessage: false,
       loadingMessage: false,
     })
@@ -77,13 +77,13 @@ export class CosmographLegends {
     })
     this._linkWidthLegend = new CosmographSizeLegend(this.cosmograph, this.linkWidthLegendContainer, {
       useLinksData: true,
-      label: d => `links · ${d}`,
+      labelResolver: d => `links · ${d}`,
       noDataMessage: false,
       loadingMessage: false,
     })
     this._linkRangeColorLegend = new CosmographRangeColorLegend(this.cosmograph, this.linkColorLegendContainer, {
       useLinksData: true,
-      label: d => `links · ${d}`,
+      labelResolver: d => `links · ${d}`,
       noDataMessage: false,
       loadingMessage: false,
     })
