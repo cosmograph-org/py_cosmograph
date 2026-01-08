@@ -80,6 +80,62 @@ def prioritize_points(kwargs, data=None):
     return kwargs
 
 
+def handle_deprecated_properties(kwargs: CosmoKwargs) -> CosmoKwargs:
+    """
+    Handle deprecated properties by mapping them to new property names.
+
+    This function:
+    1. Prioritizes new properties over deprecated ones (if both are set, deprecated is removed)
+    2. Converts deprecated properties to new ones (if only deprecated is provided)
+    3. Maps deprecated point_color_strategy values to new ones
+
+    This is called before validation to ensure deprecated properties are always handled,
+    even if users provide custom validators.
+
+    Args:
+        kwargs: Dictionary of keyword arguments
+
+    Returns:
+        Modified kwargs with deprecated properties converted to new ones
+    """
+    deprecated_to_new = {
+        "disable_simulation": "enable_simulation",
+        "point_color": "point_default_color",
+        "point_size": "point_default_size",
+        "link_color": "link_default_color",
+        "link_width": "link_default_width",
+        "link_arrows": "link_default_arrows",
+        "use_quadtree": "use_classic_quadtree",
+        "disable_zoom": "enable_zoom",
+    }
+
+    for deprecated, new_prop in deprecated_to_new.items():
+        if new_prop in kwargs and kwargs[new_prop] is not None:
+            # New property is explicitly set, remove deprecated one
+            kwargs.pop(deprecated, None)
+        elif deprecated in kwargs and kwargs[deprecated] is not None:
+            # Only deprecated property is set, convert it to new one
+            if deprecated in ("disable_simulation", "disable_zoom"):
+                # Inverted logic for these
+                kwargs[new_prop] = not kwargs[deprecated]
+            else:
+                # Direct mapping for others
+                kwargs[new_prop] = kwargs[deprecated]
+            kwargs.pop(deprecated, None)
+
+    # Map deprecated point_color_strategy values to new ones
+    if "point_color_strategy" in kwargs and kwargs["point_color_strategy"] is not None:
+        deprecated_strategy_map = {
+            "palette": "categorical",
+            "interpolatePalette": "continuous",
+        }
+        old_value = kwargs["point_color_strategy"]
+        if old_value in deprecated_strategy_map:
+            kwargs["point_color_strategy"] = deprecated_strategy_map[old_value]
+
+    return kwargs
+
+
 def validate_kwargs(kwargs):
     valid_names = set(cosmo_base_sig.names)
     invalid_keywords = kwargs.keys() - valid_names
@@ -266,6 +322,28 @@ def cosmo(
     clicked_point_id: str = None,
     selected_point_indices: list[int] = None,
     selected_point_ids: list[str] = None,
+    # DEPRECATED PROPERTIES - These will be removed in a future version
+    # ============================================================================
+    # These properties are kept for backward compatibility only.
+    # They automatically map to the new property names internally.
+    # Please update your code to use the new property names:
+    # - disable_simulation → enable_simulation (inverted logic)
+    # - point_color → point_default_color
+    # - point_size → point_default_size
+    # - link_color → link_default_color
+    # - link_width → link_default_width
+    # - link_arrows → link_default_arrows
+    # - use_quadtree → use_classic_quadtree
+    # - disable_zoom → enable_zoom (inverted logic)
+    # ============================================================================
+    disable_simulation: bool = None,  # DEPRECATED: Use enable_simulation instead (inverted logic)
+    point_color: Union[str, list[float]] = None,  # DEPRECATED: Use point_default_color instead
+    point_size: float = None,  # DEPRECATED: Use point_default_size instead
+    link_color: Union[str, list[float]] = None,  # DEPRECATED: Use link_default_color instead
+    link_width: float = None,  # DEPRECATED: Use link_default_width instead
+    link_arrows: bool = None,  # DEPRECATED: Use link_default_arrows instead
+    use_quadtree: bool = None,  # DEPRECATED: Use use_classic_quadtree instead
+    disable_zoom: bool = None,  # DEPRECATED: Use enable_zoom instead (inverted logic)
     # extra params ---------------------------------------------------------------------
     copy_before_ingress: bool = True,  # whether to make a copy the points and links before applying ingress
     data_resolution: Callable[
@@ -333,6 +411,9 @@ def cosmo(
 
     # remove all items that have None values
     kwargs = remove_none_values(kwargs)
+
+    # Handle deprecated properties (before validation, so they're converted to new ones)
+    kwargs = handle_deprecated_properties(kwargs)
 
     # validate the kwargs
     kwargs = validate_kwargs(kwargs)
