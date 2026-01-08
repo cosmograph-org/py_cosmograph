@@ -240,6 +240,107 @@ class Cosmograph(anywidget.AnyWidget):
 
     api_key = Unicode(None, allow_none=True)
 
+    # ============================================================================
+    # DEPRECATED PROPERTIES - These will be removed in a future version
+    # ============================================================================
+    # These properties are kept for backward compatibility only.
+    # They automatically map to the new property names internally.
+    # Please update your code to use the new property names:
+    # - disable_simulation → enable_simulation (inverted logic)
+    # - point_color → point_default_color
+    # - point_size → point_default_size
+    # - link_color → link_default_color
+    # - link_width → link_default_width
+    # - link_arrows → link_default_arrows
+    # - use_quadtree → use_classic_quadtree
+    # - disable_zoom → enable_zoom (inverted logic)
+    # ============================================================================
+
+    # DEPRECATED: Use enable_simulation instead (with inverted logic)
+    # Setting disable_simulation=True is equivalent to enable_simulation=False
+    # Setting disable_simulation=False is equivalent to enable_simulation=True
+    disable_simulation = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use point_default_color instead
+    point_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    )
+
+    # DEPRECATED: Use point_default_size instead
+    point_size = Float(None, allow_none=True)
+
+    # DEPRECATED: Use link_default_color instead
+    link_color = Union(
+        [Unicode(None, allow_none=True), List(Float, allow_none=True)]
+    )
+
+    # DEPRECATED: Use link_default_width instead
+    link_width = Float(None, allow_none=True)
+
+    # DEPRECATED: Use link_default_arrows instead
+    link_arrows = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use use_classic_quadtree instead
+    use_quadtree = Bool(None, allow_none=True)
+
+    # DEPRECATED: Use enable_zoom instead (with inverted logic)
+    # Setting disable_zoom=True is equivalent to enable_zoom=False
+    # Setting disable_zoom=False is equivalent to enable_zoom=True
+    disable_zoom = Bool(None, allow_none=True)
+
+    # ============================================================================
+    # OBSERVERS FOR DEPRECATED PROPERTIES
+    # ============================================================================
+    # Simple one-way mapping: deprecated property → new property
+    # These observers automatically sync deprecated properties to their new equivalents.
+    # ============================================================================
+
+    @observe("disable_simulation")
+    def _on_disable_simulation_changed(self, change):
+        """DEPRECATED: Maps disable_simulation to enable_simulation with inverted logic."""
+        if change.new is not None:
+            self.enable_simulation = not change.new
+
+    @observe("point_color")
+    def _on_point_color_changed(self, change):
+        """DEPRECATED: Maps point_color to point_default_color."""
+        self.point_default_color = change.new
+
+    @observe("point_size")
+    def _on_point_size_changed(self, change):
+        """DEPRECATED: Maps point_size to point_default_size."""
+        self.point_default_size = change.new
+
+    @observe("link_color")
+    def _on_link_color_changed(self, change):
+        """DEPRECATED: Maps link_color to link_default_color."""
+        self.link_default_color = change.new
+
+    @observe("link_width")
+    def _on_link_width_changed(self, change):
+        """DEPRECATED: Maps link_width to link_default_width."""
+        self.link_default_width = change.new
+
+    @observe("link_arrows")
+    def _on_link_arrows_changed(self, change):
+        """DEPRECATED: Maps link_arrows to link_default_arrows."""
+        self.link_default_arrows = change.new
+
+    @observe("use_quadtree")
+    def _on_use_quadtree_changed(self, change):
+        """DEPRECATED: Maps use_quadtree to use_classic_quadtree."""
+        self.use_classic_quadtree = change.new
+
+    @observe("disable_zoom")
+    def _on_disable_zoom_changed(self, change):
+        """DEPRECATED: Maps disable_zoom to enable_zoom with inverted logic."""
+        if change.new is not None:
+            self.enable_zoom = not change.new
+
+    # ============================================================================
+    # END OF DEPRECATED PROPERTIES
+    # ============================================================================
+
     @observe("points")
     def _on_points_changed(self, change):
         """
