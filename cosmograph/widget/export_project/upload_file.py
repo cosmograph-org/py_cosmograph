@@ -3,9 +3,9 @@ from typing import Any
 import time
 
 import requests
-import json
 
 from .config import API_BASE, logger
+from .create_project import _response_error_message
 
 
 def upload_file(api_key: str, data: dict[str, Any], project_id: str, debug: bool = False) -> dict[str, Any]:
@@ -38,10 +38,15 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str, debug: bool
                 },
             },
         )
-        response.raise_for_status()
+        if not response.ok:
+            err_body = _response_error_message(response, full=debug)
+            if debug:
+                msg = f"Failed to get upload URL: {response.status_code} {response.reason}. Response:\n{err_body}"
+            else:
+                msg = f"Failed to get upload URL: {err_body}"
+            raise ValueError(msg) from None
         if debug:
             logger.info("⏱️    - Generate signed URL API request took: %.3f seconds", time.perf_counter() - start_time)
-        # logger.info("Response: %s", json.dumps(response.json(), indent=4))
         response_json = response.json()
         try:
             upload_url = response_json["result"]["data"]["json"]["url"]
@@ -50,8 +55,9 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str, debug: bool
             msg = f"Failed to parse upload URL from response: {e}"
             raise ValueError(msg) from e
     except requests.RequestException as e:
-        logger.error("❌ Failed to get upload URL: %s", e)
         msg = f"Failed to get upload URL: {e}"
+        if hasattr(e, "response") and e.response is not None:
+            msg += f" Response: {_response_error_message(e.response, full=debug)}"
         raise ValueError(msg) from e
 
     try:
@@ -61,15 +67,22 @@ def upload_file(api_key: str, data: dict[str, Any], project_id: str, debug: bool
             data=data["content"],
             headers={"Content-Type": "application/parquet"}
         )
-        upload_response.raise_for_status()
+        if not upload_response.ok:
+            err_body = _response_error_message(upload_response, full=debug)
+            if debug:
+                msg = f"Failed to upload file: {upload_response.status_code} {upload_response.reason}. Response:\n{err_body}"
+            else:
+                msg = f"Failed to upload file: {err_body}"
+            raise ValueError(msg) from None
         logger.info("✅ File '%s' upload completed successfully", data["file_name"])
         if debug:
             upload_time = time.perf_counter() - start_time
             file_size_mb = data["content_length"] / (1024 * 1024)
             logger.info("⏱️    - File upload (%.2f MB) took: %.3f seconds", file_size_mb, upload_time)
     except requests.RequestException as e:
-        logger.error("❌ Failed to upload file '%s': %s", data["file_name"], e)
         msg = f"Failed to upload file: {e}"
+        if hasattr(e, "response") and e.response is not None:
+            msg += f" Response: {_response_error_message(e.response, full=debug)}"
         raise ValueError(msg) from e
 
     return {**data, "upload_url": upload_url}

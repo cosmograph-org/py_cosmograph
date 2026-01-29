@@ -7,6 +7,60 @@ import json
 
 from .config import API_BASE, logger
 
+
+# Max length for user-facing short message (avoids huge HTML/stack traces)
+_RESPONSE_ERROR_MESSAGE_MAX_LEN = 400
+
+
+def _response_error_message(response: requests.Response, full: bool = False) -> str:
+    """Extract a readable error message from an API response body.
+
+    When full=False (default), returns a short user-facing message with status and
+    the API message (or truncated body). When full=True (debug), returns the full
+    response body, pretty-printed for readability.
+    """
+    status = response.status_code
+    status_text = response.reason or "Unknown status"
+
+    if full:
+        try:
+            data = response.json()
+            return json.dumps(data, indent=2)
+        except json.JSONDecodeError:
+            return f"Status {status} {status_text}\n\nRaw body:\n{response.text}"
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        text = (response.text or "").strip()
+        if text:
+            return f"{status} {status_text}: {text[:_RESPONSE_ERROR_MESSAGE_MAX_LEN]}"
+        return f"{status} {status_text}"
+
+    if not isinstance(data, dict):
+        text = (response.text or "")[:_RESPONSE_ERROR_MESSAGE_MAX_LEN]
+        return f"{status} {status_text}: {text}" if text else f"{status} {status_text}"
+
+    # Extract short message: support error.json.message (tRPC), error.message, message
+    err = data.get("error")
+    msg = None
+    if isinstance(err, dict):
+        inner = err.get("json") or err
+        if isinstance(inner, dict) and "message" in inner:
+            msg = inner["message"]
+        elif isinstance(err.get("message"), str):
+            msg = err["message"]
+    if msg is None and isinstance(data.get("message"), str):
+        msg = data["message"]
+
+    if isinstance(msg, str) and msg.strip():
+        clean = msg.strip()
+        if len(clean) > _RESPONSE_ERROR_MESSAGE_MAX_LEN:
+            clean = clean[:_RESPONSE_ERROR_MESSAGE_MAX_LEN] + "..."
+        return f"{status} {status_text}: {clean}"
+    return f"{status} {status_text}"
+
+
 # Column mapping configuration: maps export config keys to API column keys
 POINT_COLUMN_MAPPING = {
     "pointIdBy": "id",
@@ -98,7 +152,13 @@ def create_empty_project(
             f"{API_BASE}/publicApi.createProject",
             json=config_json,
         )
-        response.raise_for_status()
+        if not response.ok:
+            err_body = _response_error_message(response, full=debug)
+            if debug:
+                msg = f"Failed to create empty project: {response.status_code} {response.reason}. Response:\n{err_body}"
+            else:
+                msg = f"Failed to create empty project: {err_body}"
+            raise ValueError(msg) from None
         if debug:
             logger.info("⏱️    - createProject API request took: %.3f seconds", time.perf_counter() - start_time)
 
@@ -106,8 +166,9 @@ def create_empty_project(
         # logger.info("✅ Empty project created successfully: %s", json.dumps(result, indent=4))
         return result
     except requests.RequestException as e:
-        logger.error("❌ Failed to create empty project '%s': %s", project_name, e)
         msg = f"Failed to create empty project: {e}"
+        if hasattr(e, "response") and e.response is not None:
+            msg += f" Response: {_response_error_message(e.response, full=debug)}"
         raise ValueError(msg) from e
 
 
@@ -248,12 +309,19 @@ def create_project(
             f"{API_BASE}/publicApi.upsertProjectByName",
             json=config_json,
         )
-        response.raise_for_status()
+        if not response.ok:
+            err_body = _response_error_message(response, full=debug)
+            if debug:
+                msg = f"Failed to create project: {response.status_code} {response.reason}. Response:\n{err_body}"
+            else:
+                msg = f"Failed to create project: {err_body}"
+            raise ValueError(msg) from None
         if debug:
             logger.info("⏱️    - upsertProjectByName API request took: %.3f seconds", time.perf_counter() - start_time)
 
         return response.json()
     except requests.RequestException as e:
-        logger.error("❌ Failed to create project '%s': %s", project_name, e)
         msg = f"Failed to create project: {e}"
+        if hasattr(e, "response") and e.response is not None:
+            msg += f" Response: {_response_error_message(e.response, full=debug)}"
         raise ValueError(msg) from e
