@@ -59,8 +59,8 @@ def export_project(
         if debug:
             logger.info("⏱️  Create empty project took: %.3f seconds", time.perf_counter() - step_start)
     except Exception as e:
-        logger.error("❌ Failed to create empty project: %s", e)
-        raise ValueError(f"Failed to create empty project: {e}") from e
+        logger.error("❌ %s", e)
+        raise
 
     # Step 2: Upload files with project ID
     points_data = None
@@ -81,8 +81,8 @@ def export_project(
             if debug:
                 logger.info("⏱️  Upload points file took: %.3f seconds", time.perf_counter() - step_start)
         except Exception as e:
-            logger.error("❌ Failed to upload points data: %s", e)
-            raise ValueError(f"Failed to process points data: {e}") from e
+            logger.error("❌ %s", e)
+            raise
 
     if links is not None and not links.empty:
         try:
@@ -100,8 +100,8 @@ def export_project(
             if debug:
                 logger.info("⏱️  Upload links file took: %.3f seconds", time.perf_counter() - step_start)
         except Exception as e:
-            logger.error("❌ Failed to upload links data: %s", e)
-            raise ValueError(f"Failed to process links data: {e}") from e
+            logger.error("❌ %s", e)
+            raise
 
     # Step 3: Update project with uploaded files and configuration
     if points_data or links_data or export_config:
@@ -119,8 +119,8 @@ def export_project(
                 logger.info("⏱️  Update project took: %.3f seconds", time.perf_counter() - step_start)
             # logger.info("Result: %s", json.dumps(result, indent=4))
         except Exception as e:
-            logger.error("❌ Failed to update project: %s", e)
-            raise ValueError(f"Failed to update project: {e}") from e
+            logger.error("❌ %s", e)
+            raise
 
     project_url = f"https://run.cosmograph.app/project/{project_id}"
     logger.info("✅ Project ready: %s", project_url)
