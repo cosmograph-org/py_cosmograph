@@ -10,7 +10,7 @@ from cosmograph import cosmo
 cosmo(points=df, links=df, point_id_by="id", point_color_by="group",
       point_size_by="score", link_source_by="src", link_target_by="tgt")
 ```
-`cosmo()` accepts ~130 keyword params; the **20 `*_by` params** map DataFrame columns to visual
+`cosmo()` accepts many keyword params; many **`*_by` params** map DataFrame columns to visual
 attributes. Data ships to JS as Arrow IPC (notebook) or Parquet (platform export).
 
 ## Key files
@@ -27,7 +27,7 @@ attributes. Data ships to JS as Arrow IPC (notebook) or Parquet (platform export
 **Ignore for params:** `meta.json` (esbuild bundle metafile, not parameters).
 
 ## Caveats
-- The local repo's `params_ssot.json` (136 params) may differ from the installed pip package (e.g. 119) — version drift.
+- The local repo's `params_ssot.json` may differ from the installed pip package due to version drift; handle version compatibility accordingly.
 - App-only params (`point_shape_by`, `point_image_url_by`, `*ByFn`) are not in the Python SSOT.
 
 ## Workflow
