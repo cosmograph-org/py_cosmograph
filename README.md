@@ -74,6 +74,17 @@ widget.selected_point_ids  # if you've selected some points and want to get info
 # etc.
 ```
 
+### Graphs with isolated points
+
+A graph can be part clusters, part loners. Cosmograph draws both, but only if you give it a points table:
+
+```python
+cosmo(points=points, links=links, point_id_by='id',
+      link_source_by='source', link_target_by='target')
+```
+
+If you pass `links` alone, the points are derived from the link endpoints, so anything with no links is not in the graph at all. The points table is what says "these are all my points".
+
 ### Nicer example
 
 Let's download a big dataset of English words, plus some hyponym-hypernym relationships. 
