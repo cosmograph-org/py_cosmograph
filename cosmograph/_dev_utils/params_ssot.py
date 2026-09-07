@@ -57,10 +57,12 @@ PARAMS_SSOT_PATH = os.path.join(
 Param = Dict[str, Any]
 
 # Parameters whose default TypeScript disagrees with, and which we have not moved yet.
-# These are places where `cosmo` sends an old cosmos engine value rather than the one the
-# library now uses, so adopting them changes how graphs render. That is a change worth
-# making on its own, not a side effect of a refresh, so the refresh leaves them alone and
-# the sync test stays green. Empty this set (and rerun the refresh) to adopt them.
+# These are places where the documented default is an old cosmos engine value rather than
+# the one the library now uses. It is documentation, not behaviour: the default reaches
+# base_cosmo's signature and the generated docs, but never the widget, since cosmo passes
+# only the arguments a caller actually supplies. Correcting 24 of them at once is still a
+# change of its own rather than a side effect of a refresh, so the refresh leaves them
+# alone and the sync test stays green. Empty this set (and rerun the refresh) to adopt them.
 UNSYNCED_DEFAULTS = frozenset(
     {
         "background_color",
