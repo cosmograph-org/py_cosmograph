@@ -17,14 +17,18 @@ logger = logging.getLogger(__name__)
 def get_buffered_arrow_table(df):
   """Converts a Pandas DataFrame to a buffered Arrow IPC stream format.
 
+  int64 columns are narrowed to int32 on the way out. That is done on a copy:
+  the caller's DataFrame keeps its own dtypes.
+
   This function is cached using joblib.Memory.
   """
 
   if df is None:
       return None
   try:
-      df_int32 = df.select_dtypes(include=["int64"]).astype("int32")
-      df[df_int32.columns] = df_int32
+      int64_columns = df.select_dtypes(include=["int64"]).columns
+      if len(int64_columns) > 0:
+          df = df.astype({column: "int32" for column in int64_columns})
       table = pa.Table.from_pandas(df)
       sink = pa.BufferOutputStream()
       with pa.ipc.new_stream(sink, table.schema) as writer:
