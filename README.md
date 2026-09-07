@@ -153,6 +153,28 @@ Zooming in a bit:
 
 ![image](https://github.com/user-attachments/assets/e988950d-9f53-40c2-8b77-18cfb92efb50)
 
+## 📐 Getting the point coordinates back
+
+You can pull the x, y coordinates of every point back into Python, and redraw the graph yourself -- matplotlib, an SVG, whatever your paper needs.
+
+```python
+graph = cosmo(points=points, links=links, point_id_by='id',
+              link_source_by='source', link_target_by='target')
+graph  # display it and let the simulation settle
+```
+
+Then, in a *later* cell (the widget answers over the notebook's comm channel, so the reply cannot arrive in the cell that asks for it):
+
+```python
+graph.request_point_positions()
+```
+
+```python
+graph.point_positions  # DataFrame with id, x, y -- one row per point
+```
+
+The ids come from the widget, so they belong to those coordinates whatever order the widget put its points in. Coordinates are in Cosmograph's space coordinates -- the same system as `point_x_by` / `point_y_by`, bounded by `space_size` -- and are read the moment the request arrives, so pause the simulation first if you want a layout that will not move.
+
 ## 🔑 API Key Setup and Project Export
 
 ### Setting up API Key

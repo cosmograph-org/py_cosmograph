@@ -115,6 +115,17 @@ async function render({ model, el }: RenderProps) {
     if (msg.type === 'capture_screenshot') {
       cosmograph?.captureScreenshot()
     }
+    if (msg.type === 'get_point_positions') {
+      // Positions are flat [x0, y0, x1, y1, ...]; Python pairs them up. The ids come
+      // from the widget too, so they are in the same order as the coordinates -- the
+      // point order here is not the row order of the points DataFrame.
+      const positions = cosmograph?.getPointPositions() ?? []
+      const indices = Array.from({ length: positions.length / 2 }, (_, i) => i)
+      const ids = await cosmograph?.getPointIdsByIndices(indices)
+      // Sent as a message, not a synced trait: asking twice for the coordinates of a
+      // settled graph produces the same array, and traitlets would not report that.
+      model.send({ type: 'point_positions', positions: Array.from(positions), ids: ids ?? null })
+    }
   })
 
   const updateSelectedIndices = async (selectedPointIndices?: number[] | null, selectedLinkIndices?: number[]): Promise<void> => {

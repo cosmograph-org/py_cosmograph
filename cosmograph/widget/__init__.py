@@ -517,6 +517,59 @@ class Cosmograph(anywidget.AnyWidget):
     def capture_screenshot(self):
         self.send({"type": "capture_screenshot"})
 
+    def request_point_positions(self):
+        """Ask the widget for the current x, y coordinates of every point.
+
+        The answer travels back over the widget comm, so it is not available on
+        the line that asks for it: ask in one cell and read
+        :attr:`point_positions` in the next::
+
+            g.request_point_positions()   # cell 1
+            g.point_positions             # cell 2 -> DataFrame
+
+        Coordinates are read at the moment the widget receives the request. If
+        the simulation is still running they are a snapshot of it; call
+        :meth:`pause` or wait for it to settle first if you want a stable layout.
+        """
+        self.send({"type": "get_point_positions"})
+
+    @property
+    def point_positions(self):
+        """The last point coordinates the widget sent, as a DataFrame.
+
+        ``None`` until :meth:`request_point_positions` has been answered. An
+        empty DataFrame means the widget answered and has no points.
+
+        Columns are ``id``, ``x`` and ``y``, one row per point. The ids come
+        from the widget, in its own point order, so they are the ids that
+        actually belong to those coordinates. There is no ``id`` column when
+        no ``point_id_by`` was given.
+
+        Coordinates are in Cosmograph's space coordinates, i.e. the same system
+        as ``point_x_by`` / ``point_y_by`` and bounded by ``space_size``.
+        """
+        return self._positions_to_frame(self._last_point_positions)
+
+    def _on_point_positions(self, payload):
+        """Handle a `point_positions` reply from the widget."""
+        self._last_point_positions = payload
+
+    def _positions_to_frame(self, payload):
+        """Turn a `point_positions` reply into a DataFrame."""
+        if payload is None:
+            return None
+
+        import pandas as pd
+
+        flat = payload.get("positions") or []
+        frame = pd.DataFrame({"x": flat[0::2], "y": flat[1::2]}, columns=["x", "y"])
+
+        ids = payload.get("ids")
+        if ids and len(ids) == len(frame):
+            frame.insert(0, "id", list(ids))
+
+        return frame
+
     def export_project_by_name(self, project_name: str, debug: bool = False):
         if not self.api_key:
             raise ValueError("API key is required for project export")
@@ -527,8 +580,20 @@ class Cosmograph(anywidget.AnyWidget):
         except Exception as e:
             raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
+    def _handle_widget_message(self, _widget, content, _buffers=None):
+        """Route a custom message from the JS side to its handler."""
+        if isinstance(content, dict) and content.get("type") == "point_positions":
+            self._on_point_positions(content)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Answers to request_point_positions() arrive as custom messages rather
+        # than through a synced trait: traitlets stays quiet when a value is set
+        # to something equal to what it already holds, and asking twice for the
+        # coordinates of a settled graph is exactly that case.
+        self._last_point_positions = None
+        self.on_msg(self._handle_widget_message)
+
         # Register this instance to receive API key updates
         try:
             register_instance(self)
