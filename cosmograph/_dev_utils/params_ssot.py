@@ -41,6 +41,7 @@ What the refresh does and does not touch, deliberately:
 import argparse
 import json
 import os
+import re
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
@@ -95,6 +96,40 @@ def _camel_case(snake_name: str) -> str:
     return head + "".join(word[:1].upper() + word[1:] for word in tail)
 
 
+def _snake_case(camel_name: str) -> str:
+    """camelCase to snake_case, keeping acronyms whole.
+
+    >>> _snake_case("pointSizeBy"), _snake_case("showFPSMonitor")
+    ('point_size_by', 'show_fps_monitor')
+    """
+    spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", camel_name)
+    return re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", spaced).lower()
+
+
+_LINK_RE = re.compile(r"\{@link\s+([^}|]+?)\s*(?:\|[^}]*)?\}")
+_DEFAULT_SENTENCE_RE = re.compile(r"\s*Default value:\s*`?[^`]*`?\.?\s*$")
+
+
+def clean_description(description: str) -> str:
+    r"""TypeScript doc prose, made fit for a Python docstring.
+
+    The descriptions are written for an IDE tooltip: they carry TSDoc `{@link}`
+    markup, hard line breaks, and a closing sentence restating the default. All
+    three read badly in ``help(cosmo)``, where the default is already in the
+    signature.
+
+    >>> clean_description("Controls whether to select a clicked point with {@link  focusPointOnClick }.")
+    'Controls whether to select a clicked point with `focus_point_on_click`.'
+    >>> clean_description("Canvas background color.\n\nHex or rgba. Default value: `#222222`")
+    'Canvas background color. Hex or rgba.'
+    """
+    text = _LINK_RE.sub(
+        lambda m: f"`{_snake_case(m.group(1).split('.')[-1].strip())}`", description
+    )
+    text = " ".join(text.split())
+    return _DEFAULT_SENTENCE_RE.sub("", text).strip()
+
+
 def _read_json(source: str) -> Any:
     """Reads a json file, or a url pointing to one."""
     if source.startswith(("http://", "https://")):
@@ -107,8 +142,26 @@ def _read_json(source: str) -> Any:
 
 
 def ts_params(source: str = DFLT_TS_SOURCE) -> Dict[str, Param]:
-    """The TypeScript params SSOT, keyed by its (camelCase) parameter name."""
-    return {param["name"]: param for param in _read_json(source)["params"]}
+    """The TypeScript params SSOT, keyed by its (camelCase) parameter name.
+
+    Refuses an empty one. A source that yields no parameters is indistinguishable
+    from a source that agrees with us perfectly - both leave every field untouched
+    and report success - so a truncated download or the wrong file would otherwise
+    pass the check silently.
+    """
+    try:
+        document = _read_json(source)
+    except OSError as error:
+        raise ValueError(
+            f"Could not read the TypeScript params SSOT at {source}"
+        ) from error
+
+    params = document.get("params") if isinstance(document, dict) else None
+    if not params:
+        raise ValueError(
+            f"{source} declares no params - expected the TypeScript params SSOT"
+        )
+    return {param["name"]: param for param in params}
 
 
 def _widget_traits() -> Dict[str, Any]:
@@ -149,6 +202,7 @@ def refresh_params(
     param_names: Optional[Iterable[str]] = None,
     name_map: Optional[Mapping[str, str]] = None,
     keep_defaults: Iterable[str] = (),
+    matched: Optional[List[str]] = None,
 ) -> List[Param]:
     """The params SSOT with descriptions and defaults refreshed from TypeScript.
 
@@ -181,6 +235,7 @@ def refresh_params(
     keep = None if param_names is None else set(param_names)
     keep_defaults = set(keep_defaults)
 
+    matched = [] if matched is None else matched
     refreshed = []
     for param in current:
         if keep is not None and param["name"] not in keep:
@@ -190,8 +245,9 @@ def refresh_params(
             name_map.get(param["name"]) or _camel_case(param["name"])
         )
         if ts_param is not None:
+            matched.append(param["name"])
             if "description" in ts_param:
-                param["description"] = ts_param["description"]
+                param["description"] = clean_description(ts_param["description"])
             if "default" in ts_param and param["name"] not in keep_defaults:
                 param["default"] = ts_param["default"]
         refreshed.append(param)
@@ -199,17 +255,35 @@ def refresh_params(
     return refreshed
 
 
+#: <repo>/js/config-props.json, three levels up from this file
+JS_NAME_MAP_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "js",
+    "config-props.json",
+)
+
+
 def _js_name_map() -> Dict[str, str]:
-    """The hand-maintained snake_case to camelCase map the JS widget uses."""
-    js_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "js"
-    )
-    path = os.path.join(js_dir, "config-props.json")
-    return _read_json(path) if os.path.isfile(path) else {}
+    """The hand-maintained snake_case to camelCase map the JS widget uses.
+
+    Raises rather than falling back to naive camelisation, which would silently
+    stop matching the names the map exists for - ``show_fps_monitor`` is
+    ``showFPSMonitor``, not ``showFpsMonitor``, and a miss just leaves the
+    parameter unrefreshed with nothing said.
+    """
+    if not os.path.isfile(JS_NAME_MAP_PATH):
+        raise FileNotFoundError(f"No snake-to-camel name map at {JS_NAME_MAP_PATH}")
+    return _read_json(JS_NAME_MAP_PATH)
 
 
-def make_params_ssot(source: str = DFLT_TS_SOURCE) -> List[Param]:
-    """The params SSOT as it should be, given the current TypeScript snapshot."""
+def make_params_ssot(
+    source: str = DFLT_TS_SOURCE, *, matched: Optional[List[str]] = None
+) -> List[Param]:
+    """The params SSOT as it should be, given the current TypeScript snapshot.
+
+    Pass ``matched`` a list to be told which parameters the TypeScript side
+    actually covered.
+    """
     with open(PARAMS_SSOT_PATH, encoding="utf-8") as file:
         current = json.load(file)
     return refresh_params(
@@ -218,6 +292,7 @@ def make_params_ssot(source: str = DFLT_TS_SOURCE) -> List[Param]:
         param_names=widget_param_names(),
         name_map=_js_name_map(),
         keep_defaults=UNSYNCED_DEFAULTS,
+        matched=matched,
     )
 
 
@@ -250,9 +325,16 @@ def main(argv=None) -> int:
         print(f"Updated the TypeScript snapshot from {args.source}")
         args.source = DFLT_TS_SOURCE
 
-    params = make_params_ssot(args.source)
+    matched: List[str] = []
+    try:
+        params = make_params_ssot(args.source, matched=matched)
+    except (ValueError, FileNotFoundError) as error:
+        print(error, file=sys.stderr)
+        return 2
     with open(PARAMS_SSOT_PATH, encoding="utf-8") as file:
         committed = file.read()
+
+    print(f"{len(matched)} of {len(params)} params matched a TypeScript counterpart")
 
     missing = [n for n in widget_param_names() if n not in {p["name"] for p in params}]
     if missing:
