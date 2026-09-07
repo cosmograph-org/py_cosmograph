@@ -115,6 +115,12 @@ async function render({ model, el }: RenderProps) {
     if (msg.type === 'capture_screenshot') {
       cosmograph?.captureScreenshot()
     }
+    if (msg.type === 'get_point_positions') {
+      // Flat [x0, y0, x1, y1, ...]; Python pairs them up.
+      const positions = cosmograph?.getPointPositions()
+      model.set('_point_positions', positions ? Array.from(positions) : [])
+      model.save_changes()
+    }
   })
 
   const updateSelectedIndices = async (selectedPointIndices?: number[] | null, selectedLinkIndices?: number[]): Promise<void> => {
