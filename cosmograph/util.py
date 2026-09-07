@@ -8,7 +8,6 @@ from typing import Dict, Any
 from functools import partial
 import re
 
-from IPython.display import HTML, Javascript, display as ipython_display
 from dol import (
     TextFiles,
     Files,
@@ -271,6 +270,8 @@ class IpythonObjects:
         self.objs = objs
 
     def display(self):
+        from IPython.display import display as ipython_display
+
         for obj in self.objs:
             return ipython_display(obj)
 
@@ -346,9 +347,26 @@ def _postprocess(func, egress):
 def postprocess(egress):
     return partial(_postprocess, egress=egress)
 
-display_output = postprocess(ipython_display)
-to_html_obj = postprocess(HTML)
-to_js_obj = postprocess(Javascript)
+# These three wrap IPython display objects. Building them at import time meant
+# `import cosmograph.util` pulled the notebook stack in, which puts it out of
+# reach of anything that only wants to read the parameter SSOT. Built on demand
+# instead; `from cosmograph.util import to_html_obj` still works.
+_IPYTHON_POSTPROCESSORS = ("display_output", "to_html_obj", "to_js_obj")
+
+
+def __getattr__(name):
+    if name not in _IPYTHON_POSTPROCESSORS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from IPython.display import HTML, Javascript, display as ipython_display
+
+    egress = dict(
+        display_output=ipython_display, to_html_obj=HTML, to_js_obj=Javascript
+    )[name]
+    return postprocess(egress)
+
+
+def __dir__():
+    return sorted(list(globals()) + list(_IPYTHON_POSTPROCESSORS))
 
 
 @add_ipython_key_completions
