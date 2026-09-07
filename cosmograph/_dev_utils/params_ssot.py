@@ -60,37 +60,11 @@ Param = Dict[str, Any]
 # These are places where the documented default is an old cosmos engine value rather than
 # the one the library now uses. It is documentation, not behaviour: the default reaches
 # base_cosmo's signature and the generated docs, but never the widget, since cosmo passes
-# only the arguments a caller actually supplies. Correcting 24 of them at once is still a
-# change of its own rather than a side effect of a refresh, so the refresh leaves them
-# alone and the sync test stays green. Empty this set (and rerun the refresh) to adopt them.
-UNSYNCED_DEFAULTS = frozenset(
-    {
-        "background_color",
-        "hovered_link_width_increase",
-        "link_color_palette",
-        "link_default_color",
-        "link_strength_range",
-        "link_width_range",
-        "point_color_palette",
-        "point_default_color",
-        "point_greyout_opacity",
-        "point_sampling_distance",
-        "point_size_range",
-        "preserve_point_positions_on_data_update",
-        "reset_selection_on_empty_canvas_click",
-        "show_dynamic_labels",
-        "show_hovered_point_label",
-        "show_labels",
-        "show_top_labels",
-        "show_top_labels_limit",
-        "simulation_friction",
-        "simulation_link_distance",
-        "simulation_link_spring",
-        "simulation_repulsion",
-        "unknown_color",
-        "use_point_color_strategy_for_cluster_labels",
-    }
-)
+# only the arguments a caller actually supplies. Correcting a batch of them at once is
+# still a change of its own rather than a side effect of a refresh, so the refresh leaves
+# anything listed here alone and the sync test stays green. Nothing is held back right
+# now; add a name here when a documented default has to wait for a release.
+UNSYNCED_DEFAULTS = frozenset()
 
 
 def _camel_case(snake_name: str) -> str:

@@ -31,7 +31,7 @@
     },
     {
         "name": "reset_selection_on_empty_canvas_click",
-        "default": null,
+        "default": true,
         "annotation": "bool",
         "description": "Reset selection on empty canvas click When `true`: - Resets the selection when the canvas is clicked and there are some points selected"
     },
@@ -67,7 +67,7 @@
     },
     {
         "name": "preserve_point_positions_on_data_update",
-        "default": null,
+        "default": false,
         "annotation": "bool",
         "description": "Preserve positions for points with same ids ( `point_id_by point_id_by` during point data update When `true`: - Points with same ids will stay where they were instead of generating new positions - New points get new positions (or positions from `point_x_by point_x_by` / `point_y_by point_y_by` if set) - Preserved positions take priority over new coordinates from `point_x_by point_x_by` / `point_y_by point_y_by` for existing points"
     },
@@ -91,7 +91,7 @@
     },
     {
         "name": "simulation_repulsion",
-        "default": 0.1,
+        "default": 0.5,
         "annotation": "float",
         "description": "Repulsion force coefficient."
     },
@@ -109,13 +109,13 @@
     },
     {
         "name": "simulation_link_spring",
-        "default": 1,
+        "default": 0.4,
         "annotation": "float",
         "description": "Link spring force coefficient."
     },
     {
         "name": "simulation_link_distance",
-        "default": 2,
+        "default": 20,
         "annotation": "float",
         "description": "Minimum link distance."
     },
@@ -142,7 +142,7 @@
     },
     {
         "name": "simulation_friction",
-        "default": 0.85,
+        "default": 0.5,
         "annotation": "float",
         "description": "Friction coefficient."
     },
@@ -154,7 +154,7 @@
     },
     {
         "name": "background_color",
-        "default": "#222222",
+        "default": "rgb(45, 49, 58)",
         "annotation": "typing.Union[str, list[float]]",
         "description": "Canvas background color. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values."
     },
@@ -166,13 +166,13 @@
     },
     {
         "name": "point_default_color",
-        "default": "#b3b3b3",
+        "default": "rgba(205, 207, 213, 0.9)",
         "annotation": "typing.Union[str, list[float]]",
         "description": "The default color to use for points when no point colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1."
     },
     {
         "name": "point_greyout_opacity",
-        "default": 0.1,
+        "default": 0.2,
         "annotation": "float",
         "description": "Opacity of greyed-out points when highlighting is active. Range: 0 (fully transparent) to 1 (fully opaque). When set, used instead of `pointOpacity` for greyed-out points."
     },
@@ -238,7 +238,7 @@
     },
     {
         "name": "link_default_color",
-        "default": "#666666",
+        "default": "rgba(205, 207, 213, 0.9)",
         "annotation": "typing.Union[str, list[float]]",
         "description": "The default color to use for links when no link colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#666666') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1."
     },
@@ -274,7 +274,7 @@
     },
     {
         "name": "hovered_link_width_increase",
-        "default": 5,
+        "default": 0,
         "annotation": "float",
         "description": "Number of pixels to add to the link width when hovered. The hovered width is calculated as: originalWidth + hoveredLinkWidthIncrease"
     },
@@ -433,7 +433,7 @@
     },
     {
         "name": "point_sampling_distance",
-        "default": 150,
+        "default": 125,
         "annotation": "int",
         "description": "Point sampling distance in pixels between neighboring points when calling the `getSampledPointPositionsMap` method. This parameter determines how many points will be included in the sample."
     },
@@ -463,7 +463,13 @@
     },
     {
         "name": "point_color_palette",
-        "default": null,
+        "default": [
+            "rgba(43, 85, 168, 0.85)",
+            "rgba(153, 82, 213, 0.85)",
+            "rgba(240, 105, 180, 0.85)",
+            "rgba(255, 149, 131, 0.85)",
+            "rgba(254, 224, 139, 0.85)"
+        ],
         "annotation": "list[str]",
         "description": "An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. **Used when `point_color_strategy` is set to `'categorical'`, `'continuous'`, or `'degree'`.**`"
     },
@@ -481,7 +487,7 @@
     },
     {
         "name": "unknown_color",
-        "default": null,
+        "default": "rgba(205, 207, 213, 0.9)",
         "annotation": "str",
         "description": "The color to use for points and links when their data is unknown and current coloring strategy can't resolve it`."
     },
@@ -493,7 +499,10 @@
     },
     {
         "name": "point_size_range",
-        "default": null,
+        "default": [
+            2,
+            9
+        ],
         "annotation": "list[float]",
         "description": "Defines the range for automatic point size scaling. Takes [min, max] values in pixels. When `point_size_by` column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized points. **Used when `point_size_strategy` is set to `'auto'` or `'degree'`.**"
     },
@@ -589,7 +598,20 @@
     },
     {
         "name": "link_color_palette",
-        "default": null,
+        "default": [
+            "#206176",
+            "#38657e",
+            "#506987",
+            "#686d90",
+            "#807098",
+            "#9874a1",
+            "#af78a9",
+            "#c77cb2",
+            "#df7fba",
+            "#f783c3",
+            "#FFB4D3",
+            "#f6c0d8"
+        ],
         "annotation": "typing.List[str]",
         "description": "An optional array of color strings that can be used to color the links in the visualization. If provided, the links will be colored using the colors in this palette, cycling through the array as needed. **Used when `link_color_strategy` is set to `'categorical'`, `'count'`, `'sum'`, or `'average'`**`"
     },
@@ -613,7 +635,10 @@
     },
     {
         "name": "link_width_range",
-        "default": null,
+        "default": [
+            1,
+            9
+        ],
         "annotation": "list[float]",
         "description": "Defines the range for automatic link width scaling. Takes [min, max] values in pixels. When `link_width_by` column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no `link_width_by_fn` provided. Note: Only works when `link_width_by` column is provided and contains numeric values and when `link_width_by_fn` is not set."
     },
@@ -631,7 +656,10 @@
     },
     {
         "name": "link_strength_range",
-        "default": null,
+        "default": [
+            0.2,
+            1
+        ],
         "annotation": "list[float]",
         "description": "Defines the range for automatic link strength scaling. Takes [min, max] values in the range [0, 1]. This setting can be used to control the strength of the links during the simulation. Note: Only works when `link_strength_by` column is provided and contains numeric values and when `link_strength_by_fn` is not set. Has effect only during the active simulation."
     },
@@ -649,13 +677,13 @@
     },
     {
         "name": "show_labels",
-        "default": null,
+        "default": true,
         "annotation": "bool",
         "description": "Whether to show labels (except hovered) on the Cosmograph canvas. When `true`, labels are visible only if `point_label_by point_label_by` is provided. Default: `false`"
     },
     {
         "name": "show_dynamic_labels",
-        "default": null,
+        "default": true,
         "annotation": "bool",
         "description": "Show automatic labels for the evenly distributed points that are currently visible on the screen. Works only when `point_label_by point_label_by` is provided. Default: `true`"
     },
@@ -667,13 +695,13 @@
     },
     {
         "name": "show_top_labels",
-        "default": null,
+        "default": true,
         "annotation": "bool",
         "description": "Show labels for the top points. Works only when `point_label_by point_label_by` is provided. Default: `true`"
     },
     {
         "name": "show_top_labels_limit",
-        "default": null,
+        "default": 150,
         "annotation": "int",
         "description": "Sets the maximum number of top points to show labels for. Default: `30`"
     },
@@ -744,7 +772,7 @@
     },
     {
         "name": "use_point_color_strategy_for_cluster_labels",
-        "default": null,
+        "default": false,
         "annotation": "bool",
         "description": "If `true`, cluster labels will acquire colors from the current point coloring strategy ( `point_color_strategy point_color_strategy` ). This can be useful when `point_cluster_by point_cluster_by` and `point_color_by point_color_by` refer to the same data. Default: `false`"
     },
@@ -756,7 +784,7 @@
     },
     {
         "name": "show_hovered_point_label",
-        "default": true,
+        "default": false,
         "annotation": "bool",
         "description": "Whether to show a hovered point label. Default: `false`"
     },
