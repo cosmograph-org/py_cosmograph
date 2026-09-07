@@ -27,7 +27,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["watchfiles", "jupyterlab"]
-test = ["linked"]
+test = ["linked", "networkx"]
 dev_utils = [
     "lxml",
     "IPython",
@@ -55,6 +55,7 @@ dependencies = [
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",
+  "networkx",
 ]
 
 [tool.hatch.envs.dev_3_12]
