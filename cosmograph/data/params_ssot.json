@@ -1,824 +1,829 @@
 [
     {
-        "name":"enable_simulation",
-        "default":true,
-        "annotation":"bool",
-        "description":"If set to false, the simulation will not run. This property will be applied only on component initialization and it can't be changed using the setConfig method. Default value: true"
+        "name": "enable_simulation",
+        "default": true,
+        "annotation": "bool",
+        "description": "Controls whether to enable force-directed layout simulation. If `undefined`, the simulation will be automatically enabled if there are no links or points have layout coordinates provided.\n\nWhen disabled (`false`):\n- Uses x/y values from data for point positions. If positions not provided, random positions will be used."
     },
     {
-        "name":"polygonal_selector_stroke_color",
-        "default":null,
-        "annotation":"str",
-        "description":"Stroke color for the lasso selection"
-    },
-    {
-        "name":"polygonal_selector_line_width",
-        "default":1,
-        "annotation":"float",
-        "description":"Line width for the lasso selection"
-    },
-    {
-        "name":"select_point_on_click",
+        "name": "polygonal_selector_stroke_color",
         "default": null,
-        "annotation":"typing.Union[bool, str]",
-        "description":"Controls whether to select a clicked point with the connected points. When `true`: Selects the clicked point and all connected points to it. When `'single'`: Selects only the clicked point. Will also focus (render ring around) the clicked point if `focusPointOnClick` is `undefined`."
+        "annotation": "str",
+        "description": "Stroke color for the lasso selection"
     },
     {
-        "name":"select_point_on_label_click",
+        "name": "polygonal_selector_line_width",
+        "default": 1,
+        "annotation": "float",
+        "description": "Line width for the lasso selection"
+    },
+    {
+        "name": "select_point_on_click",
         "default": null,
-        "annotation":"typing.Union[bool, str]",
-        "description":"Controls whether to select a point with the connected points when the point's label is clicked. When `true`: Selects the clicked point and all connected points to it. When `'single'`: Selects only the clicked point. Will also focus (render ring around) the clicked point if `focusPointOnClick` is `undefined`."
+        "annotation": "typing.Union[bool, str]",
+        "description": "Controls whether to select a clicked point with the connected points.\n\n- When `true`: Selects the clicked point and all connected points to it\n- When `'single'`: Selects only the clicked point\n- Will also focus (render ring around) the clicked point if  {@link  focusPointOnClick }  is `undefined`"
     },
     {
-        "name":"reset_selection_on_empty_canvas_click",
+        "name": "select_point_on_label_click",
         "default": null,
-        "annotation":"bool",
-        "description":"Reset selection on empty canvas click. When `true`: Resets the selection when the canvas is clicked and no points are selected. Default value: `true`."
+        "annotation": "typing.Union[bool, str]",
+        "description": "Controls whether to select a point with the connected points when the point's label is clicked.\n\n- When `true`: Selects the clicked point and all connected points to it\n- When `'single'`: Selects only the clicked point\n- Will also focus (render ring around) the clicked point if  {@link  focusPointOnClick }  is `undefined`"
     },
     {
-        "name":"focus_point_on_click",
+        "name": "reset_selection_on_empty_canvas_click",
         "default": null,
-        "annotation":"bool",
-        "description":"Controls whether to focus on a point when the point itself is clicked."
+        "annotation": "bool",
+        "description": "Reset selection on empty canvas click\n\nWhen `true`:\n- Resets the selection when the canvas is clicked and there are some points selected"
     },
     {
-        "name":"focus_point_on_label_click",
+        "name": "focus_point_on_click",
         "default": null,
-        "annotation":"bool",
-        "description":"Controls whether to focus on a point when the point's label is clicked."
+        "annotation": "bool",
+        "description": "Controls whether to focus on a point when the point itself is clicked."
     },
     {
-        "name":"components_display_state_mode",
+        "name": "focus_point_on_label_click",
         "default": null,
-        "annotation":"typing.Union[str, bool]",
-        "description":"Controls display state messages behavior for all Cosmograph components. When `undefined`: Show all state messages (loading, no data). When `'loading'`: Show only loading state message, hide no data message. When `false`: Disable all state messages. This will be applied to all components unless explicitly overridden in component-specific configuration. @default `undefined`"
+        "annotation": "bool",
+        "description": "Controls whether to focus on a point when the point's label is clicked."
     },
     {
-        "name":"status_indicator_mode",
+        "name": "components_display_state_mode",
         "default": null,
-        "annotation":"typing.Union[str, bool]",
-        "description":"Chooses which kind of status indicator to show during loading or errors. - `'spinner'` (default): show a spinner during loading, falling back to text on errors. - `'text'`: always show descriptive messages. - `false`: hide the status indicator entirely. @default 'spinner'"
+        "annotation": "typing.Union[str, bool]",
+        "description": "Controls display state messages behavior for all Cosmograph components.\n\n- When `undefined`: Show all state messages (loading, no data)\n- When `'loading'`: Show only loading state message, hide no data message\n- When `false`: Disable all state messages\n\nThis will be applied to all components unless explicitly overridden in component-specific configuration."
     },
     {
-        "name":"disable_logging",
-        "default":false,
-        "annotation":"bool",
-        "description":"Disables logging of Cosmograph messages in the console. Default: `false`"
-    },
-    {
-        "name":"preserve_point_positions_on_data_update",
+        "name": "status_indicator_mode",
         "default": null,
-        "annotation":"bool",
-        "description":"Preserve positions for points with same ids (`pointIdBy`) during point data update. When `true`: - Points with same ids will stay where they were instead of generating new positions - New points get new positions (or positions from `pointXBy`/`pointYBy` if set) - Preserved positions take priority over new coordinates from `pointXBy`/`pointYBy` for existing points @default false"
+        "annotation": "typing.Union[str, bool]",
+        "description": "Chooses which kind of status indicator to show during loading or errors.\n\n- `'spinner'` (default): show a spinner during loading, falling back to text on errors.\n- `'text'`: always show descriptive messages.\n- `false`: hide the status indicator entirely."
     },
     {
-        "name":"simulation_decay",
-        "default":1000,
-        "annotation":"float",
-        "description":"Defines how quickly the simulation cools down."
+        "name": "disable_logging",
+        "default": false,
+        "annotation": "bool",
+        "description": "Disables logging of Cosmograph messages in the console."
     },
     {
-        "name":"simulation_gravity",
-        "default":0,
-        "annotation":"float",
-        "description":"Coefficient for gravity force."
+        "name": "preserve_point_positions_on_data_update",
+        "default": null,
+        "annotation": "bool",
+        "description": "Preserve positions for points with same ids ( {@link  CosmographConfig.pointIdBy pointIdBy }  during point data update\n\nWhen `true`:\n- Points with same ids will stay where they were instead of generating new positions\n- New points get new positions (or positions from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  if set)\n- Preserved positions take priority over new coordinates from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  for existing points"
     },
     {
-        "name":"simulation_center",
-        "default":0,
-        "annotation":"float",
-        "description":"Centers the mass force coefficient."
+        "name": "simulation_decay",
+        "default": 1000,
+        "annotation": "float",
+        "description": "Decay coefficient. Use bigger values if you want the simulation to \"cool down\" slower. Default value: `5000`"
     },
     {
-        "name":"simulation_repulsion",
-        "default":0.1,
-        "annotation":"float",
-        "description":"Configures point repulsion between points."
+        "name": "simulation_gravity",
+        "default": 0,
+        "annotation": "float",
+        "description": "Gravity force coefficient. Default value: `0.25`"
     },
     {
-        "name":"simulation_repulsion_theta",
-        "default":1.7,
-        "annotation":"float",
-        "description":"Decreases \/ increases the detalization of the Many-Body force calculations."
+        "name": "simulation_center",
+        "default": 0,
+        "annotation": "float",
+        "description": "Centering to center mass force coefficient. Default value: `0`"
     },
     {
-        "name":"simulation_repulsion_quadtree_levels",
-        "default":12,
-        "annotation":"float",
-        "description":"Barnes\u2013Hut approximation depth, usable when useQuadtree is set to True."
+        "name": "simulation_repulsion",
+        "default": 0.1,
+        "annotation": "float",
+        "description": "Repulsion force coefficient. Default value: `1.0`"
     },
     {
-        "name":"simulation_link_spring",
-        "default":1,
-        "annotation":"float",
-        "description":"Spring constant for links."
+        "name": "simulation_repulsion_theta",
+        "default": 1.7,
+        "annotation": "float",
+        "description": "Decreases / increases the detalization of the Many-Body force calculations."
     },
     {
-        "name":"simulation_link_distance",
-        "default":2,
-        "annotation":"float",
-        "description":"Default distance for links."
+        "name": "simulation_repulsion_quadtree_levels",
+        "default": 12,
+        "annotation": "float",
+        "description": "Barnes\u2013Hut approximation depth, usable when useQuadtree is set to True."
     },
     {
-        "name":"simulation_link_dist_random_variation_range",
-        "default":[
+        "name": "simulation_link_spring",
+        "default": 1,
+        "annotation": "float",
+        "description": "Link spring force coefficient. Default value: `1`"
+    },
+    {
+        "name": "simulation_link_distance",
+        "default": 2,
+        "annotation": "float",
+        "description": "Minimum link distance. Default value: `10`"
+    },
+    {
+        "name": "simulation_link_dist_random_variation_range",
+        "default": [
             1,
             1.2
         ],
-        "annotation":"list[typing.Any]",
-        "description":"Random link distance range."
+        "annotation": "list[typing.Any]",
+        "description": "Range of random link distance values. Default value: `[1, 1.2]`"
     },
     {
-        "name":"simulation_repulsion_from_mouse",
-        "default":2,
-        "annotation":"float",
-        "description":"Mouse position repulsion coefficient, activated by right-click."
+        "name": "simulation_repulsion_from_mouse",
+        "default": 2,
+        "annotation": "float",
+        "description": "Mouse position repulsion coefficient, activated by right-click."
     },
     {
-        "name":"enable_right_click_repulsion",
-        "default":false,
-        "annotation":"bool",
-        "description":"Enable or disable the repulsion force from mouse when right-clicking. When set to `true`, holding the right mouse button will activate the mouse repulsion force. When set to `false`, right-clicking will not trigger any repulsion force. Default value: `false`"
+        "name": "enable_right_click_repulsion",
+        "default": false,
+        "annotation": "bool",
+        "description": "Enable or disable the repulsion force from mouse when right-clicking. When set to `true`, holding the right mouse button will activate the mouse repulsion force. When set to `false`, right-clicking will not trigger any repulsion force. Default value: `false`"
     },
     {
-        "name":"simulation_friction",
-        "default":0.85,
-        "annotation":"float",
-        "description":"Sets simulation friction."
+        "name": "simulation_friction",
+        "default": 0.85,
+        "annotation": "float",
+        "description": "Friction coefficient. Default value: `0.85`"
     },
     {
-        "name":"simulation_cluster",
-        "default":null,
-        "annotation":"float",
-        "description":"Cluster coefficient. Default value: `0.1`."
+        "name": "simulation_cluster",
+        "default": null,
+        "annotation": "float",
+        "description": "Cluster coefficient. Default value: `0.1`"
     },
     {
-        "name":"background_color",
-        "default":"#222222",
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"Canvas background color."
+        "name": "background_color",
+        "default": "#222222",
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "Canvas background color. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: '#222222'"
     },
     {
-        "name":"space_size",
-        "default":4096,
-        "annotation":"int",
-        "description":"Size of the simulation space."
+        "name": "space_size",
+        "default": 4096,
+        "annotation": "int",
+        "description": "Simulation space size. Default value: `4096` (larger values may crash on some devices, e.g. iOS; see https://github.com/cosmosgl/graph/issues/203)."
     },
     {
-        "name":"point_default_color",
-        "default":"#b3b3b3",
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"The default color to use for points when no point colors are provided, or if the color value in the array is undefined or null. This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: '#b3b3b3'"
+        "name": "point_default_color",
+        "default": "#b3b3b3",
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "The default color to use for points when no point colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: '#b3b3b3'"
     },
     {
-        "name":"point_greyout_opacity",
-        "default":0.1,
-        "annotation":"float",
-        "description":"Opacity of unselected nodes during selection."
+        "name": "point_greyout_opacity",
+        "default": 0.1,
+        "annotation": "float",
+        "description": "Opacity of greyed-out points when highlighting is active. Range: 0 (fully transparent) to 1 (fully opaque). When set, used instead of `pointOpacity` for greyed-out points. Default value: `undefined`"
     },
     {
-        "name":"point_greyout_color",
-        "default":null,
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"The color to use for points when they are greyed out (when selection is active). This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. If not provided, the color will be the same as the point's original color, but darkened or lightened depending on the background color. If point_greyout_opacity is also defined, it will override the alpha/opacity component of this color. Default value: `undefined`"
+        "name": "point_greyout_color",
+        "default": null,
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "The color to use for points when they are greyed out (when highlighting is active). This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1.\n\nIf not provided, the color will be the same as the point's original color, but darkened or lightened depending on the background color.\n\nIf `pointGreyoutOpacity` is also defined, it will be multiplied with the final alpha of this color.\n\nDefault value: `undefined`"
     },
     {
-        "name":"point_default_size",
-        "default":4,
-        "annotation":"float",
-        "description":"The default size value to use for points when no point sizes are provided or if the size value in the array is undefined or null. Default value: 4"
+        "name": "point_default_size",
+        "default": 4,
+        "annotation": "float",
+        "description": "The default size value to use for points when no point sizes are provided or if the size value in the array is `undefined` or `null`. Default value: `4`"
     },
     {
-        "name":"point_size_scale",
-        "default":1,
-        "annotation":"float",
-        "description":"Scale factor for point sizes."
+        "name": "point_size_scale",
+        "default": 1,
+        "annotation": "float",
+        "description": "Scale factor for the point size. Default value: `1`"
     },
     {
-        "name":"point_opacity",
-        "default":1.0,
-        "annotation":"float",
-        "description":"Universal opacity value applied to all points. This value multiplies with individual point alpha values (if set via setPointColors). Useful for dynamically controlling opacity of all points without updating individual RGBA arrays. Default value: `1.0`"
+        "name": "point_opacity",
+        "default": 1.0,
+        "annotation": "float",
+        "description": "Universal opacity value applied to all points. This value multiplies with individual point alpha values (if set via setPointColors). Useful for dynamically controlling opacity of all points without updating individual RGBA arrays. Default value: `1.0`"
     },
     {
-        "name":"hovered_point_cursor",
-        "default":null,
-        "annotation":"str",
-        "description":"Cursor type when hovering over a point."
+        "name": "hovered_point_cursor",
+        "default": null,
+        "annotation": "str",
+        "description": "Cursor style to use when hovering over a point Default value: `auto`"
     },
     {
-        "name":"render_hovered_point_ring",
-        "default":false,
-        "annotation":"bool",
-        "description":"Enables ring around hovered points."
+        "name": "render_hovered_point_ring",
+        "default": false,
+        "annotation": "bool",
+        "description": "Turns ring rendering around a point on hover on / off Default value: `false`"
     },
     {
-        "name":"hovered_point_ring_color",
-        "default":"white",
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"Color of hovered point ring."
+        "name": "hovered_point_ring_color",
+        "default": "white",
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "Hovered point ring color hex value. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: `white`"
     },
     {
-        "name":"focused_point_ring_color",
-        "default":null,
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"Color of the focused point ring."
+        "name": "focused_point_ring_color",
+        "default": null,
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "Focused point ring color hex value. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: `white`"
     },
     {
-        "name":"focused_point_index",
-        "default":null,
-        "annotation":"int",
-        "description":"Index of the focused point, prioritized over focus_point method."
+        "name": "focused_point_index",
+        "default": null,
+        "annotation": "int",
+        "description": "Set focus on a point by index. A ring will be rendered around the focused point. The focused ring is larger than outline rings to create a clear visual hierarchy. When set to `undefined`, no point is focused. Default value: `undefined`"
     },
     {
-        "name":"render_links",
-        "default":true,
-        "annotation":"bool",
-        "description":"Enables or disables link rendering."
+        "name": "render_links",
+        "default": true,
+        "annotation": "bool",
+        "description": "Turns link rendering on / off. Default value: `true`"
     },
     {
-        "name":"link_default_color",
-        "default":"#666666",
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"The default color to use for links when no link colors are provided, or if the color value in the array is undefined or null. This can be either a hex color string (e.g., '#666666') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: '#666666'"
+        "name": "link_default_color",
+        "default": "#666666",
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "The default color to use for links when no link colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#666666') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: '#666666'"
     },
     {
-        "name":"link_greyout_opacity",
-        "default":0.1,
-        "annotation":"float",
-        "description":"Opacity of unselected links during selection."
+        "name": "link_greyout_opacity",
+        "default": 0.1,
+        "annotation": "float",
+        "description": "Greyed-out link opacity value when link highlighting is active. Default value: `0.1`"
     },
     {
-        "name":"link_default_width",
-        "default":1,
-        "annotation":"float",
-        "description":"The default width value to use for links when no link widths are provided or if the width value in the array is undefined or null. Default value: 1"
+        "name": "link_default_width",
+        "default": 1,
+        "annotation": "float",
+        "description": "The default width value to use for links when no link widths are provided or if the width value in the array is `undefined` or `null`. Default value: `1`"
     },
     {
-        "name":"link_width_scale",
-        "default":1,
-        "annotation":"float",
-        "description":"Scale factor for link widths."
+        "name": "link_width_scale",
+        "default": 1,
+        "annotation": "float",
+        "description": "Scale factor for the link width. Default value: `1`"
     },
     {
-        "name":"link_opacity",
-        "default":1.0,
-        "annotation":"float",
-        "description":"Universal opacity value applied to all links. This value multiplies with individual link alpha values (if set via setLinkColors). Useful for dynamically controlling opacity of all links without updating individual RGBA arrays. Default value: `1.0`"
+        "name": "link_opacity",
+        "default": 1.0,
+        "annotation": "float",
+        "description": "Universal opacity value applied to all links. This value multiplies with individual link alpha values (if set via setLinkColors). Useful for dynamically controlling opacity of all links without updating individual RGBA arrays. Default value: `1.0`"
     },
     {
-        "name":"hovered_link_color",
-        "default":null,
-        "annotation":"typing.Union[str, list[float]]",
-        "description":"The color to use for links when they are hovered. This can be either a hex color string (e.g., '#ff3333') or an array of RGBA values in the format [red, green, blue, alpha] where each value is a number between 0 and 255. Default value: `undefined`"
+        "name": "hovered_link_color",
+        "default": null,
+        "annotation": "typing.Union[str, list[float]]",
+        "description": "The color to use for links when they are hovered. This can be either a hex color string (e.g., '#ff3333') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: `undefined`"
     },
     {
-        "name":"hovered_link_width_increase",
-        "default":5,
-        "annotation":"float",
-        "description":"Number of pixels to add to the link width when hovered. The hovered width is calculated as: originalWidth + hoveredLinkWidthIncrease. Default value: `5`"
+        "name": "hovered_link_width_increase",
+        "default": 5,
+        "annotation": "float",
+        "description": "Number of pixels to add to the link width when hovered. The hovered width is calculated as: originalWidth + hoveredLinkWidthIncrease Default value: `5`"
     },
     {
-        "name":"hovered_link_cursor",
-        "default":"auto",
-        "annotation":"str",
-        "description":"Cursor style to use when hovering over a link. Default value: `auto`"
+        "name": "hovered_link_cursor",
+        "default": "auto",
+        "annotation": "str",
+        "description": "Cursor style to use when hovering over a link Default value: `auto`"
     },
     {
-        "name":"curved_links",
-        "default":false,
-        "annotation":"bool",
-        "description":"Enables or disables curved links."
+        "name": "curved_links",
+        "default": false,
+        "annotation": "bool",
+        "description": "If set to true, links are rendered as curved lines. Otherwise as straight lines. Default value: `false`"
     },
     {
-        "name":"curved_link_segments",
-        "default":19,
-        "annotation":"int",
-        "description":"Segments defining curved links."
+        "name": "curved_link_segments",
+        "default": 19,
+        "annotation": "int",
+        "description": "Number of segments in a curved line. Default value: `19`."
     },
     {
-        "name":"curved_link_weight",
-        "default":0.8,
-        "annotation":"float",
-        "description":"Weight factor for link curvature."
+        "name": "curved_link_weight",
+        "default": 0.8,
+        "annotation": "float",
+        "description": "Weight affects the shape of the curve. Default value: `0.8`."
     },
     {
-        "name":"curved_link_control_point_distance",
-        "default":0.5,
-        "annotation":"float",
-        "description":"Control point positioning for curves."
+        "name": "curved_link_control_point_distance",
+        "default": 0.5,
+        "annotation": "float",
+        "description": "Defines the position of the control point of the curve on the normal from the centre of the line. If set to 1 then the control point is at a distance equal to the length of the line. Default value: `0.5`"
     },
     {
-        "name":"link_default_arrows",
-        "default":null,
-        "annotation":"bool",
-        "description":"The default value to use for link arrows when no link arrow data is provided. If set to `true`, all links will have arrows by default. If set to `false`, links will not have arrows unless specified via `link_arrow_by`. Default value: `false`"
+        "name": "link_default_arrows",
+        "default": null,
+        "annotation": "bool",
+        "description": "The default link arrow value that controls whether or not to display link arrows. Default value: `false`"
     },
     {
-        "name":"link_arrows_size_scale",
-        "default":1,
-        "annotation":"float",
-        "description":"Scale factor for link arrow size."
+        "name": "link_arrows_size_scale",
+        "default": 1,
+        "annotation": "float",
+        "description": "Scale factor for the link arrows size. Default value: `1`"
     },
     {
-        "name":"link_visibility_distance_range",
-        "default":[
+        "name": "link_visibility_distance_range",
+        "default": [
             50,
             150
         ],
-        "annotation":"list[float]",
-        "description":"Pixel distance range for link transparency."
+        "annotation": "list[float]",
+        "description": "The range defines the minimum and maximum link visibility distance in pixels. The link will be fully opaque when its length is less than the first number in the array, and will have `linkVisibilityMinTransparency` transparency when its length is greater than the second number in the array. This distance is defined in screen space coordinates and will change as you zoom in and out (e.g. links become longer when you zoom in, and shorter when you zoom out). Default value: `[50, 150]`"
     },
     {
-        "name":"link_visibility_min_transparency",
-        "default":0.25,
-        "annotation":"float",
-        "description":"Minimum transparency of links based on link_visibility_distance_range."
+        "name": "link_visibility_min_transparency",
+        "default": 0.25,
+        "annotation": "float",
+        "description": "The transparency value that the link will have when its length reaches the maximum link distance value from `linkVisibilityDistanceRange`. Default value: `0.25`"
     },
     {
-        "name":"use_classic_quadtree",
-        "default":false,
-        "annotation":"bool",
-        "description":"Use the classic quadtree algorithm for the Many-Body force. This property will be applied only on component initialization and it can't be changed using the setConfig method. Default value: `false`"
+        "name": "use_classic_quadtree",
+        "default": false,
+        "annotation": "bool",
+        "description": "Use the classic quadtree algorithm for the Many-Body force. This property will be applied only on component initialization and it can't be changed using the setConfig method. Default value: `false`"
     },
     {
-        "name":"show_fps_monitor",
-        "default":false,
-        "annotation":"bool",
-        "description":"Display an FPS counter in the upper right corner of the canvas."
+        "name": "show_fps_monitor",
+        "default": false,
+        "annotation": "bool",
+        "description": "Display an FPS counter in the upper right corner of the canvas."
     },
     {
-        "name":"pixel_ratio",
-        "default":2,
-        "annotation":"float",
-        "description":"Canvas pixel ratio."
+        "name": "pixel_ratio",
+        "default": 2,
+        "annotation": "float",
+        "description": "Pixel ratio for the canvas. Higher values use more GPU memory but provide better quality on high-DPI displays. Default value: `window.devicePixelRatio || 2`"
     },
     {
-        "name":"scale_points_on_zoom",
-        "default":true,
-        "annotation":"bool",
-        "description":"Scales point sizes when zooming."
+        "name": "scale_points_on_zoom",
+        "default": true,
+        "annotation": "bool",
+        "description": "Increase or decrease the size of the points when zooming in or out. Default value: `false`"
     },
     {
-        "name":"scale_links_on_zoom",
-        "default":true,
-        "annotation":"bool",
-        "description":"Increase or decrease the size of the links when zooming in or out."
+        "name": "scale_links_on_zoom",
+        "default": true,
+        "annotation": "bool",
+        "description": "Increase or decrease the size of the links when zooming in or out. Default value: `false`"
     },
     {
-        "name":"initial_zoom_level",
-        "default":3,
-        "annotation":"float",
-        "description":"Starting zoom level."
+        "name": "initial_zoom_level",
+        "default": 3,
+        "annotation": "float",
+        "description": "Initial zoom level. This property will be applied only on component initialization and it can't be changed using the `setConfig` or `setConfigPartial` methods. If set, `fitViewOnInit` value will be ignored. Default value: `undefined`"
     },
     {
-        "name":"enable_zoom",
-        "default":true,
-        "annotation":"bool",
-        "description":"Enables or disables zooming in and out. Default: `true`"
+        "name": "enable_zoom",
+        "default": true,
+        "annotation": "bool",
+        "description": "Enables or disables zooming in and out. Default value: `true`"
     },
     {
-        "name":"enable_simulation_during_zoom",
-        "default":false,
-        "annotation":"bool",
-        "description":"Controls whether the simulation remains active during zoom operations. When set to `true`, the simulation continues running while zooming. When set to `false`, the simulation pauses during zoom operations. Default value: `false`"
+        "name": "enable_simulation_during_zoom",
+        "default": false,
+        "annotation": "bool",
+        "description": "Controls whether the simulation remains active during interactive (user-driven) zoom operations. When set to `true`, the simulation continues running while zooming. When set to `false`, the simulation pauses during zoom operations. Programmatic zoom methods (e.g., `zoomToPointByIndex`, `fitView`) default to running the simulation regardless of this setting, but can be controlled via their `enableSimulation` parameter. Default value: `false`"
     },
     {
-        "name":"enable_drag",
-        "default":null,
-        "annotation":"bool",
-        "description":"Allows graph dragging."
+        "name": "enable_drag",
+        "default": null,
+        "annotation": "bool",
+        "description": "Enables or disables dragging of points in the graph. Default value: `false`"
     },
     {
-        "name":"fit_view_on_init",
-        "default":true,
-        "annotation":"bool",
-        "description":"Automatically fits view to all points upon initialization."
+        "name": "fit_view_on_init",
+        "default": true,
+        "annotation": "bool",
+        "description": "Whether to center and zoom the view to fit all points in the scene on initialization or not. Ignored if `initialZoomLevel` is set. Default: `true`"
     },
     {
-        "name":"fit_view_delay",
-        "default":250,
-        "annotation":"float",
-        "description":"Delay for fitting view after initialization in milliseconds."
+        "name": "fit_view_delay",
+        "default": 250,
+        "annotation": "float",
+        "description": "Delay in milliseconds before fitting the view when `fitViewOnInit` is enabled. Useful if you want the layout to stabilize a bit before fitting. Default: `250`"
     },
     {
-        "name":"fit_view_padding",
-        "default":null,
-        "annotation":"float",
-        "description":"Padding around fit view area."
+        "name": "fit_view_padding",
+        "default": null,
+        "annotation": "float",
+        "description": "Padding to apply when fitting the view to show all points. This value should be between 0 and 1, and is added to the calculated bounding box to provide some extra space around the points. This is used when the `fitViewOnInit` option is enabled. Default: `0.1`"
     },
     {
-        "name":"fit_view_duration",
-        "default":null,
-        "annotation":"float",
-        "description":"Animation duration for view fitting in milliseconds."
+        "name": "fit_view_duration",
+        "default": null,
+        "annotation": "float",
+        "description": "Duration in milliseconds for fitting the view to show all points when fitViewOnInit is enabled. Default: `250`"
     },
     {
-        "name":"fit_view_by_points_in_rect",
-        "default":null,
-        "annotation":"list[list[float]]",
-        "description":"Fits view to specified rectangle of points, active when fit_view_on_init is True."
+        "name": "fit_view_by_points_in_rect",
+        "default": null,
+        "annotation": "list[list[float]]",
+        "description": "When `fitViewOnInit` is set to `true`, fits the view to show the points within a rectangle defined by its two corner coordinates `[[left, bottom], [right, top]]` in the scene space. Default: `undefined`"
     },
     {
-        "name":"fit_view_by_point_indices",
-        "default":null,
-        "annotation":"list[int]",
-        "description":"When `fit_view_on_init` is set to `true`, fits the view to show only the specified points by their indices. Takes precedence over `fit_view_by_points_in_rect` when both are provided. Default: `undefined`"
+        "name": "fit_view_by_point_indices",
+        "default": null,
+        "annotation": "list[int]",
+        "description": "When `fitViewOnInit` is set to `true`, fits the view to show only the specified points by their indices. Takes precedence over `fitViewByPointsInRect` when both are provided. Default: `undefined`"
     },
     {
-        "name":"random_seed",
-        "default":null,
-        "annotation":"typing.Union[int, str]",
-        "description":"Seed value for generating random numbers in simulations."
+        "name": "random_seed",
+        "default": null,
+        "annotation": "typing.Union[int, str]",
+        "description": "Providing a `randomSeed` value allows you to control the randomness of the layout across different simulation runs. It is useful when you want the graph to always look the same on same datasets. This property will be applied only on component initialization and it can't be changed using the `setConfig` or `setConfigPartial` methods. Default value: undefined"
     },
     {
-        "name":"point_sampling_distance",
-        "default":150,
-        "annotation":"int",
-        "description":"Distance threshold for sampling points."
+        "name": "point_sampling_distance",
+        "default": 150,
+        "annotation": "int",
+        "description": "Point sampling distance in pixels between neighboring points when calling the `getSampledPointPositionsMap` method. This parameter determines how many points will be included in the sample. Default value: `100`"
     },
     {
-        "name":"rescale_positions",
-        "default":null,
-        "annotation":"typing.Union[bool, None]",
-        "description":"Controls automatic position adjustment of points in the visible space. When `undefined` (default): If simulation is disabled (`enableSimulation: false`), points will be automatically repositioned to fit within the visible space. If simulation is enabled, points will not be rescaled. When explicitly set: `true`: Forces points positions to be rescaled. `false`: Forces points positions to not be rescaled."
+        "name": "rescale_positions",
+        "default": null,
+        "annotation": "typing.Union[bool, None]",
+        "description": "Controls automatic position adjustment of points in the visible space.\n\nWhen `undefined` (default):\n- If simulation is disabled (`enableSimulation: false`), points will be automatically   repositioned to fit within the visible space\n- If simulation is enabled, points will not be rescaled\n\nWhen explicitly set:\n- `true`: Forces points positions to be rescaled\n- `false`: Forces points positions to not be rescaled\n\nDefault value: `undefined`"
     },
     {
-        "name":"point_id_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_id_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Unique identifier column for each point. Required for mapping links to points correctly."
     },
     {
-        "name":"point_index_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_index_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Numeric index column for each point. Used for efficient lookups and should be a sequential integer starting from 0."
     },
     {
-        "name":"point_color_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_color_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the point color. If provided, points will be colored based on the values in this column, which should be either a color `string` or an array of numeric `[r, g, b, a]` values."
     },
     {
-        "name":"point_color_palette",
-        "default":null,
-        "annotation":"list[str]",
-        "description":"An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed. Used when point_color_strategy is set to `'categorical'`, `'continuous'`, `'degree'`, `'preciseDegree'`, or `'linkDirection'`."
+        "name": "point_color_palette",
+        "default": null,
+        "annotation": "list[str]",
+        "description": "An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed.\n\n**Used when  {@link  pointColorStrategy }  is set to `'categorical'`, `'continuous'`, or `'degree'`.**`"
     },
     {
-        "name":"point_color_by_map",
-        "default":null,
-        "annotation":"typing.Dict[str, typing.Union[str, list[float]]]",
-        "description":"An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values. Used when point_color_strategy is set to `'map'`."
+        "name": "point_color_by_map",
+        "default": null,
+        "annotation": "typing.Dict[str, typing.Union[str, list[float]]]",
+        "description": "An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values.\n\n**Used when  {@link  pointColorStrategy }  is set to `'map'`.**"
     },
     {
-        "name":"point_color_strategy",
-        "default":null,
-        "annotation":"str",
-        "description":"Specifies the strategy for coloring points based on data from the point_color_by column. Available strategies: `undefined` (default): Automatically uses the optimal strategy based on input configuration and color data type. Current strategy can be acquired with cosmograph.activePointColorStrategy. All strategies use `unknown_color` for nullish/unparseable values (null, undefined, 'null', '', 'undefined', 'nan'). `'categorical'`: Uses colors from point_color_palette without interpolation. For numeric data: Creates equal-width buckets mapped to point_color_palette colors. For categorical data: Assigns colors from point_color_palette in order, cycling when unique values exceed palette length. Uses unknown_color for nullish values. Has effect only if point_color_by provided. `'continuous'`: Interpolates colors from point_color_palette. For numeric data: Creates continuous color scale between point_color_palette colors. For categorical data: Creates evenly-spaced color scale by interpolating between point_color_palette colors to match the number of unique values so every value is a unique color. Uses unknown_color for nullish values. Has effect only if point_color_by provided. `'map'`: Uses color mapping from point_color_by_map to values in point_color_by. Applies exact color from point_color_by_map for matching values. Falls back to unknown_color when value is not found in map or invalid. Has effect only if point_color_by_map and point_color_by provided. `'degree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette with quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Minimum and maximum values are clamped to 5th and 95th percentiles of total degree distribution. Has effect only if links provided. `'preciseDegree'`: Colors points based on their degree (number of connections) using interpolated point_color_palette without quantile-based boundaries. Maps point degrees to continuous color scale between point_color_palette colors. Has effect only if links provided. `'linkDirection'`: Colors points based on their link direction (in, out, bidirectional, isolated) using point_color_palette. Has effect only if links provided. `'direct'`: Directly uses point_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If point_color_by_fn exists, applies it to transform point_color_by values into custom colors. Falls back to unknown_color if invalid color. If neither point_color_by nor point_color_by_fn exist, colors all points with unknown_color. `'single'`: Colors all points uniformly to the same color specified by point_color."
+        "name": "point_color_strategy",
+        "default": null,
+        "annotation": "str",
+        "description": "Specifies the strategy for coloring points based on data from the  {@link  pointColorBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with  {@link  Cosmograph.activePointColorStrategy  }  getter.\n\nSee  {@link  PointColorStrategy }  for available strategies and their documentation."
     },
     {
-        "name":"unknown_color",
-        "default":null,
-        "annotation":"str",
-        "description":"The color to use for points and links when their data is unknown and the current coloring strategy cannot resolve it. Used for nullish/unparseable values (null, undefined, 'null', '', 'undefined', 'nan'), invalid color values, missing map entries, or when no color data is available. Default: 'rgba(205, 207, 213, 0.9)' (light gray with 90% opacity)."
+        "name": "unknown_color",
+        "default": null,
+        "annotation": "str",
+        "description": "The color to use for points and links when their data is unknown and current coloring strategy can't resolve it`."
     },
     {
-        "name":"point_size_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_size_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name that should contain numeric values to be used for the point size and label weight (if labels enabled). If provided, points will be sized based on the values in this column. **Use `pointSizeRange` to control the size range.**"
     },
     {
-        "name":"point_size_range",
-        "default":null,
-        "annotation":"list[float]",
-        "description":""
+        "name": "point_size_range",
+        "default": null,
+        "annotation": "list[float]",
+        "description": "Defines the range for automatic point size scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  pointSizeBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized points.\n\n**Used when  {@link  pointSizeStrategy }  is set to `'auto'` or `'degree'`.**"
     },
     {
-        "name":"point_size_strategy",
-        "default":null,
-        "annotation":"str",
-        "description":"Specifies the strategy for sizing points based on data from the point_size_by column."
+        "name": "point_size_strategy",
+        "default": null,
+        "annotation": "str",
+        "description": "Specifies the strategy for sizing points based on data from the  {@link  pointSizeBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and size data type. Current strategy can be acquired with  {@link  Cosmograph.activePointSizeStrategy  }  getter.\n\nSee  {@link  PointSizeStrategy }  for available strategies and their documentation."
     },
     {
-        "name":"point_label_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_label_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the point label."
     },
     {
-        "name":"point_label_weight_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_label_weight_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Specify the numeric column that will be used for the point label weight. Higher weight values make labels more likely to be shown.\n\nIf not provided, the points labels will be sorted by  {@link  pointSizeBy }  if provided or their total links count (degree) otherwise ."
     },
     {
-        "name":"point_x_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_x_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the point's x-coordinate. If provided with `pointYBy`, points will be positioned based on the values from `pointXBy` and `pointYBy` columns."
     },
     {
-        "name":"point_y_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_y_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the point's y-coordinate. If provided with `pointXBy`, points will be positioned based on the values from `pointXBy` and `pointYBy` columns."
     },
     {
-        "name":"point_cluster_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_cluster_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Column name containing cluster assignments for points. Can be string or number."
     },
     {
-        "name":"point_cluster_strength_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "point_cluster_strength_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The `pointClusterStrengthBy` column defines how strongly each point is attracted to its assigned cluster during the simulation.\n\nThe column should contain numeric values where higher values (closer to 1.0) = stronger attraction, point stays closer to its cluster, Lower values (closer to 0.0) = weaker attraction, point can move more freely away from its cluster\n\nHas effect only when  {@link  pointClusterBy }  is provided."
     },
     {
-        "name":"cluster_positions_map",
-        "default":null,
-        "annotation":"typing.Dict[str, list[float]]",
-        "description":"Mapping of cluster keys to [x, y] coordinate positions. Keys should match values from the pointClusterBy column. Missing cluster keys will be automatically positioned using the centermass. Won't take effect if point positions are provided by pointXBy or pointYBy. @example Object mapping cluster keys to coordinates: clusterPositionsMap: { 'Rock': [10, 20], 'Rap': [30, 40] }"
+        "name": "cluster_positions_map",
+        "default": null,
+        "annotation": "typing.Dict[str, list[float]]",
+        "description": "Mapping of cluster keys to [x, y] coordinate positions. Keys should match values from the  {@link  CosmographConfig.pointClusterBy pointClusterBy }  column. Missing cluster keys will be automatically positioned using the centermass. Won't take effect if point positions are provided by  {@link  CosmographConfig.pointXBy pointXBy }  or  {@link  CosmographConfig.pointYBy pointYBy } ."
     },
     {
-        "name":"point_include_columns",
-        "default":null,
-        "annotation":"list[str]",
-        "description":"An array of additional column names to include in point data."
+        "name": "point_include_columns",
+        "default": null,
+        "annotation": "list[str]",
+        "description": "An array of additional column names to include in the point data.\n\nThese columns will be available on the point objects but not used by Cosmograph directly, can be used as accessors for Cosmograph components. Useful for storing additional information about the points. If provided with `*`, all columns will be included."
     },
     {
-        "name":"point_timeline_by",
-        "default":null,
-        "annotation":"str",
-        "description":"Column to determine values for the point timeline. Shows a point timeline if set."
+        "name": "point_timeline_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Column to determine values for the point timeline. Shows a point timeline if set."
     },
     {
-        "name":"link_source_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_source_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the **source** point of each link. This should match the `pointIdBy` values in the points data."
     },
     {
-        "name":"link_source_index_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_source_index_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the index of the **source** point of each link. This is used for efficient lookups and should match the `pointIndexBy` values in the points data."
     },
     {
-        "name":"link_target_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_target_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the **target** point of each link. This should match the `pointIdBy` values in the points data."
     },
     {
-        "name":"link_target_index_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_target_index_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the index of the **target** point of each link. This is used for efficient lookups and should match the `pointIndexBy` values in the points data."
     },
     {
-        "name":"link_color_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_color_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the link color.\n\nIf provided, links will be colored based on the values in this column, which should be either a color `string` or an array of numeric `[r, g, b, a]` values."
     },
     {
-        "name":"link_color_palette",
-        "default":null,
-        "annotation":"typing.List[str]",
-        "description":"An optional array of color strings that can be used to color the links in the visualization. If provided, the links will be colored using the colors in this palette, cycling through the array as needed. Used when link_color_strategy is set to `'categorical'`, `'sum'`, `'average'`, or `'count'`."
+        "name": "link_color_palette",
+        "default": null,
+        "annotation": "typing.List[str]",
+        "description": "An optional array of color strings that can be used to color the links in the visualization. If provided, the links will be colored using the colors in this palette, cycling through the array as needed.\n\n**Used when  {@link  linkColorStrategy }  is set to `'categorical'`, `'count'`, `'sum'`, or `'average'`**`"
     },
     {
-        "name":"link_color_strategy",
-        "default":null,
-        "annotation":"str",
-        "description":"Specifies the strategy for coloring links based on data from the link_color_by column. When `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with cosmograph.activeLinkColorStrategy. Available strategies: `'sum'`: Uses the sum of numeric values between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. Uses unknown_color for nullish values. Has effect only if link_color_by provided and contains numeric data. `'average'`: Uses the average of numeric values between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. Uses unknown_color for nullish values. Has effect only if link_color_by provided and contains numeric data. `'count'`: Uses the count of links between the same source and target points in link_color_by to determine link colors and interpolates them from link_color_palette. `'categorical'`: Uses colors from link_color_palette for link_color_by data without interpolation. For numeric data: Creates equal-width buckets mapped to link_color_palette colors. For categorical data: Assigns colors from link_color_palette in order, cycling when unique values exceed palette length. Uses unknown_color for nullish values. Has effect only if link_color_by provided. `'direct'`: Directly uses link_color_by column values as colors. Applies the color if it's a valid color string (hex, rgb, named color, etc) or an array of [r, g, b, a]. If link_color_by_fn exists, applies it to transform link_color_by values into custom colors. Falls back to unknown_color if invalid color. If neither link_color_by nor link_color_by_fn exist, colors all links with unknown_color. `'single'`: Colors all links uniformly to the same color specified by link_default_color. This is the default strategy when no link_color_by is provided."
+        "name": "link_color_strategy",
+        "default": null,
+        "annotation": "str",
+        "description": "Specifies the strategy for coloring links based on data from the  {@link  linkColorBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with  {@link  Cosmograph.activeLinkColorStrategy  }  getter.\n\nSee  {@link  LinkColorStrategy }  for available strategies and their documentation."
     },
     {
-        "name":"link_width_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_width_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the link width.\n\nIf provided, links will have their widths set based on the values in this column, which should be numeric values."
     },
     {
-        "name":"link_width_strategy",
-        "default":null,
-        "annotation":"str",
-        "description":"Specifies the strategy for sizing links based on data from the link_width_by column. When `undefined` (default), will automatically use the optimal strategy based on the input configuration and width data type. Current strategy can be acquired with cosmograph.activeLinkWidthStrategy. Available strategies: `'sum'`: Uses the sum of numeric values between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. Has effect only if link_width_by provided and contains numeric data. `'average'`: Uses the average of numeric values between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. Has effect only if link_width_by provided and contains numeric data. `'count'`: Uses the count of links between the same source and target points in link_width_by to determine link widths and interpolates them from link_width_range. `'direct'`: Directly uses link_width_by column values as widths. Treats numeric values in link_width_by as link widths in pixels 1:1 without interpolation if they are numbers. If link_width_by_fn exists, applies it to transform link_width_by values into custom widths. Falls back to link_default_width if invalid width. If neither link_width_by nor link_width_by_fn exist, sets all links width to link_default_width. `'single'`: Sets all links width to the same value specified by link_default_width. This is the default strategy when no link_width_by is provided."
+        "name": "link_width_strategy",
+        "default": null,
+        "annotation": "str",
+        "description": "Specifies the strategy for sizing links based on data from the  {@link  linkWidthBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and width data type. Current strategy can be acquired with  {@link  Cosmograph.activeLinkWidthStrategy  }  getter.\n\nSee  {@link  LinkWidthStrategy }  for available strategies and their documentation."
     },
     {
-        "name":"link_width_range",
-        "default":null,
-        "annotation":"list[float]",
-        "description":"Defines the range for automatic link width scaling. Takes [min, max] values in pixels. When link_width_by column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no link_width_by_fn provided."
+        "name": "link_width_range",
+        "default": null,
+        "annotation": "list[float]",
+        "description": "Defines the range for automatic link width scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  linkWidthBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no  {@link  linkWidthByFn }  provided.\n\nNote: Only works when  {@link  linkWidthBy }  column is provided and contains numeric values and when  {@link  linkWidthByFn }  is not set."
     },
     {
-        "name":"link_arrow_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_arrow_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name that determines whether a link should have an arrow. If provided, links will have arrows based on the `boolean` values in this column."
     },
     {
-        "name":"link_strength_by",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "link_strength_by",
+        "default": null,
+        "annotation": "str",
+        "description": "The column name for the link strength. If provided, links will have their strengths set based on the values in this column, which should be numeric values. Link strength affects the force simulation."
     },
     {
-        "name":"link_strength_range",
-        "default":null,
-        "annotation":"list[float]",
-        "description":""
+        "name": "link_strength_range",
+        "default": null,
+        "annotation": "list[float]",
+        "description": "Defines the range for automatic link strength scaling. Takes [min, max] values in the range [0, 1].\n\nThis setting can be used to control the strength of the links during the simulation.\n\nNote: Only works when  {@link  linkStrengthBy }  column is provided and contains numeric values and when  {@link  linkStrengthByFn }  is not set. Has effect only during the active simulation."
     },
     {
-        "name":"link_include_columns",
-        "default":null,
-        "annotation":"list[str]",
-        "description":"An array of additional column names to include in link data."
+        "name": "link_include_columns",
+        "default": null,
+        "annotation": "list[str]",
+        "description": "An array of additional column names to include in the link data.\n\nThese columns will be available on the link objects but not used by Cosmograph directly, can be used as accessors for Cosmograph components. Useful for storing additional information about the links. If provided with `*`, all columns will be included."
     },
     {
-        "name":"link_timeline_by",
-        "default":null,
-        "annotation":"str",
-        "description":"Column to determine values for the link timeline. Shows a timeline for links if set."
+        "name": "link_timeline_by",
+        "default": null,
+        "annotation": "str",
+        "description": "Column to determine values for the link timeline. Shows a timeline for links if set."
     },
     {
-        "name":"show_labels",
-        "default":null,
-        "annotation":"bool",
-        "description":""
+        "name": "show_labels",
+        "default": null,
+        "annotation": "bool",
+        "description": "Whether to show labels (except hovered) on the Cosmograph canvas. When `true`, labels are visible only if  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `false`"
     },
     {
-        "name":"show_dynamic_labels",
-        "default":null,
-        "annotation":"bool",
-        "description":"Flag to show dynamic labels for visible points."
+        "name": "show_dynamic_labels",
+        "default": null,
+        "annotation": "bool",
+        "description": "Show automatic labels for the evenly distributed points that are currently visible on the screen.\n\nWorks only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `true`"
     },
     {
-        "name":"show_labels_for",
-        "default":null,
-        "annotation":"list[str]",
-        "description":"An array of point ids for which to show labels."
+        "name": "show_labels_for",
+        "default": null,
+        "annotation": "list[str]",
+        "description": "An array of point ids to show labels for.\n\nWorks only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `undefined`"
     },
     {
-        "name":"show_top_labels",
-        "default":null,
-        "annotation":"bool",
-        "description":"Flag to display labels for the top points."
+        "name": "show_top_labels",
+        "default": null,
+        "annotation": "bool",
+        "description": "Show labels for the top points. Works only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `true`"
     },
     {
-        "name":"show_top_labels_limit",
-        "default":null,
-        "annotation":"int",
-        "description":"Maximum number of top points to show labels for."
+        "name": "show_top_labels_limit",
+        "default": null,
+        "annotation": "int",
+        "description": "Sets the maximum number of top points to show labels for. Default: `30`"
     },
     {
-        "name":"show_cluster_labels",
-        "default":false,
-        "annotation":"bool",
-        "description":"Show labels for the clusters based on the `pointClusterBy` column. When any point is selected, cluster labels will be hidden until the selection is cleared."
+        "name": "show_cluster_labels",
+        "default": false,
+        "annotation": "bool",
+        "description": "Show labels for the clusters based on the  {@link  CosmographConfig.pointClusterBy pointClusterBy }  column. Will take priority over point labels. When any point is selected, cluster labels will be hidden until the selection is cleared.\n\nHas effect only when  {@link  CosmographConfig.pointClusterBy pointClusterBy }  is provided. Default: `false`"
     },
     {
-        "name":"point_label_color",
-        "default":null,
-        "annotation":"str",
-        "description":"Specifies the CSS color to use for the point labels."
+        "name": "point_label_color",
+        "default": null,
+        "annotation": "str",
+        "description": "Specifies the CSS color to use for the point labels.\n\nIf `undefined`, label will be colored as point."
     },
     {
-        "name":"point_label_font_size",
-        "default":13,
-        "annotation":"float",
-        "description":"Specifies the font size to use for the point labels."
+        "name": "point_label_font_size",
+        "default": 13,
+        "annotation": "float",
+        "description": "Specifies the font size to use for the point labels."
     },
     {
-        "name":"cluster_label_font_size",
-        "default":16,
-        "annotation":"float",
-        "description":"Specifies the font size to use for the cluster labels."
+        "name": "cluster_label_font_size",
+        "default": 16,
+        "annotation": "float",
+        "description": "Specifies the font size to use for the cluster labels. If  {@link  CosmographConfig.scaleClusterLabels scaleClusterLabels }  is `true` (by default), the font size will be scaled based on the number of points in the cluster and the `clusterLabelFontSize` will be used as the baseline."
     },
     {
-        "name":"scale_cluster_labels",
-        "default":true,
-        "annotation":"bool",
-        "description":"Whether to scale the cluster labels based on the number of points in the cluster."
+        "name": "scale_cluster_labels",
+        "default": true,
+        "annotation": "bool",
+        "description": "Whether to scale the cluster labels based on the number of points in the cluster. Default: `true`"
     },
     {
-        "name":"static_label_weight",
-        "default":0.8,
-        "annotation":"float",
-        "description":"Specifies the weight of the static labels."
+        "name": "static_label_weight",
+        "default": 0.8,
+        "annotation": "float",
+        "description": "Specifies the weight of the static labels. Default: `0.8`"
     },
     {
-        "name":"dynamic_label_weight",
-        "default":0.7,
-        "annotation":"float",
-        "description":"Specifies the weight of the dynamic labels."
+        "name": "dynamic_label_weight",
+        "default": 0.7,
+        "annotation": "float",
+        "description": "Specifies the weight of the dynamic labels. Default: `0.7`"
     },
     {
-        "name":"label_margin",
-        "default":5,
-        "annotation":"float",
-        "description":"Specifies the margin between the label and the point."
+        "name": "label_margin",
+        "default": 5,
+        "annotation": "float",
+        "description": "Specifies the margin between the label and the point. Default: `5`"
     },
     {
-        "name":"label_padding",
-        "default":[6.5, 4.5, 6.5, 4.5],
-        "annotation":"list[float]",
-        "description":"Specifies the [left, top, right, bottom] padding of the label element."
+        "name": "label_padding",
+        "default": [
+            6.5,
+            4.5,
+            6.5,
+            4.5
+        ],
+        "annotation": "list[float]",
+        "description": "Specifies the [left, top, right, bottom] padding of the label element. Default: `[6.5, 4.5, 6.5, 4.5]`"
     },
     {
-        "name":"custom_labels",
-        "default":null,
-        "annotation":"list[dict]",
-        "description":"Specifies an array of custom labels to be displayed on the Cosmograph canvas. Each custom label is a dictionary with the following optional properties: `text` (string, required): The label text. `position` (list[float] of length 2, required): The [x, y] position of the label in space coordinates. `className` (string, optional): CSS class name for the label. `color` (string, optional): CSS color for the label. `weight` (float, optional): Label weight between 0 and 1. `fontSize` (float, optional): Font size in pixels. `style` (string, optional): CSS style string. `padding` (dict, optional): Padding object with `left`, `top`, `right`, `bottom` properties. `maxWidth` (float, optional): Maximum width of the label in pixels."
+        "name": "custom_labels",
+        "default": null,
+        "annotation": "list[dict]",
+        "description": "Deprecated alias for  {@link  CosmographConfig.annotations annotations } . Use `annotations` instead."
     },
     {
-        "name":"use_point_color_strategy_for_cluster_labels",
-        "default":null,
-        "annotation":"bool",
-        "description":"If `true`, cluster labels will acquire colors from the current point coloring strategy (`pointColorStrategy`). This can be useful when `pointClusterBy` and `pointColorBy` refer to the same data. Default: `false`"
+        "name": "use_point_color_strategy_for_cluster_labels",
+        "default": null,
+        "annotation": "bool",
+        "description": "If `true`, cluster labels will acquire colors from the current point coloring strategy ( {@link  CosmographConfig.pointColorStrategy pointColorStrategy } ). This can be useful when  {@link  CosmographConfig.pointClusterBy pointClusterBy }  and  {@link  CosmographConfig.pointColorBy pointColorBy }  refer to the same data. Default: `false`"
     },
     {
-        "name":"select_cluster_on_label_click",
-        "default":null,
-        "annotation":"bool",
-        "description":"Controls whether to select points of a cluster when its label is clicked."
+        "name": "select_cluster_on_label_click",
+        "default": null,
+        "annotation": "bool",
+        "description": "Controls whether to select points of a cluster when its label is clicked."
     },
     {
-        "name":"show_hovered_point_label",
-        "default":true,
-        "annotation":"bool",
-        "description":"Whether to show a hovered point label."
+        "name": "show_hovered_point_label",
+        "default": true,
+        "annotation": "bool",
+        "description": "Whether to show a hovered point label. Default: `false`"
     },
     {
-        "name":"disable_point_size_legend",
-        "default":null,
-        "annotation":"bool",
-        "description":""
+        "name": "disable_point_size_legend",
+        "default": null,
+        "annotation": "bool",
+        "description": ""
     },
     {
-        "name":"disable_link_width_legend",
-        "default":null,
-        "annotation":"bool",
-        "description":""
+        "name": "disable_link_width_legend",
+        "default": null,
+        "annotation": "bool",
+        "description": ""
     },
     {
-        "name":"disable_point_color_legend",
-        "default":null,
-        "annotation":"bool",
-        "description":""
+        "name": "disable_point_color_legend",
+        "default": null,
+        "annotation": "bool",
+        "description": ""
     },
     {
-        "name":"disable_link_color_legend",
-        "default":null,
-        "annotation":"bool",
-        "description":""
+        "name": "disable_link_color_legend",
+        "default": null,
+        "annotation": "bool",
+        "description": ""
     },
     {
-        "name":"points",
-        "default":null,
-        "annotation":"object",
-        "description":"Data in a pandas DataFrame format."
+        "name": "points",
+        "default": null,
+        "annotation": "object",
+        "description": "Input data for the points."
     },
     {
-        "name":"links",
-        "default":null,
-        "annotation":"object",
-        "description":"Data in a pandas DataFrame format."
+        "name": "links",
+        "default": null,
+        "annotation": "object",
+        "description": "The input data for the links.\n\n {@link  CosmographInputData }  Accepts `File | string | Table | Uint8Array | ArrayBuffer | Record<string, unknown>[]`"
     },
     {
-        "name":"clicked_point_index",
-        "default":null,
-        "annotation":"int",
-        "description":""
+        "name": "clicked_point_index",
+        "default": null,
+        "annotation": "int",
+        "description": ""
     },
     {
-        "name":"clicked_point_id",
-        "default":null,
-        "annotation":"str",
-        "description":""
+        "name": "clicked_point_id",
+        "default": null,
+        "annotation": "str",
+        "description": ""
     },
     {
-        "name":"selected_point_indices",
-        "default":null,
-        "annotation":"list[int]",
-        "description":""
+        "name": "selected_point_indices",
+        "default": null,
+        "annotation": "list[int]",
+        "description": ""
     },
     {
-        "name":"selected_point_ids",
-        "default":null,
-        "annotation":"list[str]",
-        "description":""
+        "name": "selected_point_ids",
+        "default": null,
+        "annotation": "list[str]",
+        "description": ""
     },
     {
-        "name":"api_key",
-        "default":null,
-        "annotation":"str",
-        "description":"API key for authenticating with Cosmograph services. Can be set globally using set_api_key() function."
+        "name": "api_key",
+        "default": null,
+        "annotation": "str",
+        "description": "API key for authenticating with Cosmograph services. Can be set globally using set_api_key() function."
     }
 ]
