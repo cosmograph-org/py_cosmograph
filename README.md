@@ -74,17 +74,6 @@ widget.selected_point_ids  # if you've selected some points and want to get info
 # etc.
 ```
 
-### Graphs with isolated points
-
-A graph can be part clusters, part loners. Cosmograph draws both, but only if you give it a points table:
-
-```python
-cosmo(points=points, links=links, point_id_by='id',
-      link_source_by='source', link_target_by='target')
-```
-
-If you pass `links` alone, the points are derived from the link endpoints, so anything with no links is not in the graph at all. The points table is what says "these are all my points".
-
 ### Nicer example
 
 Let's download a big dataset of English words, plus some hyponym-hypernym relationships. 
@@ -163,6 +152,20 @@ h
 Zooming in a bit:
 
 ![image](https://github.com/user-attachments/assets/e988950d-9f53-40c2-8b77-18cfb92efb50)
+
+### Points and links have to agree
+
+Cosmograph builds its point table from `points`, then joins `links` onto it by id. Two things follow from that, and both fail quietly:
+
+- A point with no links is drawn, but only if it is in the `points` table. Hand Cosmograph `links` on their own and the points get worked out from the link endpoints, so anything unlinked is not in the graph at all.
+- A link is dropped if either end is missing from the `points` table. No error, no warning -- the edge is just not there.
+
+So if your graph is part clusters, part loners, pass both tables, and make sure every id used in `links` appears in `points`:
+
+```python
+cosmo(points=points, links=links, point_id_by='id',
+      link_source_by='source', link_target_by='target')
+```
 
 ## 🔑 API Key Setup and Project Export
 
