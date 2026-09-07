@@ -155,7 +155,7 @@ Zooming in a bit:
 
 ## 📐 Getting the point coordinates back
 
-Once the simulation has settled, you can pull the x, y coordinates of every point back into Python -- handy for redrawing the graph in matplotlib, exporting an SVG, or making a figure for a paper.
+You can pull the x, y coordinates of every point back into Python, and redraw the graph yourself -- matplotlib, an SVG, whatever your paper needs.
 
 ```python
 graph = cosmo(points=points, links=links, point_id_by='id',
@@ -173,13 +173,7 @@ graph.request_point_positions()
 graph.point_positions  # DataFrame with id, x, y -- one row per point
 ```
 
-In a notebook that supports top-level `await` you can do both in one go:
-
-```python
-coords = await graph.fetch_point_positions()
-```
-
-Coordinates are in Cosmograph's space coordinates -- the same system as `point_x_by` / `point_y_by`, bounded by `space_size`.
+The ids come from the widget, so they belong to those coordinates whatever order the widget put its points in. Coordinates are in Cosmograph's space coordinates -- the same system as `point_x_by` / `point_y_by`, bounded by `space_size` -- and are read the moment the request arrives, so pause the simulation first if you want a layout that will not move.
 
 ## 🔑 API Key Setup and Project Export
 

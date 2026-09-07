@@ -238,11 +238,6 @@ class Cosmograph(anywidget.AnyWidget):
     selected_link_indices = List(Int, default_value=None, allow_none=True).tag(sync=True)
     export_config = Dict(default_value={}, allow_none=True).tag(sync=True)
 
-    # Flat [x0, y0, x1, y1, ...] array of point coordinates, sent by the JS side in
-    # response to `request_point_positions()`. Read it through the `point_positions`
-    # property, which pairs the values up into a DataFrame.
-    _point_positions = List(Float, default_value=None, allow_none=True).tag(sync=True)
-
     api_key = Unicode(None, allow_none=True)
 
     # ============================================================================
@@ -525,105 +520,55 @@ class Cosmograph(anywidget.AnyWidget):
     def request_point_positions(self):
         """Ask the widget for the current x, y coordinates of every point.
 
-        The coordinates are what the simulation has settled on (or the static
-        layout, if the simulation is disabled), which is what you need to
-        redraw the graph elsewhere -- matplotlib, an SVG, a paper figure.
-
-        The answer travels back over the widget comm, so it is not available
-        on the same line that asks for it. Ask in one cell and read
+        The answer travels back over the widget comm, so it is not available on
+        the line that asks for it: ask in one cell and read
         :attr:`point_positions` in the next::
 
             g.request_point_positions()   # cell 1
             g.point_positions             # cell 2 -> DataFrame
 
-        In an environment that supports top-level ``await`` you can do both at
-        once with :meth:`fetch_point_positions`.
+        Coordinates are read at the moment the widget receives the request. If
+        the simulation is still running they are a snapshot of it; call
+        :meth:`pause` or wait for it to settle first if you want a stable layout.
         """
         self.send({"type": "get_point_positions"})
 
     @property
     def point_positions(self):
-        """The last point coordinates sent by the widget, as a DataFrame.
+        """The last point coordinates the widget sent, as a DataFrame.
 
-        Returns ``None`` until :meth:`request_point_positions` (or
-        :meth:`fetch_point_positions`) has been answered.
+        ``None`` until :meth:`request_point_positions` has been answered. An
+        empty DataFrame means the widget answered and has no points.
 
-        The DataFrame has ``x`` and ``y`` columns and one row per point, in
-        point-index order, so its index lines up with the rows of ``points``.
-        When ``point_id_by`` is set and the ids are still in that order, an
-        ``id`` column is included too.
+        Columns are ``id``, ``x`` and ``y``, one row per point. The ids come
+        from the widget, in its own point order, so they are the ids that
+        actually belong to those coordinates. There is no ``id`` column when
+        no ``point_id_by`` was given.
 
-        Coordinates are in Cosmograph's space coordinates, i.e. the same
-        system as ``point_x_by`` / ``point_y_by`` and bounded by ``space_size``.
+        Coordinates are in Cosmograph's space coordinates, i.e. the same system
+        as ``point_x_by`` / ``point_y_by`` and bounded by ``space_size``.
         """
-        return self._positions_to_frame(self._point_positions)
+        return self._positions_to_frame(self._last_point_positions)
 
-    async def fetch_point_positions(self, timeout=10):
-        """Request the point coordinates and wait for them.
+    def _on_point_positions(self, payload):
+        """Handle a `point_positions` reply from the widget."""
+        self._last_point_positions = payload
 
-        Only usable where the comm can be serviced while we wait -- a Jupyter
-        cell with top-level ``await``, or any running asyncio loop::
-
-            coords = await g.fetch_point_positions()
-
-        Args:
-            timeout: Seconds to wait before giving up.
-
-        Returns:
-            The same DataFrame as :attr:`point_positions`.
-
-        Raises:
-            TimeoutError: If the widget did not answer within ``timeout``.
-        """
-        import asyncio
-
-        future = asyncio.get_running_loop().create_future()
-
-        def _on_positions(change):
-            if not future.done():
-                future.set_result(change.new)
-
-        self.observe(_on_positions, names="_point_positions")
-        try:
-            self.request_point_positions()
-            try:
-                positions = await asyncio.wait_for(future, timeout)
-            except asyncio.TimeoutError:
-                raise TimeoutError(
-                    f"No point positions came back within {timeout} seconds. "
-                    "The widget needs to be displayed and its data loaded before "
-                    "it can report coordinates."
-                )
-        finally:
-            self.unobserve(_on_positions, names="_point_positions")
-
-        return self._positions_to_frame(positions)
-
-    def _positions_to_frame(self, flat_positions):
-        """Pair a flat [x0, y0, x1, y1, ...] array into a points DataFrame."""
-        if not flat_positions:
+    def _positions_to_frame(self, payload):
+        """Turn a `point_positions` reply into a DataFrame."""
+        if payload is None:
             return None
 
         import pandas as pd
 
-        xs = flat_positions[0::2]
-        ys = flat_positions[1::2]
-        frame = pd.DataFrame({"x": xs, "y": ys})
+        flat = payload.get("positions") or []
+        frame = pd.DataFrame({"x": flat[0::2], "y": flat[1::2]}, columns=["x", "y"])
 
-        ids = self._point_ids()
-        if ids is not None and len(ids) == len(frame):
+        ids = payload.get("ids")
+        if ids and len(ids) == len(frame):
             frame.insert(0, "id", list(ids))
 
         return frame
-
-    def _point_ids(self):
-        """The point id column of `points`, if there is one to be had."""
-        if self.point_id_by is None or self.points is None:
-            return None
-        try:
-            return self.points[self.point_id_by]
-        except (KeyError, TypeError):
-            return None
 
     def export_project_by_name(self, project_name: str, debug: bool = False):
         if not self.api_key:
@@ -635,8 +580,20 @@ class Cosmograph(anywidget.AnyWidget):
         except Exception as e:
             raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
+    def _handle_widget_message(self, _widget, content, _buffers=None):
+        """Route a custom message from the JS side to its handler."""
+        if isinstance(content, dict) and content.get("type") == "point_positions":
+            self._on_point_positions(content)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Answers to request_point_positions() arrive as custom messages rather
+        # than through a synced trait: traitlets stays quiet when a value is set
+        # to something equal to what it already holds, and asking twice for the
+        # coordinates of a settled graph is exactly that case.
+        self._last_point_positions = None
+        self.on_msg(self._handle_widget_message)
+
         # Register this instance to receive API key updates
         try:
             register_instance(self)

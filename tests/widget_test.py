@@ -22,6 +22,13 @@ def _widget(**kwargs):
     return widget
 
 
+def _answer(widget, positions, ids=None):
+    """Stand in for the JS side answering a request."""
+    widget._handle_widget_message(
+        widget, {"type": "point_positions", "positions": positions, "ids": ids}
+    )
+
+
 def test_request_point_positions_sends_message():
     widget = _widget()
     widget.request_point_positions()
@@ -35,9 +42,7 @@ def test_point_positions_is_none_before_the_widget_answers():
 
 def test_point_positions_pairs_up_the_flat_array():
     widget = _widget(points=_points_frame())
-
-    # What the JS side sends back: [x0, y0, x1, y1, ...]
-    widget._point_positions = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    _answer(widget, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
     positions = widget.point_positions
     assert list(positions.columns) == ["x", "y"]
@@ -45,54 +50,45 @@ def test_point_positions_pairs_up_the_flat_array():
     assert positions["y"].tolist() == [2.0, 4.0, 6.0]
 
 
-def test_point_positions_carries_the_ids_when_point_id_by_is_set():
+def test_the_ids_come_from_the_widget_not_from_the_points_table():
+    # The widget's point order is its own; taking ids from `points` would line
+    # coordinates up with the wrong rows.
     widget = _widget(points=_points_frame(), point_id_by="name")
-    widget._point_positions = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    _answer(widget, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0], ids=["c", "a", "b"])
 
     positions = widget.point_positions
     assert list(positions.columns) == ["id", "x", "y"]
-    assert positions["id"].tolist() == ["Dragon Hunt", "Mystic Voyage", "Treasure Seekers"]
+    assert positions["id"].tolist() == ["c", "a", "b"]
 
 
-def test_point_positions_skips_the_ids_when_the_counts_disagree():
-    # The widget can be showing fewer/more points than `points` holds, e.g. after
-    # the data was swapped out. Better no ids than wrong ones.
-    widget = _widget(points=_points_frame(), point_id_by="name")
-    widget._point_positions = [1.0, 2.0, 3.0, 4.0]
-
-    positions = widget.point_positions
-    assert list(positions.columns) == ["x", "y"]
-
-
-def test_point_positions_skips_the_ids_when_the_column_is_missing():
-    widget = _widget(points=_points_frame(), point_id_by="no_such_column")
-    widget._point_positions = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-
+def test_no_id_column_when_the_widget_sends_no_ids():
+    widget = _widget(points=_points_frame())
+    _answer(widget, [1.0, 2.0], ids=None)
     assert list(widget.point_positions.columns) == ["x", "y"]
 
 
-def test_fetch_point_positions_waits_for_the_answer():
-    import asyncio
+def test_a_graph_with_no_points_answers_with_an_empty_frame_not_none():
+    # "asked and there is nothing" has to be distinguishable from "never asked".
+    widget = _widget()
+    _answer(widget, [], ids=[])
 
+    positions = widget.point_positions
+    assert positions is not None
+    assert len(positions) == 0
+    assert list(positions.columns) == ["x", "y"]
+
+
+def test_asking_twice_for_an_unchanged_layout_answers_twice():
+    # A settled graph gives the same numbers every time. A synced trait would stay
+    # quiet on the second answer, because traitlets does not fire on an equal value;
+    # a message does not have that problem.
     widget = _widget(points=_points_frame())
+    same = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
-    async def answer_after_the_request():
-        # Stand in for the JS side: reply once the request has gone out.
-        task = asyncio.ensure_future(widget.fetch_point_positions(timeout=5))
-        await asyncio.sleep(0)
-        assert widget.sent_messages == [{"type": "get_point_positions"}]
-        widget._point_positions = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-        return await task
+    _answer(widget, same, ids=["a", "b", "c"])
+    first = widget.point_positions
+    _answer(widget, same, ids=["a", "b", "c"])
+    second = widget.point_positions
 
-    positions = asyncio.run(answer_after_the_request())
-    assert positions["x"].tolist() == [1.0, 3.0, 5.0]
-
-
-def test_fetch_point_positions_times_out_when_nobody_answers():
-    import asyncio
-    import pytest
-
-    widget = _widget(points=_points_frame())
-
-    with pytest.raises(TimeoutError):
-        asyncio.run(widget.fetch_point_positions(timeout=0.01))
+    assert first.equals(second)
+    assert second["id"].tolist() == ["a", "b", "c"]
