@@ -136,7 +136,7 @@ def handle_deprecated_properties(kwargs: CosmoKwargs) -> CosmoKwargs:
     return kwargs
 
 
-def validate_kwargs(kwargs):
+def validate_argument_names(kwargs):
     valid_names = set(cosmo_base_sig.names)
     invalid_keywords = kwargs.keys() - valid_names
 
@@ -158,6 +158,56 @@ def validate_kwargs(kwargs):
 
         raise ValueError(error_msg)
 
+    return kwargs
+
+
+# How many repeated ids to name in the error message before saying "and N more"
+N_DUPLICATE_IDS_TO_SHOW = 5
+
+
+def validate_unique_point_ids(kwargs):
+    """
+    Raise if the `point_id_by` column has repeated values.
+
+    Cosmograph draws one point per id, so duplicates are dropped without a word:
+    a 600k-row file with a repeated id column showed under a hundred points
+    (https://github.com/cosmograph-org/py_cosmograph/issues/21). Better to say so.
+
+    Only runs when both `points` and `point_id_by` are given, and quietly does
+    nothing if the column isn't there -- that is somebody else's error to raise.
+    """
+    points = kwargs.get("points", None)
+    point_id_by = kwargs.get("point_id_by", None)
+    if points is None or point_id_by is None:
+        return kwargs
+
+    try:
+        ids = points[point_id_by]
+        repeated = ids[ids.duplicated()]
+    except (KeyError, TypeError, AttributeError):
+        return kwargs
+
+    n_repeated = len(repeated)
+    if n_repeated == 0:
+        return kwargs
+
+    distinct = list(dict.fromkeys(repeated.tolist()))
+    shown = ", ".join(map(repr, distinct[:N_DUPLICATE_IDS_TO_SHOW]))
+    if len(distinct) > N_DUPLICATE_IDS_TO_SHOW:
+        shown += f", and {len(distinct) - N_DUPLICATE_IDS_TO_SHOW} more"
+
+    raise ValueError(
+        f"The point_id_by column {point_id_by!r} has {n_repeated} repeated "
+        f"value(s): {shown}. Cosmograph draws one point per id, so the repeats "
+        f"would be dropped and you would see fewer points than you have rows. "
+        f"Deduplicate the points, or use a column whose values are unique."
+    )
+
+
+def validate_kwargs(kwargs):
+    """Check the argument names, then check the data they point at."""
+    kwargs = validate_argument_names(kwargs)
+    kwargs = validate_unique_point_ids(kwargs)
     return kwargs
 
 
