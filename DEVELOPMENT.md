@@ -27,6 +27,24 @@ hatch run pip install -e .
 npm run dev
 ```
 
+### 🧭 Parameter SSOT
+
+`cosmograph/data/params_ssot.json` holds the name, type, default and description of every
+`cosmo` parameter. Types, defaults and descriptions come from the TypeScript library, so they
+are refreshed rather than edited by hand:
+
+```bash
+# fail if params_ssot.json no longer matches the TypeScript sources
+python -m cosmograph._dev_utils.params_ssot --check
+
+# refresh it, optionally from a newer build of the TypeScript params SSOT
+python -m cosmograph._dev_utils.params_ssot [--source <path or url>]
+```
+
+The TypeScript side generates its half with `pnpm run ai:params-ssot` in the cosmograph repo,
+which ships the result as `ai/params-ssot.json` inside `@cosmograph/cosmograph`.
+`tests/params_ssot_test.py` fails when the committed file drifts from the vendored snapshot.
+
 ### 🔄 Common Commands
 | Task                | Command                      |
 |---------------------|------------------------------|

@@ -1,0 +1,4342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cosmograph.app/schemas/params-ssot.json",
+  "title": "CosmographParamsSsot",
+  "description": "Every CosmographConfig parameter with its type, description and default value. Generated from the TypeScript sources; do not edit by hand.",
+  "source": {
+    "type": "CosmographConfig",
+    "schema": "ai/schemas/cosmograph-config.schema.json",
+    "defaults": "packages/cosmograph/src/cosmograph/config/defaults.ts"
+  },
+  "definitions": {
+    "TransitionEasing": {
+      "type": "string",
+      "enum": [
+        "linear",
+        "quad-in",
+        "quad-out",
+        "quad-in-out",
+        "cubic-in",
+        "cubic-out",
+        "cubic-in-out",
+        "sin-in",
+        "sin-out",
+        "sin-in-out",
+        "exp-in",
+        "exp-out",
+        "exp-in-out",
+        "circle-in",
+        "circle-out",
+        "circle-in-out"
+      ]
+    },
+    "PointShape": {
+      "type": "number",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "GraphIndices": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        {
+          "$ref": "#/definitions/Uint32Array"
+        },
+        {
+          "$ref": "#/definitions/Int32Array"
+        }
+      ],
+      "description": "A list of point or link indices.\n\nTyped arrays are accepted alongside plain arrays so a caller that already holds indices in a typed buffer \u2014 a query result, a crossfilter mask \u2014 can hand them over directly instead of boxing every value into a JS number first. At graph scale that copy is not free: a million indices cost tens of milliseconds and tens of megabytes per update."
+    },
+    "Uint32Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "ArrayBufferLike": {
+      "$ref": "#/definitions/ArrayBuffer"
+    },
+    "ArrayBuffer": {
+      "type": "object",
+      "properties": {
+        "byteLength": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "byteLength"
+      ],
+      "additionalProperties": false
+    },
+    "Int32Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "LinkStyle": {
+      "type": "number",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "description": "Link stroke pattern; one value per link via `setLinkStyles`. Dash metrics come from `linkDashLength`/`linkDashGap`."
+    },
+    "HoveredPointPosition": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      ],
+      "description": "Position of a hovered point in space coordinates: `[x, y]` in 2D mode, `[x, y, z]` in 3D mode."
+    },
+    "MouseEvent": {
+      "type": "object",
+      "properties": {
+        "bubbles": {
+          "type": "boolean"
+        },
+        "cancelBubble": {
+          "type": "boolean"
+        },
+        "cancelable": {
+          "type": "boolean"
+        },
+        "composed": {
+          "type": "boolean"
+        },
+        "currentTarget": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EventTarget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultPrevented": {
+          "type": "boolean"
+        },
+        "eventPhase": {
+          "type": "number"
+        },
+        "isTrusted": {
+          "type": "boolean"
+        },
+        "returnValue": {
+          "type": "boolean"
+        },
+        "srcElement": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EventTarget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EventTarget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timeStamp": {
+          "$ref": "#/definitions/DOMHighResTimeStamp"
+        },
+        "type": {
+          "type": "string"
+        },
+        "NONE": {
+          "type": "number",
+          "const": 0
+        },
+        "CAPTURING_PHASE": {
+          "type": "number",
+          "const": 1
+        },
+        "AT_TARGET": {
+          "type": "number",
+          "const": 2
+        },
+        "BUBBLING_PHASE": {
+          "type": "number",
+          "const": 3
+        },
+        "detail": {
+          "type": "number"
+        },
+        "view": {
+          "type": "null",
+          "const": null
+        },
+        "which": {
+          "type": "number"
+        },
+        "altKey": {
+          "type": "boolean"
+        },
+        "button": {
+          "type": "number"
+        },
+        "buttons": {
+          "type": "number"
+        },
+        "clientX": {
+          "type": "number"
+        },
+        "clientY": {
+          "type": "number"
+        },
+        "ctrlKey": {
+          "type": "boolean"
+        },
+        "layerX": {
+          "type": "number"
+        },
+        "layerY": {
+          "type": "number"
+        },
+        "metaKey": {
+          "type": "boolean"
+        },
+        "movementX": {
+          "type": "number"
+        },
+        "movementY": {
+          "type": "number"
+        },
+        "offsetX": {
+          "type": "number"
+        },
+        "offsetY": {
+          "type": "number"
+        },
+        "pageX": {
+          "type": "number"
+        },
+        "pageY": {
+          "type": "number"
+        },
+        "relatedTarget": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EventTarget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "screenX": {
+          "type": "number"
+        },
+        "screenY": {
+          "type": "number"
+        },
+        "shiftKey": {
+          "type": "boolean"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "CAPTURING_PHASE",
+        "NONE",
+        "altKey",
+        "bubbles",
+        "button",
+        "buttons",
+        "cancelBubble",
+        "cancelable",
+        "clientX",
+        "clientY",
+        "composed",
+        "ctrlKey",
+        "currentTarget",
+        "defaultPrevented",
+        "detail",
+        "eventPhase",
+        "isTrusted",
+        "layerX",
+        "layerY",
+        "metaKey",
+        "movementX",
+        "movementY",
+        "offsetX",
+        "offsetY",
+        "pageX",
+        "pageY",
+        "relatedTarget",
+        "returnValue",
+        "screenX",
+        "screenY",
+        "shiftKey",
+        "srcElement",
+        "target",
+        "timeStamp",
+        "type",
+        "view",
+        "which",
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    },
+    "EventTarget": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "DOMHighResTimeStamp": {
+      "type": "number"
+    },
+    "D3DragEvent<HTMLCanvasElement,undefined,Hovered>": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/DragBehavior%3CHTMLCanvasElement%2Cundefined%2CHovered%3E",
+          "description": "The DragBehavior associated with the event"
+        },
+        "type": {
+          "type": "string",
+          "description": "The event type for the DragEvent"
+        },
+        "subject": {
+          "$ref": "#/definitions/Hovered",
+          "description": "The drag subject, defined by drag.subject."
+        },
+        "x": {
+          "type": "number",
+          "description": "The new x-coordinate of the subject, relative to the container"
+        },
+        "y": {
+          "type": "number",
+          "description": "The new y-coordinate of the subject, relative to the container"
+        },
+        "dx": {
+          "type": "number",
+          "description": "The change in x-coordinate since the previous drag event."
+        },
+        "dy": {
+          "type": "number",
+          "description": "The change in y-coordinate since the previous drag event."
+        },
+        "identifier": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "mouse"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "description": "The string \u201cmouse\u201d, or a numeric touch identifier."
+        },
+        "active": {
+          "type": "number",
+          "description": "The number of currently active drag gestures (on start and end, not including this one).\n\nThe event.active field is useful for detecting the first start event and the last end event in a sequence of concurrent drag gestures: it is zero when the first drag gesture starts, and zero when the last drag gesture ends."
+        },
+        "sourceEvent": {
+          "description": "The underlying input event, such as mousemove or touchmove."
+        }
+      },
+      "required": [
+        "target",
+        "type",
+        "subject",
+        "x",
+        "y",
+        "dx",
+        "dy",
+        "identifier",
+        "active",
+        "sourceEvent"
+      ],
+      "additionalProperties": false,
+      "description": "D3 Drag event\n\nThe first generic refers to the type of element to be dragged. The second generic refers to the type of the datum of the dragged element. The third generic refers to the type of the drag behavior subject."
+    },
+    "DragBehavior<HTMLCanvasElement,undefined,Hovered>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prototype": {},
+        "length": {
+          "type": "number"
+        },
+        "arguments": {},
+        "caller": {
+          "$ref": "#/definitions/Function"
+        }
+      },
+      "required": [
+        "arguments",
+        "caller",
+        "length",
+        "prototype"
+      ],
+      "description": "A D3 Drag Behavior\n\nThe first generic refers to the type of element to be dragged. The second generic refers to the type of the datum of the dragged element. The third generic refers to the type of the drag behavior subject.\n\nThe subject of a drag gesture represents the thing being dragged. It is computed when an initiating input event is received, such as a mousedown or touchstart, immediately before the drag gesture starts. The subject is then exposed as event.subject on subsequent drag events for this gesture.\n\nThe default subject is the datum of the element in the originating selection (see drag) that received the initiating input event; if this datum is undefined, an object representing the coordinates of the pointer is created. When dragging circle elements in SVG, the default subject is thus the datum of the circle being dragged. With Canvas, the default subject is the canvas element\u2019s datum (regardless of where on the canvas you click). In this case, a custom subject accessor would be more appropriate, such as one that picks the closest circle to the mouse within a given search radius."
+    },
+    "Function": {
+      "type": "object",
+      "properties": {
+        "prototype": {},
+        "length": {
+          "type": "number"
+        },
+        "arguments": {},
+        "caller": {
+          "$ref": "#/definitions/Function"
+        }
+      },
+      "required": [
+        "prototype",
+        "length",
+        "arguments",
+        "caller"
+      ],
+      "additionalProperties": false
+    },
+    "Hovered": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "number"
+        },
+        "position": {
+          "$ref": "#/definitions/HoveredPointPosition"
+        }
+      },
+      "required": [
+        "index",
+        "position"
+      ],
+      "additionalProperties": false,
+      "description": "Hovered point state. `position` is `[x, y]` in 2D mode and `[x, y, z]` in 3D mode (space coordinates)."
+    },
+    "D3ZoomEvent<HTMLCanvasElement,undefined>": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/ZoomBehavior%3CHTMLCanvasElement%2Cundefined%3E",
+          "description": "The ZoomBehavior associated with the event"
+        },
+        "type": {
+          "type": "string",
+          "description": "The event type for the zoom event"
+        },
+        "transform": {
+          "$ref": "#/definitions/ZoomTransform",
+          "description": "The current zoom transform"
+        },
+        "sourceEvent": {
+          "description": "The underlying input event, such as mousemove or touchmove."
+        }
+      },
+      "required": [
+        "target",
+        "type",
+        "transform",
+        "sourceEvent"
+      ],
+      "additionalProperties": false,
+      "description": "A D3 Zoom Event\n\nThe first generic refers to the type of reference element to which the zoom behavior is attached. The second generic refers to the type of the datum of the reference element."
+    },
+    "ZoomBehavior<HTMLCanvasElement,undefined>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prototype": {},
+        "length": {
+          "type": "number"
+        },
+        "arguments": {},
+        "caller": {
+          "$ref": "#/definitions/Function"
+        }
+      },
+      "required": [
+        "arguments",
+        "caller",
+        "length",
+        "prototype"
+      ],
+      "description": "A D3 Zoom Behavior\n\nThe first generic refers to the type of reference element to which the zoom behavior is attached. The second generic refers to the type of the datum of the reference element."
+    },
+    "ZoomTransform": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "The translation amount tx along the x-axis. This property should be considered read-only; instead of mutating a transform, use transform.scale and transform.translate to derive a new transform. Also see zoom.scaleBy, zoom.scaleTo and zoom.translateBy for convenience methods on the zoom behavior."
+        },
+        "y": {
+          "type": "number",
+          "description": "The translation amount ty along the y-axis This property should be considered read-only; instead of mutating a transform, use transform.scale and transform.translate to derive a new transform. Also see zoom.scaleBy, zoom.scaleTo and zoom.translateBy for convenience methods on the zoom behavior."
+        },
+        "k": {
+          "type": "number",
+          "description": "The scale factor k. This property should be considered read-only; instead of mutating a transform, use transform.scale and transform.translate to derive a new transform. Also see zoom.scaleBy, zoom.scaleTo and zoom.translateBy for convenience methods on the zoom behavior."
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "k"
+      ],
+      "additionalProperties": false,
+      "description": "A zoom transform\n\nThe zoom behavior stores the zoom state on the element to which the zoom behavior was applied, not on the zoom behavior itself. This is because the zoom behavior can be applied to many elements simultaneously, and each element can be zoomed independently. The zoom state can change either on user interaction or programmatically via zoom.transform.\n\nTo retrieve the zoom state, use event.transform on the current zoom event within a zoom event listener (see zoom.on), or use d3.zoomTransform for a given node. The latter is particularly useful for modifying the zoom state programmatically, say to implement buttons for zooming in and out.\n\nFor details see  {@link  https://github.com/d3/d3-zoom#zoom-transforms }"
+    },
+    "PointLabelPosition": {
+      "type": "string",
+      "enum": [
+        "above",
+        "below",
+        "center"
+      ]
+    },
+    "AccessorFn<unknown,string>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {},
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "AccessorFn<unknown,number>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {},
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "CosmographAnnotation": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/PositionAnnotation"
+        },
+        {
+          "$ref": "#/definitions/PointAnnotation"
+        }
+      ]
+    },
+    "PositionAnnotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          ],
+          "description": "Position annotations are rendered only in 2D mode."
+        },
+        "skipRescale": {
+          "type": "boolean",
+          "description": "Treat position as graph-space coordinates and skip config rescaling."
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Default: true"
+        },
+        "anchorMargin": {
+          "type": "number",
+          "description": "Vertical spacing between anchor point and annotation label. Default: 8"
+        },
+        "arrow": {
+          "type": "boolean",
+          "description": "Adds a small pointer from the annotation label toward its anchor. Default: false"
+        },
+        "maxWidth": {
+          "type": "number"
+        },
+        "anchor": {
+          "$ref": "#/definitions/AnnotationAnchor"
+        },
+        "text": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "className": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "fontSize": {
+          "type": "number"
+        },
+        "style": {
+          "type": "string"
+        },
+        "padding": {
+          "$ref": "#/definitions/Padding"
+        }
+      },
+      "required": [
+        "position",
+        "text"
+      ]
+    },
+    "AnnotationAnchor": {
+      "type": "object",
+      "properties": {
+        "visible": {
+          "type": "boolean",
+          "description": "Default: false"
+        },
+        "style": {
+          "type": "string"
+        },
+        "text": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "className": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Padding": {
+      "type": "object",
+      "properties": {
+        "left": {
+          "type": "number"
+        },
+        "top": {
+          "type": "number"
+        },
+        "right": {
+          "type": "number"
+        },
+        "bottom": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "left",
+        "top",
+        "right",
+        "bottom"
+      ],
+      "additionalProperties": false
+    },
+    "PointAnnotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pointId": {
+          "type": "string"
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Default: true"
+        },
+        "anchorMargin": {
+          "type": "number",
+          "description": "Vertical spacing between anchor point and annotation label. Default: 8"
+        },
+        "arrow": {
+          "type": "boolean",
+          "description": "Adds a small pointer from the annotation label toward its anchor. Default: false"
+        },
+        "maxWidth": {
+          "type": "number"
+        },
+        "anchor": {
+          "$ref": "#/definitions/AnnotationAnchor"
+        },
+        "text": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "className": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "fontSize": {
+          "type": "number"
+        },
+        "style": {
+          "type": "string"
+        },
+        "padding": {
+          "$ref": "#/definitions/Padding"
+        }
+      },
+      "required": [
+        "pointId",
+        "text"
+      ]
+    },
+    "Record<string,([number,number]|[number,number,number])>": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        ]
+      }
+    },
+    "CosmographInputData": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/File"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/Table"
+        },
+        {
+          "$ref": "#/definitions/Uint8Array"
+        },
+        {
+          "$ref": "#/definitions/ArrayBuffer"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E"
+          }
+        }
+      ],
+      "description": "Represents the input data for Cosmograph points or links. This can be an array of objects or a more complex data structure containing information about each point or link to be rendered. Accepts `File`, `string`, `Table` (Apache Arrow), `Uint8Array` (Apache Arrow), `ArrayBuffer` (Apache Arrow), `Record<string, unknown>[]`\n\n`string` will be treated as table name in external DuckDB-Wasm instance when `duckDbConnection` is provided to the Cosmograph instance."
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        },
+        "lastModified": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "webkitRelativePath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "lastModified",
+        "name",
+        "size",
+        "type",
+        "webkitRelativePath"
+      ],
+      "additionalProperties": false
+    },
+    "Table": {
+      "type": "object",
+      "properties": {
+        "TType": {
+          "$ref": "#/definitions/Struct%3Cany%3E"
+        },
+        "TArray": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructRowProxy%3Cany%3E"
+          }
+        },
+        "TValue": {
+          "$ref": "#/definitions/StructRowProxy%3Cany%3E"
+        }
+      },
+      "required": [
+        "TType",
+        "TArray",
+        "TValue"
+      ],
+      "additionalProperties": false,
+      "description": "Tables are collections of  {@link  Vector } s and have a  {@link  Schema } . Use the convenience methods  {@link  makeTable }  or  {@link  tableFromArrays }  to create a table in JavaScript. To create a table from the IPC format, use  {@link  tableFromIPC  } ."
+    },
+    "Struct<any>": {
+      "type": "object",
+      "properties": {
+        "TType": {
+          "$ref": "#/definitions/Type.Struct"
+        },
+        "TArray": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructRowProxy%3Cany%3E"
+          }
+        },
+        "TOffsetArray": {},
+        "TValue": {
+          "$ref": "#/definitions/StructRowProxy%3Cany%3E"
+        },
+        "TChildren": {},
+        "ArrayType": {},
+        "OffsetArrayType": {
+          "$ref": "#/definitions/ArrayCtor%3C(Int32Array%7CBigInt64Array)%3E"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field%3C()%3E"
+          }
+        },
+        "dataTypes": {}
+      },
+      "required": [
+        "ArrayType",
+        "OffsetArrayType",
+        "TArray",
+        "TChildren",
+        "TOffsetArray",
+        "TType",
+        "TValue",
+        "children",
+        "dataTypes"
+      ],
+      "additionalProperties": false
+    },
+    "Type.Struct": {
+      "type": "number",
+      "const": 13
+    },
+    "StructRowProxy<any>": {
+      "type": "object",
+      "properties": {}
+    },
+    "ArrayCtor<(Int32Array|BigInt64Array)>": {
+      "$ref": "#/definitions/TypedArrayConstructor%3C(Int32Array%7CBigInt64Array)%3E"
+    },
+    "TypedArrayConstructor<(Int32Array|BigInt64Array)>": {
+      "type": "object",
+      "properties": {
+        "prototype": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Int32Array"
+            },
+            {
+              "$ref": "#/definitions/BigInt64Array"
+            }
+          ]
+        },
+        "BYTES_PER_ELEMENT": {
+          "type": "number",
+          "description": "The size in bytes of each element in the array."
+        }
+      },
+      "required": [
+        "prototype",
+        "BYTES_PER_ELEMENT"
+      ],
+      "additionalProperties": false
+    },
+    "BigInt64Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "Field<()>": {
+      "type": "object",
+      "properties": {
+        "type": {},
+        "name": {
+          "type": "string"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "$ref": "#/definitions/Map%3Cstring%2Cstring%3E"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "nullable",
+        "metadata"
+      ],
+      "additionalProperties": false
+    },
+    "Map<string,string>": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "size"
+      ],
+      "additionalProperties": false
+    },
+    "Uint8Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "Record<string,unknown>": {
+      "type": "object",
+      "additionalProperties": {}
+    },
+    "NumericDomain": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "ColorAccessorFn": {
+      "$ref": "#/definitions/AccessorFn%3Cstring%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
+    },
+    "AccessorFn<string,(string|[number,number,number,number])>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "ColorAccessorFn<number>": {
+      "$ref": "#/definitions/AccessorFn%3Cnumber%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
+    },
+    "AccessorFn<number,(string|[number,number,number,number])>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "ColorAccessorFn<boolean>": {
+      "$ref": "#/definitions/AccessorFn%3Cboolean%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
+    },
+    "AccessorFn<boolean,(string|[number,number,number,number])>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "ColorAccessorFn<unknown>": {
+      "$ref": "#/definitions/AccessorFn%3Cunknown%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
+    },
+    "AccessorFn<unknown,(string|[number,number,number,number])>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {},
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "LinkColorStrategyType": {
+      "type": "string",
+      "enum": [
+        "sum",
+        "average",
+        "count",
+        "categorical",
+        "direct",
+        "single"
+      ]
+    },
+    "SizeAccessorFn<string>": {
+      "$ref": "#/definitions/AccessorFn%3Cstring%2Cnumber%3E"
+    },
+    "AccessorFn<string,number>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "SizeAccessorFn<number>": {
+      "$ref": "#/definitions/AccessorFn%3Cnumber%2Cnumber%3E"
+    },
+    "AccessorFn<number,number>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "SizeAccessorFn<boolean>": {
+      "$ref": "#/definitions/AccessorFn%3Cboolean%2Cnumber%3E"
+    },
+    "AccessorFn<boolean,number>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "SizeAccessorFn<unknown>": {
+      "$ref": "#/definitions/AccessorFn%3Cunknown%2Cnumber%3E"
+    },
+    "LinkWidthStrategyType": {
+      "type": "string",
+      "enum": [
+        "sum",
+        "average",
+        "count",
+        "direct",
+        "single"
+      ]
+    },
+    "Record<string,(LinkStyle|number|string)>": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/LinkStyle"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "BooleanAccessorFn": {
+      "$ref": "#/definitions/AccessorFn%3Cstring%2Cboolean%3E"
+    },
+    "AccessorFn<string,boolean>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "BooleanAccessorFn<number>": {
+      "$ref": "#/definitions/AccessorFn%3Cnumber%2Cboolean%3E"
+    },
+    "AccessorFn<number,boolean>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "BooleanAccessorFn<unknown>": {
+      "$ref": "#/definitions/AccessorFn%3Cunknown%2Cboolean%3E"
+    },
+    "AccessorFn<unknown,boolean>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {},
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "SizeAccessorFn": {
+      "$ref": "#/definitions/AccessorFn%3Cnumber%2Cnumber%3E"
+    },
+    "Record<string,(string|[number,number,number,number])>": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      }
+    },
+    "PointColorStrategyType": {
+      "type": "string",
+      "enum": [
+        "categorical",
+        "continuous",
+        "map",
+        "degree",
+        "preciseDegree",
+        "linkDirection",
+        "direct",
+        "single"
+      ]
+    },
+    "PointSizeStrategyType": {
+      "type": "string",
+      "enum": [
+        "degree",
+        "preciseDegree",
+        "auto",
+        "direct",
+        "single"
+      ]
+    },
+    "AccessorFn<any,unknown>": {
+      "$comment": "(value: T, index?: number) => O",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "value": {},
+            "index": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Base accessor with generic input/output types"
+    },
+    "CosmographData": {
+      "$ref": "#/definitions/Table",
+      "description": "Represents the data operated by the Cosmograph.\n\nThe data is stored in the Apache Arrow `Table` format, which is a fast and efficient way to store and process large amounts of data.\n\nFor more information on the `Table` format, see the [Apache Arrow documentation](https://arrow.apache.org/docs/format/Columnar.html)."
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "params": [
+    {
+      "name": "transitionDuration",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Transition duration in milliseconds. Default value: `800`",
+      "default": 800
+    },
+    {
+      "name": "transitionEasing",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/TransitionEasing"
+          },
+          {
+            "type": "string",
+            "const": "linear"
+          },
+          {
+            "type": "string",
+            "const": "quad-in"
+          },
+          {
+            "type": "string",
+            "const": "quad-out"
+          },
+          {
+            "type": "string",
+            "const": "quad-in-out"
+          },
+          {
+            "type": "string",
+            "const": "cubic-in"
+          },
+          {
+            "type": "string",
+            "const": "cubic-out"
+          },
+          {
+            "type": "string",
+            "const": "cubic-in-out"
+          },
+          {
+            "type": "string",
+            "const": "sin-in"
+          },
+          {
+            "type": "string",
+            "const": "sin-out"
+          },
+          {
+            "type": "string",
+            "const": "sin-in-out"
+          },
+          {
+            "type": "string",
+            "const": "exp-in"
+          },
+          {
+            "type": "string",
+            "const": "exp-out"
+          },
+          {
+            "type": "string",
+            "const": "exp-in-out"
+          },
+          {
+            "type": "string",
+            "const": "circle-in"
+          },
+          {
+            "type": "string",
+            "const": "circle-out"
+          },
+          {
+            "type": "string",
+            "const": "circle-in-out"
+          }
+        ]
+      },
+      "description": "Easing curve for transitions. Default value: `TransitionEasing.CubicInOut`"
+    },
+    {
+      "name": "onTransitionStart",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when a transition starts. Default value: `undefined`"
+    },
+    {
+      "name": "onTransition",
+      "schema": {
+        "$comment": "(progress: number) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "progress": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "progress"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called on every transition frame. The `progress` value ranges from 0 to 1. Default value: `undefined`"
+    },
+    {
+      "name": "onTransitionEnd",
+      "schema": {
+        "$comment": "(interrupted: boolean) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "interrupted": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "interrupted"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a transition ends. `interrupted` is `true` when a transition was replaced or aborted before completion. Default value: `undefined`"
+    },
+    {
+      "name": "onResize",
+      "schema": {
+        "$comment": "(width: number, height: number) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "width",
+              "height"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called after the canvas viewport changes size. Default value: `undefined`"
+    },
+    {
+      "name": "backgroundColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "Canvas background color. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: '#222222'",
+      "default": "rgb(45, 49, 58)"
+    },
+    {
+      "name": "spaceSize",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Simulation space size. Default value: `4096` (larger values may crash on some devices, e.g. iOS; see https://github.com/cosmosgl/graph/issues/203)."
+    },
+    {
+      "name": "spaceDimensions",
+      "schema": {
+        "type": "number",
+        "enum": [
+          2,
+          3
+        ]
+      },
+      "description": "Rendering and simulation space dimensionality. `2` \u2014 flat pan/zoom view (d3-zoom); `3` \u2014 perspective orbit camera (drag rotates, wheel/pinch dollies, Shift/Space + drag pans). The force simulation and its spatial structures run in the same dimensionality.\n\nIndependent of the ingested data: 2D positions viewed in 3D lie in the `z = 0` plane, and 3D positions viewed in 2D are projected top-down (their z is preserved). Can be changed at runtime via `setConfig` / `setConfigPartial` to switch modes without re-ingesting data. Default value: `2`"
+    },
+    {
+      "name": "pointDefaultColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "The default color to use for points when no point colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: '#b3b3b3'",
+      "default": "rgba(205, 207, 213, 0.9)"
+    },
+    {
+      "name": "pointGreyoutColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "The color to use for points when they are greyed out (when highlighting is active). This can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1.\n\nIf not provided, the color will be the same as the point's original color, but darkened or lightened depending on the background color.\n\nIf `pointGreyoutOpacity` is also defined, it will be multiplied with the final alpha of this color.\n\nDefault value: `undefined`"
+    },
+    {
+      "name": "pointGreyoutOpacity",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Opacity of greyed-out points when highlighting is active. Range: 0 (fully transparent) to 1 (fully opaque). When set, used instead of `pointOpacity` for greyed-out points. Default value: `undefined`",
+      "default": 0.2
+    },
+    {
+      "name": "pointDefaultSize",
+      "schema": {
+        "type": "number"
+      },
+      "description": "The default size value to use for points when no point sizes are provided or if the size value in the array is `undefined` or `null`. Default value: `4`"
+    },
+    {
+      "name": "pointDefaultShape",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/PointShape"
+          },
+          {
+            "type": "string",
+            "const": "0"
+          },
+          {
+            "type": "string",
+            "const": "1"
+          },
+          {
+            "type": "string",
+            "const": "2"
+          },
+          {
+            "type": "string",
+            "const": "3"
+          },
+          {
+            "type": "string",
+            "const": "4"
+          },
+          {
+            "type": "string",
+            "const": "5"
+          },
+          {
+            "type": "string",
+            "const": "6"
+          },
+          {
+            "type": "string",
+            "const": "7"
+          },
+          {
+            "type": "string",
+            "const": "8"
+          }
+        ]
+      },
+      "description": "The default shape to use for points when no point shapes are provided via `setPointShapes()`, or if the shape value in the array is `undefined`, `null`, or invalid. Accepts a `PointShape` enum value (e.g., `PointShape.Circle`), a plain number (e.g., `2`), or a numeric string (e.g., `\"2\"`). Default value: `PointShape.Circle`"
+    },
+    {
+      "name": "pointOpacity",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Universal opacity value applied to all points. This value multiplies with individual point alpha values (if set via setPointColors). Useful for dynamically controlling opacity of all points without updating individual RGBA arrays. Default value: `1.0`"
+    },
+    {
+      "name": "pointSizeScale",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Scale factor for the point size. Default value: `1`"
+    },
+    {
+      "name": "pointOcclusionCulling",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Enables the depth-based occlusion culling optimization that skips shading and blending of point fragments hidden underneath other opaque points. Greatly improves performance when many large opaque points overlap; rendering output stays visually identical (point edges remain antialiased and per-point translucent colors still blend correctly). When `true`, the optimization applies automatically whenever it is safe: in 2D mode (`spaceDimensions: 2`), while `pointOpacity` is `1` and `highlightedPointIndices` is not set. Outside those conditions rendering falls back to the standard single-pass path. Set to `false` to always use the standard single-pass rendering. Default value: `true`"
+    },
+    {
+      "name": "pointDepthFade",
+      "schema": {
+        "type": "number"
+      },
+      "description": "3D depth cueing: fades point colors toward the background with distance from the camera, so nearer points visibly pop in front of farther ones. The value is the fade strength at the far edge of the scene, from `0` (disabled) to `1` (fully faded into the background). Only used in 3D mode (`spaceDimensions: 3`). Default value: `0.4`"
+    },
+    {
+      "name": "pointSphereShading",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Shade circle points as lit spheres (impostor shading with a soft headlight) in 3D mode, so overlapping points read as separate volumes. Applies to circle-shaped points only; other shapes render flat as before. Only used in 3D mode (`spaceDimensions: 3`). Default value: `false`"
+    },
+    {
+      "name": "hoveredPointCursor",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Cursor style to use when hovering over a point Default value: `auto`"
+    },
+    {
+      "name": "hoveredLinkCursor",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Cursor style to use when hovering over a link Default value: `auto`"
+    },
+    {
+      "name": "renderHoveredPointRing",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Turns ring rendering around a point on hover on / off Default value: `false`"
+    },
+    {
+      "name": "hoveredPointRingColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "Hovered point ring color hex value. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: `white`"
+    },
+    {
+      "name": "focusedPointRingColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "Focused point ring color hex value. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: `white`"
+    },
+    {
+      "name": "focusedPointIndex",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Set focus on a point by index. A ring will be rendered around the focused point. The focused ring is larger than outline rings to create a clear visual hierarchy. When set to `undefined`, no point is focused. Default value: `undefined`"
+    },
+    {
+      "name": "outlinedPointIndices",
+      "schema": {
+        "$ref": "#/definitions/GraphIndices"
+      },
+      "description": "Array of point indices to draw an outline ring around. The outline ring is a circle rendered around the point regardless of the point's shape. When a point is both outlined and greyed out (not highlighted), the ring color is dimmed to match. Default value: `undefined`"
+    },
+    {
+      "name": "outlinedPointRingColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "Color of the outline ring drawn around outlined points. Can be either a hex color string (e.g., '#b3b3b3') or an array of RGBA values. Default value: `'white'`"
+    },
+    {
+      "name": "renderLinks",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Turns link rendering on / off. Default value: `true`"
+    },
+    {
+      "name": "linkDefaultColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "The default color to use for links when no link colors are provided, or if the color value in the array is `undefined` or `null`. This can be either a hex color string (e.g., '#666666') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: '#666666'",
+      "default": "rgba(205, 207, 213, 0.9)"
+    },
+    {
+      "name": "linkOpacity",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Universal opacity value applied to all links. This value multiplies with individual link alpha values (if set via setLinkColors). Useful for dynamically controlling opacity of all links without updating individual RGBA arrays. Default value: `1.0`"
+    },
+    {
+      "name": "linkGreyoutOpacity",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Greyed-out link opacity value when link highlighting is active. Default value: `0.1`"
+    },
+    {
+      "name": "focusedLinkIndex",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Set focus on a link by index. The focused link will be rendered with extra width. When set to `undefined`, no link is focused. Default value: `undefined`"
+    },
+    {
+      "name": "focusedLinkWidthIncrease",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Number of pixels to add to the link width when focused. The focused width is calculated as: originalWidth + focusedLinkWidthIncrease Default value: `5`"
+    },
+    {
+      "name": "linkDefaultWidth",
+      "schema": {
+        "type": "number"
+      },
+      "description": "The default width value to use for links when no link widths are provided or if the width value in the array is `undefined` or `null`. Default value: `1`"
+    },
+    {
+      "name": "linkDefaultStyle",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/LinkStyle"
+          },
+          {
+            "type": "string",
+            "const": "0"
+          },
+          {
+            "type": "string",
+            "const": "1"
+          },
+          {
+            "type": "string",
+            "const": "2"
+          }
+        ]
+      },
+      "description": "The default style (stroke pattern) to use for links when no link styles are provided via `setLinkStyles()`, or if the style value in the array is `undefined`, `null`, or invalid. Accepts a `LinkStyle` enum value (e.g., `LinkStyle.Solid`), a plain number (e.g., `1`), or a numeric string (e.g., `\"1\"`). `0` = Solid, `1` = Dashed, `2` = Dotted. Default value: `LinkStyle.Solid`"
+    },
+    {
+      "name": "linkDashLength",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Dash length for dashed links (`LinkStyle.Dashed`). When `scaleLinksOnZoom` is `false` (default), this is a size in screen pixels: dashes keep a constant on-screen size, but the pattern shifts along a link as its on-screen length changes with zoom. When `scaleLinksOnZoom` is `true`, it is measured in graph space, which locks the pattern to the link so it scales with zoom instead of shifting. Default value: `8`"
+    },
+    {
+      "name": "linkDashGap",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Gap between dashes (dashed links) or between dots (dotted links). Uses the same units as `linkDashLength` \u2014 screen pixels, or graph space when `scaleLinksOnZoom` is `true`. Default value: `4`"
+    },
+    {
+      "name": "linkColorInterpolateFromEndpoints",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "If `true`, each link's color is interpolated along its length from the color of its source point to the color of its target point (derived from the point colors set via `setPointColors()`). This overrides the per-link RGB color from `setLinkColors()` (link opacity, greyout, and hover still apply). It works orthogonally to the link stroke pattern, so a dashed or dotted link can also be a gradient. Note: on curved links the gradient (and dash/dot spacing) is approximate. Default value: `false`"
+    },
+    {
+      "name": "hoveredLinkColor",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      },
+      "description": "The color to use for links when they are hovered. This can be either a hex color string (e.g., '#ff3333') or an array of RGBA values in the format `[red, green, blue, alpha]` where each value is a number between 0 and 1. Default value: `undefined`"
+    },
+    {
+      "name": "hoveredLinkWidthIncrease",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Number of pixels to add to the link width when hovered. The hovered width is calculated as: originalWidth + hoveredLinkWidthIncrease Default value: `5`",
+      "default": 0
+    },
+    {
+      "name": "linkWidthScale",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Scale factor for the link width. Default value: `1`"
+    },
+    {
+      "name": "scaleLinksOnZoom",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Increase or decrease the size of the links when zooming in or out. Default value: `false`"
+    },
+    {
+      "name": "linkBlending",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls alpha blending for link rendering.\n\nWhen `true` (default), links are drawn with standard source-over alpha blending for transparency and soft antialiased edges. When `false`, links are drawn as opaque hard edges (faster for dense graphs), and greyed-out links (`highlightedLinkIndices`) are hidden entirely instead of dimmed \u2014 dash gaps stay transparent. Default value: `true`"
+    },
+    {
+      "name": "curvedLinks",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "If set to true, links are rendered as curved lines. Otherwise as straight lines. Default value: `false`"
+    },
+    {
+      "name": "curvedLinkSegments",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Number of segments in a curved line. Default value: `19`."
+    },
+    {
+      "name": "curvedLinkWeight",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Weight affects the shape of the curve. Default value: `0.8`."
+    },
+    {
+      "name": "curvedLinkControlPointDistance",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Defines the position of the control point of the curve on the normal from the centre of the line. If set to 1 then the control point is at a distance equal to the length of the line. Default value: `0.5`"
+    },
+    {
+      "name": "linkDefaultArrows",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "The default link arrow value that controls whether or not to display link arrows. Default value: `false`"
+    },
+    {
+      "name": "linkArrowsSizeScale",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Scale factor for the link arrows size. Default value: `1`"
+    },
+    {
+      "name": "linkVisibilityDistanceRange",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "description": "The range defines the minimum and maximum link visibility distance in pixels. The link will be fully opaque when its length is less than the first number in the array, and will have `linkVisibilityMinTransparency` transparency when its length is greater than the second number in the array. This distance is defined in screen space coordinates and will change as you zoom in and out (e.g. links become longer when you zoom in, and shorter when you zoom out). Default value: `[50, 150]`"
+    },
+    {
+      "name": "linkVisibilityMinTransparency",
+      "schema": {
+        "type": "number"
+      },
+      "description": "The transparency value that the link will have when its length reaches the maximum link distance value from `linkVisibilityDistanceRange`. Default value: `0.25`"
+    },
+    {
+      "name": "simulationDecay",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Decay coefficient. Use bigger values if you want the simulation to \"cool down\" slower. Default value: `5000`"
+    },
+    {
+      "name": "simulationGravity",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Gravity force coefficient. Default value: `0.25`"
+    },
+    {
+      "name": "simulationCenter",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Centering to center mass force coefficient. Default value: `0`"
+    },
+    {
+      "name": "simulationRepulsion",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Repulsion force coefficient. Default value: `1.0`",
+      "default": 0.5
+    },
+    {
+      "name": "simulationRepulsionTheta",
+      "schema": {
+        "type": "number",
+        "deprecated": "Has no effect: the many-body force has no theta approximation to tune."
+      }
+    },
+    {
+      "name": "simulationLinkSpring",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Link spring force coefficient. Default value: `1`",
+      "default": 0.4
+    },
+    {
+      "name": "simulationLinkDistance",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Minimum link distance. Default value: `10`",
+      "default": 20
+    },
+    {
+      "name": "simulationLinkDistRandomVariationRange",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "description": "Range of random link distance values. Default value: `[1, 1.2]`"
+    },
+    {
+      "name": "simulationFriction",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Friction coefficient. Default value: `0.85`",
+      "default": 0.5
+    },
+    {
+      "name": "simulationCluster",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Cluster coefficient. Default value: `0.1`"
+    },
+    {
+      "name": "simulationCollision",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Collision force coefficient. When set to a value greater than 0, points will push each other apart when they overlap. Uses a spatial-hash grid, so it scales better than naive O(n\u00b2) collision. Default value: `0`"
+    },
+    {
+      "name": "simulationCollisionRadius",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Collision radius. When set to undefined or 0, the collision radius is derived from point sizes (half of the point size). When set to a positive value, all points use this fixed collision radius. Default value: `undefined`"
+    },
+    {
+      "name": "simulationCollisionPadding",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Extra padding added to each point's collision radius, in space units. Without padding, points settle just touching; with padding, two points keep a gap of twice this value between their visual edges. Default value: `0`"
+    },
+    {
+      "name": "simulationCollisionIterations",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Number of collision relaxation iterations per simulation tick. Higher values make the collision constraint stiffer and more responsive (overlaps resolve faster), at a linear performance cost in the collision step. Similar to d3-force's `collide.iterations`. Default value: `1`"
+    },
+    {
+      "name": "simulationAlphaOnDrag",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Simulation re-heat on point drag. When the user starts dragging a point and the simulation is enabled, alpha is raised to at least this value and the simulation is restarted if it was paused or had settled, so the surrounding points react to the dragged point (similar to d3-force's `alphaTarget` pattern on drag start). Set to `0` to disable. Default value: `0.3`"
+    },
+    {
+      "name": "onSimulationStart",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when the simulation starts."
+    },
+    {
+      "name": "onSimulationTick",
+      "schema": {
+        "$comment": "(alpha: number, hoveredIndex?: number, pointPosition?: HoveredPointPosition) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "alpha": {
+                "type": "number"
+              },
+              "hoveredIndex": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              }
+            },
+            "required": [
+              "alpha"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called on every tick of the simulation."
+    },
+    {
+      "name": "onSimulationEnd",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when the simulation stops."
+    },
+    {
+      "name": "onSimulationPause",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when the simulation is paused."
+    },
+    {
+      "name": "onSimulationUnpause",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when the simulation is unpaused."
+    },
+    {
+      "name": "onClick",
+      "schema": {
+        "$comment": "(index: number | undefined, pointPosition: HoveredPointPosition | undefined, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called on every canvas click. If clicked on a point, its index will be passed as the first argument, position as the second argument (`[x, y]` in 2D mode, `[x, y, z]` in 3D mode) and the corresponding mouse event as the third argument: `(index: number | undefined, pointPosition: [x, y] | [x, y, z] | undefined, event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onPointClick",
+      "schema": {
+        "$comment": "(index: number, pointPosition: HoveredPointPosition, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "index",
+              "pointPosition",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a point is clicked. The point index will be passed as the first argument, position as the second argument (`[x, y]` in 2D mode, `[x, y, z]` in 3D mode) and the corresponding mouse event as the third argument: `(index: number, pointPosition: [x, y] | [x, y, z], event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onLinkClick",
+      "schema": {
+        "$comment": "(linkIndex: number, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "linkIndex": {
+                "type": "number"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "linkIndex",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a link is clicked. The link index will be passed as the first argument and the corresponding mouse event as the second argument: `(linkIndex: number, event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onBackgroundClick",
+      "schema": {
+        "$comment": "(event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when the background (empty space) is clicked. The mouse event will be passed as the first argument: `(event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onContextMenu",
+      "schema": {
+        "$comment": "(index: number | undefined, pointPosition: HoveredPointPosition | undefined, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a context menu trigger (typically right click) happens on the canvas. If triggered on a point, its index will be passed as the first argument, position as the second argument (`[x, y]` in 2D mode, `[x, y, z]` in 3D mode) and the corresponding mouse event as the third argument: `(index: number | undefined, pointPosition: [x, y] | [x, y, z] | undefined, event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onPointContextMenu",
+      "schema": {
+        "$comment": "(index: number, pointPosition: HoveredPointPosition, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "index",
+              "pointPosition",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a context menu trigger (typically right click) happens on a point. The point index will be passed as the first argument, position as the second argument (`[x, y]` in 2D mode, `[x, y, z]` in 3D mode) and the corresponding mouse event as the third argument: `(index: number, pointPosition: [x, y] | [x, y, z], event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onLinkContextMenu",
+      "schema": {
+        "$comment": "(linkIndex: number, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "linkIndex": {
+                "type": "number"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "linkIndex",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a context menu trigger (typically right click) happens on a link. The link index will be passed as the first argument and the corresponding mouse event as the second argument: `(linkIndex: number, event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onBackgroundContextMenu",
+      "schema": {
+        "$comment": "(event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a context menu trigger (typically right click) happens on the background (empty space). The mouse event will be passed as the first argument: `(event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onMouseMove",
+      "schema": {
+        "$comment": "(index: number | undefined, pointPosition: HoveredPointPosition | undefined, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when mouse movement happens. If the mouse moves over a point, its index will be passed as the first argument, position as the second argument (`[x, y]` in 2D mode, `[x, y, z]` in 3D mode) and the corresponding mouse event as the third argument: `(index: number | undefined, pointPosition: [x, y] | [x, y, z] | undefined, event: MouseEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onPointMouseOver",
+      "schema": {
+        "$comment": "(index: number, pointPosition: HoveredPointPosition, event: MouseEvent | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | D3ZoomEvent<HTMLCanvasElement, undefined> | undefined, isHighlighted: boolean, isOutlined: boolean) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "pointPosition": {
+                "$ref": "#/definitions/HoveredPointPosition"
+              },
+              "event": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/MouseEvent"
+                  },
+                  {
+                    "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+                  },
+                  {
+                    "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+                  }
+                ]
+              },
+              "isHighlighted": {
+                "type": "boolean"
+              },
+              "isOutlined": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "index",
+              "pointPosition",
+              "isHighlighted",
+              "isOutlined"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a point appears under the mouse as a result of a mouse event, zooming and panning, or movement of points. The point index will be passed as the first argument, position as the second argument, the corresponding mouse event or D3's zoom event as the third argument, whether the hovered point is highlighted as the fourth argument, and whether the hovered point is outlined as the fifth argument: `(index, pointPosition, event, isHighlighted, isOutlined) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onPointMouseOut",
+      "schema": {
+        "$comment": "(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | undefined) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/MouseEvent"
+                  },
+                  {
+                    "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+                  },
+                  {
+                    "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when a point is no longer underneath the mouse pointer because of a mouse event, zoom/pan event, or movement of points. The corresponding mouse event or D3's zoom event will be passed as the first argument: `(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | undefined) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onLinkMouseOver",
+      "schema": {
+        "$comment": "(linkIndex: number) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "linkIndex": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "linkIndex"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when the mouse moves over a link. The link index will be passed as the first argument: `(linkIndex: number) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onLinkMouseOut",
+      "schema": {
+        "$comment": "(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | undefined) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/MouseEvent"
+                  },
+                  {
+                    "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+                  },
+                  {
+                    "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when the mouse moves out of a link. The event will be passed as the first argument: `(event: MouseEvent | D3ZoomEvent<HTMLCanvasElement, undefined> | D3DragEvent<HTMLCanvasElement, undefined, Hovered> | undefined) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onZoomStart",
+      "schema": {
+        "$comment": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+              },
+              "userDriven": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "e",
+              "userDriven"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when zooming or panning starts. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): `(event: D3ZoomEvent, userDriven: boolean) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onZoom",
+      "schema": {
+        "$comment": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+              },
+              "userDriven": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "e",
+              "userDriven"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called continuously during zooming or panning. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): `(event: D3ZoomEvent, userDriven: boolean) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onZoomEnd",
+      "schema": {
+        "$comment": "(e: D3ZoomEvent<HTMLCanvasElement, undefined>, userDriven: boolean) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3ZoomEvent%3CHTMLCanvasElement%2Cundefined%3E"
+              },
+              "userDriven": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "e",
+              "userDriven"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when zooming or panning ends. First argument is a D3 Zoom Event and second indicates whether the event has been initiated by a user interaction (e.g. a mouse event): `(event: D3ZoomEvent, userDriven: boolean) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onDragStart",
+      "schema": {
+        "$comment": "(e: D3DragEvent<HTMLCanvasElement, undefined, Hovered>) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+              }
+            },
+            "required": [
+              "e"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when dragging starts. First argument is a D3 Drag Event: `(event: D3DragEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onDrag",
+      "schema": {
+        "$comment": "(e: D3DragEvent<HTMLCanvasElement, undefined, Hovered>) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+              }
+            },
+            "required": [
+              "e"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called continuously during dragging. First argument is a D3 Drag Event: `(event: D3DragEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "onDragEnd",
+      "schema": {
+        "$comment": "(e: D3DragEvent<HTMLCanvasElement, undefined, Hovered>) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "e": {
+                "$ref": "#/definitions/D3DragEvent%3CHTMLCanvasElement%2Cundefined%2CHovered%3E"
+              }
+            },
+            "required": [
+              "e"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when dragging ends. First argument is a D3 Drag Event: `(event: D3DragEvent) => void`. Default value: `undefined`"
+    },
+    {
+      "name": "showFPSMonitor",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Show WebGL performance monitor. Default value: `false`"
+    },
+    {
+      "name": "pixelRatio",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Pixel ratio for the canvas. Higher values use more GPU memory but provide better quality on high-DPI displays. Default value: `window.devicePixelRatio || 2`"
+    },
+    {
+      "name": "scalePointsOnZoom",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Increase or decrease the size of the points when zooming in or out. Default value: `false`"
+    },
+    {
+      "name": "initialZoomLevel",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Initial zoom level. This property will be applied only on component initialization and it can't be changed using the `setConfig` or `setConfigPartial` methods. If set, `fitViewOnInit` value will be ignored. Default value: `undefined`"
+    },
+    {
+      "name": "enableZoom",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Enables or disables zooming in and out. Default value: `true`"
+    },
+    {
+      "name": "enableSimulationDuringZoom",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls whether the simulation remains active during interactive (user-driven) zoom operations. When set to `true`, the simulation continues running while zooming. When set to `false`, the simulation pauses during zoom operations. Programmatic zoom methods (e.g., `zoomToPointByIndex`, `fitView`) default to running the simulation regardless of this setting, but can be controlled via their `enableSimulation` parameter. Default value: `false`"
+    },
+    {
+      "name": "enableDrag",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Enables or disables dragging of points in the graph. Default value: `false`"
+    },
+    {
+      "name": "fitViewOnInit",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Whether to center and zoom the view to fit all points in the scene on initialization or not. Ignored if `initialZoomLevel` is set. Default: `true`"
+    },
+    {
+      "name": "fitViewDelay",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Delay in milliseconds before fitting the view when `fitViewOnInit` is enabled. Useful if you want the layout to stabilize a bit before fitting. Default: `250`"
+    },
+    {
+      "name": "fitViewPadding",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Padding to apply when fitting the view to show all points. This value should be between 0 and 1, and is added to the calculated bounding box to provide some extra space around the points. This is used when the `fitViewOnInit` option is enabled. Default: `0.1`"
+    },
+    {
+      "name": "fitViewDuration",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Duration in milliseconds for fitting the view to show all points when fitViewOnInit is enabled. Default: `250`"
+    },
+    {
+      "name": "fitViewByPointsInRect",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        ]
+      },
+      "description": "When `fitViewOnInit` is set to `true`, fits the view to show the points within a rectangle defined by its two corner coordinates `[[left, bottom], [right, top]]` in the scene space. Default: `undefined`"
+    },
+    {
+      "name": "fitViewByPointIndices",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "description": "When `fitViewOnInit` is set to `true`, fits the view to show only the specified points by their indices. Takes precedence over `fitViewByPointsInRect` when both are provided. Default: `undefined`"
+    },
+    {
+      "name": "randomSeed",
+      "schema": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "description": "Providing a `randomSeed` value allows you to control the randomness of the layout across different simulation runs. It is useful when you want the graph to always look the same on same datasets. This property will be applied only on component initialization and it can't be changed using the `setConfig` or `setConfigPartial` methods. Default value: undefined"
+    },
+    {
+      "name": "pointSamplingDistance",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Point sampling distance in pixels between neighboring points when calling the `getSampledPointPositionsMap` method. This parameter determines how many points will be included in the sample. Default value: `100`",
+      "default": 125
+    },
+    {
+      "name": "linkSamplingDistance",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Link sampling distance in pixels between neighboring links when calling the `getSampledLinks` method. This parameter determines how many links will be included in the sample (based on link midpoints in screen space). Default value: `100`"
+    },
+    {
+      "name": "rescalePositions",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls automatic position adjustment of points in the visible space.\n\nWhen `undefined` (default):\n- If simulation is disabled (`enableSimulation: false`), points will be automatically   repositioned to fit within the visible space\n- If simulation is enabled, points will not be rescaled\n\nWhen explicitly set:\n- `true`: Forces points positions to be rescaled\n- `false`: Forces points positions to not be rescaled\n\nDefault value: `undefined`"
+    },
+    {
+      "name": "cameraFov",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Vertical field of view of the 3D camera in degrees. Only used when `spaceDimensions` is `3`. Default value: `45`"
+    },
+    {
+      "name": "cameraNear",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Near clipping plane distance of the 3D camera. When `undefined`, the near plane adapts to the camera distance and the extent of the data, keeping depth-buffer precision usable at any scene scale. Only used in 3D mode. Default value: `undefined`"
+    },
+    {
+      "name": "cameraFar",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Far clipping plane distance of the 3D camera. When `undefined`, the far plane is derived automatically from the camera distance and the extent of the data. Only used in 3D mode. Default value: `undefined`"
+    },
+    {
+      "name": "cameraInitialPosition",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 3,
+        "maxItems": 3
+      },
+      "description": "Initial eye position of the 3D camera as `[x, y, z]`, applied when entering 3D mode. The camera looks at the center of the data bounds from this position. When `undefined`, the camera frames the data bounds automatically (like `fitView`). Only used in 3D mode. Default value: `undefined`"
+    },
+    {
+      "name": "showLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Whether to show labels (except hovered) on the Cosmograph canvas. When `true`, labels are visible only if  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `false`",
+      "default": true
+    },
+    {
+      "name": "showDynamicLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Show automatic labels for the evenly distributed points that are currently visible on the screen.\n\nWorks only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "showDynamicLabelsLimit",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Maximum number of dynamic labels to show. Default: `30`",
+      "default": 100
+    },
+    {
+      "name": "showLabelsFor",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "An array of point ids to show labels for.\n\nWorks only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `undefined`"
+    },
+    {
+      "name": "showFocusedPointLabel",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Whether to show label for the focused point. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "showTopLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Show labels for the top points. Works only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "showTopLabelsLimit",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Sets the maximum number of top points to show labels for. Default: `30`",
+      "default": 150
+    },
+    {
+      "name": "showClusterLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Show labels for the clusters based on the  {@link  CosmographConfig.pointClusterBy pointClusterBy }  column. Will take priority over point labels. When any point is selected, cluster labels will be hidden until the selection is cleared.\n\nHas effect only when  {@link  CosmographConfig.pointClusterBy pointClusterBy }  is provided. Default: `false`"
+    },
+    {
+      "name": "showClusterLabelsLimit",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Maximum number of cluster labels to render. Default: `500`",
+      "default": 1000
+    },
+    {
+      "name": "showUnselectedPointLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "When `true`, shows labels for unselected points during filtering/selection. When `false`, hides unselected labels, allocating more visual space for selected point labels. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "showSelectedLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "When `true`, shows labels for selected points when filtering/selection is active. When `false`, selected point labels are hidden. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "selectedPointLabelsLimit",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Maximum number of labels to show for selected points. When selection is active and  {@link  CosmographConfig.showUnselectedPointLabels showUnselectedPointLabels }  is `false`, this limit is used instead of  {@link  CosmographConfig.showTopLabelsLimit showTopLabelsLimit } . Default: `100`",
+      "default": 100
+    },
+    {
+      "name": "pointLabelColor",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Specifies the CSS color to use for the point labels.\n\nIf `undefined`, label will be colored as point."
+    },
+    {
+      "name": "pointLabelFontSize",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Specifies the font size to use for the point labels.",
+      "default": 13
+    },
+    {
+      "name": "pointLabelPosition",
+      "schema": {
+        "$ref": "#/definitions/PointLabelPosition"
+      },
+      "description": "Controls point label placement relative to the node.\n\n- `'above'`: place label above the node\n- `'below'`: place label below the node\n- `'center'`: place label centered on the node\n\nApplies to regular and hovered point labels. Default: `'above'`",
+      "default": "above"
+    },
+    {
+      "name": "clusterLabelFontSize",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Specifies the font size to use for the cluster labels. If  {@link  CosmographConfig.scaleClusterLabels scaleClusterLabels }  is `true` (by default), the font size will be scaled based on the number of points in the cluster and the `clusterLabelFontSize` will be used as the baseline.",
+      "default": 16
+    },
+    {
+      "name": "clusterLabelClassName",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$comment": "(text: string, clusterIndex: number) => string",
+            "type": "object",
+            "properties": {
+              "namedArgs": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "clusterIndex": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "text",
+                  "clusterIndex"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "description": "Specifies the CSS class or inline CSS string to use for the cluster labels. Inline `color` styles take priority over the computed cluster label color.",
+      "default": ""
+    },
+    {
+      "name": "scaleClusterLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Whether to scale the cluster labels based on the number of points in the cluster. Default: `true`",
+      "default": true
+    },
+    {
+      "name": "usePointColorStrategyForClusterLabels",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "If `true`, cluster labels will acquire colors from the current point coloring strategy ( {@link  CosmographConfig.pointColorStrategy pointColorStrategy } ). This can be useful when  {@link  CosmographConfig.pointClusterBy pointClusterBy }  and  {@link  CosmographConfig.pointColorBy pointColorBy }  refer to the same data. Default: `false`",
+      "default": false
+    },
+    {
+      "name": "pointLabelFn",
+      "schema": {
+        "$ref": "#/definitions/AccessorFn%3Cunknown%2Cstring%3E"
+      },
+      "description": "Specifies the function that will be used to generate the labels based on  {@link  CosmographConfig.pointLabelBy pointLabelBy }  column. It should return a `string`.\n\nWorks only when  {@link  CosmographConfig.pointLabelBy pointLabelBy }  is provided. Overrides the values specified in  {@link  CosmographConfig.pointLabelBy pointLabelBy }  column by processing them."
+    },
+    {
+      "name": "pointLabelWeightFn",
+      "schema": {
+        "$ref": "#/definitions/AccessorFn%3Cunknown%2Cnumber%3E"
+      },
+      "description": "Specifies the function that will be used to generate the label weights. Should return a `number` between 0 and 1.\n\nWorks only when  {@link  CosmographConfig.pointLabelWeightBy pointLabelWeightBy }  is provided. Overrides the values specified in  {@link  CosmographConfig.pointLabelWeightBy pointLabelWeightBy }  column by processing them."
+    },
+    {
+      "name": "pointLabelClassName",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$comment": "(text: string, pointIndex: number, pointId?: string) => string",
+            "type": "object",
+            "properties": {
+              "namedArgs": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "pointIndex": {
+                    "type": "number"
+                  },
+                  "pointId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text",
+                  "pointIndex"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "description": "Specifies the CSS class to use for the point labels. This can either be a string specifying a fixed CSS class name or a function that returns a CSS class name based on the point index and optional point ID."
+    },
+    {
+      "name": "staticLabelWeight",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Specifies the weight of the static labels. Default: `0.8`",
+      "default": 0.8
+    },
+    {
+      "name": "dynamicLabelWeight",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Specifies the weight of the dynamic labels. Default: `0.7`",
+      "default": 0.7
+    },
+    {
+      "name": "labelMargin",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Specifies the margin between the label and the point. Default: `5`",
+      "default": 5
+    },
+    {
+      "name": "labelPadding",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 4,
+        "maxItems": 4
+      },
+      "description": "Specifies the [left, top, right, bottom] padding of the label element. Default: `[6.5, 4.5, 6.5, 4.5]`",
+      "default": [
+        6.5,
+        4.5,
+        6.5,
+        4.5
+      ]
+    },
+    {
+      "name": "annotations",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/CosmographAnnotation"
+        }
+      },
+      "description": "Specifies an array of annotations to be displayed on the Cosmograph canvas. Each annotation is defined by the `CosmographAnnotation` type and can be either:\n- attached to a point by its `pointId`\n- placed at a fixed graph `position` (2D only)"
+    },
+    {
+      "name": "customLabels",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/CosmographAnnotation"
+        }
+      },
+      "description": "Deprecated alias for  {@link  CosmographConfig.annotations annotations } . Use `annotations` instead."
+    },
+    {
+      "name": "showHoveredPointLabel",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Whether to show a hovered point label. Default: `false`",
+      "default": false
+    },
+    {
+      "name": "hoveredPointLabelClassName",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$comment": "(text: string, pointIndexBy: number, pointIdBy?: string) => string",
+            "type": "object",
+            "properties": {
+              "namedArgs": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "pointIndexBy": {
+                    "type": "number"
+                  },
+                  "pointIdBy": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text",
+                  "pointIndexBy"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "description": "Specifies the CSS class to use for the hovered point label. This can either be a string specifying a fixed CSS class name or a function that returns a CSS class name based on the point index and optional point ID.",
+      "default": "color: white; background: #333841;"
+    },
+    {
+      "name": "clusterPositionsMap",
+      "schema": {
+        "$ref": "#/definitions/Record%3Cstring%2C(%5Bnumber%2Cnumber%5D%7C%5Bnumber%2Cnumber%2Cnumber%5D)%3E"
+      },
+      "description": "Mapping of cluster keys to [x, y] coordinate positions. Keys should match values from the  {@link  CosmographConfig.pointClusterBy pointClusterBy }  column. Missing cluster keys will be automatically positioned using the centermass. Won't take effect if point positions are provided by  {@link  CosmographConfig.pointXBy pointXBy }  or  {@link  CosmographConfig.pointYBy pointYBy } ."
+    },
+    {
+      "name": "links",
+      "schema": {
+        "$ref": "#/definitions/CosmographInputData"
+      },
+      "description": "The input data for the links.\n\n {@link  CosmographInputData }  Accepts `File | string | Table | Uint8Array | ArrayBuffer | Record<string, unknown>[]`"
+    },
+    {
+      "name": "linkSourceBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the **source** point of each link. This should match the `pointIdBy` values in the points data."
+    },
+    {
+      "name": "linkSourceIndexBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the index of the **source** point of each link. This is used for efficient lookups and should match the `pointIndexBy` values in the points data."
+    },
+    {
+      "name": "linkTargetBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the **target** point of each link. This should match the `pointIdBy` values in the points data."
+    },
+    {
+      "name": "linkTargetIndexBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the index of the **target** point of each link. This is used for efficient lookups and should match the `pointIndexBy` values in the points data."
+    },
+    {
+      "name": "linkColorBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the link color.\n\nIf provided, links will be colored based on the values in this column, which should be either a color `string` or an array of numeric `[r, g, b, a]` values."
+    },
+    {
+      "name": "linkColorDomain",
+      "schema": {
+        "$ref": "#/definitions/NumericDomain"
+      },
+      "description": "Fixed numeric domain used for link color scales.\n\nApplies when  {@link  linkColorStrategy }  is `'sum'`, `'average'`, `'count'`, or numeric `'categorical'`. Values outside the domain are clamped to the first or last palette color. Invalid domains fall back to data-derived extents."
+    },
+    {
+      "name": "linkColorByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/ColorAccessorFn"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cnumber%3E"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cboolean%3E"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Specifies the function that will be used to generate the color for each link based on the value in the  {@link  linkColorBy }  column. It takes a link record as input and its index, and should return a color `string` or an array of `[r, g, b, a]` values.\n\nWorks only when  {@link  linkColorBy }  is provided. Overrides the values in  {@link  linkColorBy }  column by processing them (in this case the values in the  {@link  linkColorBy }  column can be of any type, not just colors)."
+    },
+    {
+      "name": "linkColorPalette",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "An optional array of color strings that can be used to color the links in the visualization. If provided, the links will be colored using the colors in this palette, cycling through the array as needed.\n\n**Used when  {@link  linkColorStrategy }  is set to `'categorical'`, `'count'`, `'sum'`, or `'average'`**`",
+      "default": [
+        "#206176",
+        "#38657e",
+        "#506987",
+        "#686d90",
+        "#807098",
+        "#9874a1",
+        "#af78a9",
+        "#c77cb2",
+        "#df7fba",
+        "#f783c3",
+        "#FFB4D3",
+        "#f6c0d8"
+      ]
+    },
+    {
+      "name": "linkColorStrategy",
+      "schema": {
+        "$ref": "#/definitions/LinkColorStrategyType"
+      },
+      "description": "Specifies the strategy for coloring links based on data from the  {@link  linkColorBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with  {@link  Cosmograph.activeLinkColorStrategy  }  getter.\n\nSee  {@link  LinkColorStrategy }  for available strategies and their documentation."
+    },
+    {
+      "name": "linkWidthBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the link width.\n\nIf provided, links will have their widths set based on the values in this column, which should be numeric values."
+    },
+    {
+      "name": "linkWidthByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cstring%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cnumber%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cboolean%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Specifies the function that will be used to generate the width for each link based on the value in the  {@link  linkWidthBy }  column. It takes a link record as input and its index, and should return a numeric value.\n\nWorks only when  {@link  linkWidthBy }  is provided. Overrides the values in the  {@link  linkWidthBy }  column by processing them (in this case the values in the  {@link  linkWidthBy }  column can be of any type, not just numbers)."
+    },
+    {
+      "name": "linkWidthStrategy",
+      "schema": {
+        "$ref": "#/definitions/LinkWidthStrategyType"
+      },
+      "description": "Specifies the strategy for sizing links based on data from the  {@link  linkWidthBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and width data type. Current strategy can be acquired with  {@link  Cosmograph.activeLinkWidthStrategy  }  getter.\n\nSee  {@link  LinkWidthStrategy }  for available strategies and their documentation."
+    },
+    {
+      "name": "linkWidthRange",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "description": "Defines the range for automatic link width scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  linkWidthBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no  {@link  linkWidthByFn }  provided.\n\nNote: Only works when  {@link  linkWidthBy }  column is provided and contains numeric values and when  {@link  linkWidthByFn }  is not set.",
+      "default": [
+        1,
+        9
+      ]
+    },
+    {
+      "name": "linkStyleBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the link stroke style.\n\nValues may be the case-insensitive names `'solid'`, `'dashed'`, or `'dotted'`, or the corresponding numeric values `0`, `1`, and `2`. Invalid values use  {@link  linkDefaultStyle  } ."
+    },
+    {
+      "name": "linkStyleMap",
+      "schema": {
+        "$ref": "#/definitions/Record%3Cstring%2C(LinkStyle%7Cnumber%7Cstring)%3E"
+      },
+      "description": "Maps  {@link  linkStyleBy }  column values to link styles, e.g. `{ friend: 'dashed' }`.\n\nWhen set, it is the only interpreter of the column: each link gets the style mapped from its value, and unmapped values use  {@link  linkDefaultStyle  } ."
+    },
+    {
+      "name": "linkArrowBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name that determines whether a link should have an arrow. If provided, links will have arrows based on the `boolean` values in this column."
+    },
+    {
+      "name": "linkArrowByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/BooleanAccessorFn"
+          },
+          {
+            "$ref": "#/definitions/BooleanAccessorFn%3Cnumber%3E"
+          },
+          {
+            "$ref": "#/definitions/BooleanAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Specifies the function that determines if a link should have an arrow based on the value in the  {@link  linkArrowBy }  column. It takes a link record as input and its index, and should return a boolean value.\n\nWorks only when  {@link  linkArrowBy }  is provided. Overrides the values in the  {@link  linkArrowBy }  column by processing them (in this case the values in the  {@link  linkArrowBy }  column can be of any type, not just booleans)."
+    },
+    {
+      "name": "linkStrengthBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the link strength. If provided, links will have their strengths set based on the values in this column, which should be numeric values. Link strength affects the force simulation."
+    },
+    {
+      "name": "linkStrengthByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/SizeAccessorFn"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cstring%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cboolean%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Specifies the function that will be used to generate the strength for each link based on the value in the  {@link  linkStrengthBy }  column. It takes a link record as input and its index, and should return a numeric value.\n\nWorks only when  {@link  linkStrengthBy }  is provided. Overrides the values in the  {@link  linkStrengthBy }  column by processing them (in this case the values in the  {@link  linkStrengthBy }  column can be of any type, not just numbers)."
+    },
+    {
+      "name": "linkStrengthRange",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "description": "Defines the range for automatic link strength scaling. Takes [min, max] values in the range [0, 1].\n\nThis setting can be used to control the strength of the links during the simulation.\n\nNote: Only works when  {@link  linkStrengthBy }  column is provided and contains numeric values and when  {@link  linkStrengthByFn }  is not set. Has effect only during the active simulation.",
+      "default": [
+        0.2,
+        1
+      ]
+    },
+    {
+      "name": "linkIncludeColumns",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "An array of additional column names to include in the link data.\n\nThese columns will be available on the link objects but not used by Cosmograph directly, can be used as accessors for Cosmograph components. Useful for storing additional information about the links. If provided with `*`, all columns will be included."
+    },
+    {
+      "name": "points",
+      "schema": {
+        "$ref": "#/definitions/CosmographInputData"
+      },
+      "description": "Input data for the points."
+    },
+    {
+      "name": "pointIdBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Unique identifier column for each point. Required for mapping links to points correctly."
+    },
+    {
+      "name": "pointIndexBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Numeric index column for each point. Used for efficient lookups and should be a sequential integer starting from 0."
+    },
+    {
+      "name": "pointColorBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the point color. If provided, points will be colored based on the values in this column, which should be either a color `string` or an array of numeric `[r, g, b, a]` values."
+    },
+    {
+      "name": "pointColorDomain",
+      "schema": {
+        "$ref": "#/definitions/NumericDomain"
+      },
+      "description": "Fixed numeric domain used for point color scales.\n\nApplies to numeric  {@link  pointColorBy }  values when  {@link  pointColorStrategy }  is `'continuous'` or numeric `'categorical'`. Values outside the domain are clamped to the first or last palette color. Invalid domains fall back to data-derived extents."
+    },
+    {
+      "name": "pointColorByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/ColorAccessorFn"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cnumber%3E"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cboolean%3E"
+          },
+          {
+            "$ref": "#/definitions/ColorAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Specifies the function that will be used to generate the color for each point based on the value in the  {@link  pointColorBy }  column. It takes a point record and its index as input, and should return a color `string` or an array of `[r, g, b, a]` values.\n\nOverrides the values in  {@link  pointColorBy }  column by processing them (in this case the values in the  {@link  pointColorBy }  column can be of any type, not just colors).\n\n**Has effect only when  {@link  pointColorBy }  is provided and  {@link  pointColorStrategy }  is `undefined`.**"
+    },
+    {
+      "name": "pointColorPalette",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "An optional array of color strings that can be used to color the points in the visualization. If provided, the points will be colored using the colors in this palette, cycling through the array as needed.\n\n**Used when  {@link  pointColorStrategy }  is set to `'categorical'`, `'continuous'`, or `'degree'`.**`",
+      "default": [
+        "rgba(43, 85, 168, 0.85)",
+        "rgba(153, 82, 213, 0.85)",
+        "rgba(240, 105, 180, 0.85)",
+        "rgba(255, 149, 131, 0.85)",
+        "rgba(254, 224, 139, 0.85)"
+      ]
+    },
+    {
+      "name": "pointColorByMap",
+      "schema": {
+        "$ref": "#/definitions/Record%3Cstring%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
+      },
+      "description": "An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values.\n\n**Used when  {@link  pointColorStrategy }  is set to `'map'`.**"
+    },
+    {
+      "name": "pointColorStrategy",
+      "schema": {
+        "$ref": "#/definitions/PointColorStrategyType"
+      },
+      "description": "Specifies the strategy for coloring points based on data from the  {@link  pointColorBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and color data type. Current strategy can be acquired with  {@link  Cosmograph.activePointColorStrategy  }  getter.\n\nSee  {@link  PointColorStrategy }  for available strategies and their documentation."
+    },
+    {
+      "name": "pointSizeBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name that should contain numeric values to be used for the point size and label weight (if labels enabled). If provided, points will be sized based on the values in this column. **Use `pointSizeRange` to control the size range.**"
+    },
+    {
+      "name": "pointSizeStrategy",
+      "schema": {
+        "$ref": "#/definitions/PointSizeStrategyType"
+      },
+      "description": "Specifies the strategy for sizing points based on data from the  {@link  pointSizeBy }  column.\n\nWhen `undefined` (default), will automatically use the optimal strategy based on the input configuration and size data type. Current strategy can be acquired with  {@link  Cosmograph.activePointSizeStrategy  }  getter.\n\nSee  {@link  PointSizeStrategy }  for available strategies and their documentation."
+    },
+    {
+      "name": "pointSizeRange",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "description": "Defines the range for automatic point size scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  pointSizeBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized points.\n\n**Used when  {@link  pointSizeStrategy }  is set to `'auto'` or `'degree'`.**",
+      "default": [
+        2,
+        9
+      ]
+    },
+    {
+      "name": "pointSizeByFn",
+      "schema": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/SizeAccessorFn"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cstring%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cboolean%3E"
+          },
+          {
+            "$ref": "#/definitions/SizeAccessorFn%3Cunknown%3E"
+          }
+        ]
+      },
+      "description": "Function that generates sizes for points based on values in the  {@link  pointSizeBy }  column.\n\nOverrides the values in  {@link  pointSizeBy }  column by processing them (values can be of any type, not just numbers).\n\n**Has effect only when  {@link  pointSizeBy }  is provided and  {@link  pointSizeStrategy }  is `undefined`.**"
+    },
+    {
+      "name": "pointClusterBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Column name containing cluster assignments for points. Can be string or number."
+    },
+    {
+      "name": "pointClusterByFn",
+      "schema": {
+        "$ref": "#/definitions/AccessorFn%3Cany%2Cunknown%3E"
+      },
+      "description": "Function that generates cluster assignments for points based on values in the  {@link  pointClusterBy }  column.\n\nOverrides the values in  {@link  pointClusterBy }  column by processing them.\n\n**Has effect only when  {@link  pointClusterBy }  is provided.**"
+    },
+    {
+      "name": "pointClusterStrengthBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The `pointClusterStrengthBy` column defines how strongly each point is attracted to its assigned cluster during the simulation.\n\nThe column should contain numeric values where higher values (closer to 1.0) = stronger attraction, point stays closer to its cluster, Lower values (closer to 0.0) = weaker attraction, point can move more freely away from its cluster\n\nHas effect only when  {@link  pointClusterBy }  is provided."
+    },
+    {
+      "name": "pointShapeBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Column name for point shape. Values: numeric 0\u20138 (Circle=0, Square=1, Triangle=2, Diamond=3, Pentagon=4, Hexagon=5, Star=6, Cross=7, None=8) or known string names (e.g. \"circle\", \"square\", \"none\"). Other strings map per distinct value via a global ordinal scale over drawable shapes (excludes none)."
+    },
+    {
+      "name": "pointImageUrlBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Column name for image URLs (string per row) to be displayed as point images."
+    },
+    {
+      "name": "pointImageSize",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Default size in pixels for point images when pointImageSizeBy is not set."
+    },
+    {
+      "name": "pointImageSizeBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Optional column name for per-point image display size (numeric); overrides pointImageSize per point when provided."
+    },
+    {
+      "name": "hidePointShapesForLoadedImages",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Hide point shapes (circle/square/etc.) for points whose images have been loaded. Useful when images should visually replace the underlying shape marker.",
+      "default": true
+    },
+    {
+      "name": "pointLabelBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the point label."
+    },
+    {
+      "name": "pointLabelWeightBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Specify the numeric column that will be used for the point label weight. Higher weight values make labels more likely to be shown.\n\nIf not provided, the points labels will be sorted by  {@link  pointSizeBy }  if provided or their total links count (degree) otherwise ."
+    },
+    {
+      "name": "pointXBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the point's x-coordinate. If provided with `pointYBy`, points will be positioned based on the values from `pointXBy` and `pointYBy` columns."
+    },
+    {
+      "name": "pointYBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The column name for the point's y-coordinate. If provided with `pointXBy`, points will be positioned based on the values from `pointXBy` and `pointYBy` columns."
+    },
+    {
+      "name": "pointZBy",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Optional column name for the point's z-coordinate. Requires both `pointXBy` and `pointYBy`."
+    },
+    {
+      "name": "pointIncludeColumns",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "An array of additional column names to include in the point data.\n\nThese columns will be available on the point objects but not used by Cosmograph directly, can be used as accessors for Cosmograph components. Useful for storing additional information about the points. If provided with `*`, all columns will be included."
+    },
+    {
+      "name": "onSimulationRestart",
+      "schema": {
+        "$comment": "() => void",
+        "deprecated": "Use `onSimulationUnpause` instead"
+      }
+    },
+    {
+      "name": "simulationImpulse",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Coefficient of simulation impulse from 0 to 1. If `undefined`, the graph will not apply a new impulse to the renders during adding or removing data items, but instead will use the current simulation impulse value from the graph. Has no impact if `enableSimulation` is `false`. Default value: `undefined`."
+    },
+    {
+      "name": "onPointsFiltered",
+      "schema": {
+        "$comment": "(highlightedPoints: CosmographData, highlightedPointIndices: number[] | undefined, highlightedLinkIndices: number[] | undefined) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "highlightedPoints": {
+                "$ref": "#/definitions/CosmographData"
+              },
+              "highlightedPointIndices": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "highlightedLinkIndices": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "highlightedPoints"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Fires whenever the highlight recomputes \u2014 either because a Mosaic clause on `pointsSelection` / `linksSelection` changed, or because the user point/link selection changed. Receives the surviving points table and the resolved highlighted point/link indices."
+    },
+    {
+      "name": "onLinksFiltered",
+      "schema": {
+        "$comment": "(highlightedLinks: CosmographData, highlightedPointIndices: number[] | undefined, highlightedLinkIndices: number[] | undefined) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "highlightedLinks": {
+                "$ref": "#/definitions/CosmographData"
+              },
+              "highlightedPointIndices": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "highlightedLinkIndices": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "highlightedLinks"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Fires whenever the highlight recomputes \u2014 either because a Mosaic clause on `pointsSelection` / `linksSelection` changed, or because the user point/link selection changed. Receives the surviving links table and the resolved highlighted point/link indices."
+    },
+    {
+      "name": "onLabelClick",
+      "schema": {
+        "$comment": "(index: number, id: string, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "id": {
+                "type": "string"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "index",
+              "id",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when clicked on a label."
+    },
+    {
+      "name": "onAnnotationClick",
+      "schema": {
+        "$comment": "(id: string, event: MouseEvent) => boolean | void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "id",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when clicked on an annotation label or anchor. Return `false` from an anchor click to prevent the default visibility toggle."
+    },
+    {
+      "name": "onClusterLabelClick",
+      "schema": {
+        "$comment": "(index: number, id: string, event: MouseEvent) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "id": {
+                "type": "string"
+              },
+              "event": {
+                "$ref": "#/definitions/MouseEvent"
+              }
+            },
+            "required": [
+              "index",
+              "id",
+              "event"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when clicked on a cluster label."
+    },
+    {
+      "name": "onGraphRebuilt",
+      "schema": {
+        "$comment": "(stats: {\n    pointsCount: number;\n    linksCount: number;\n    pointsSummary?: Record<string, unknown>[];\n    linksSummary?: Record<string, unknown>[];\n  }) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "stats": {
+                "type": "object",
+                "properties": {
+                  "pointsCount": {
+                    "type": "number"
+                  },
+                  "linksCount": {
+                    "type": "number"
+                  },
+                  "pointsSummary": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E"
+                    }
+                  },
+                  "linksSummary": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E"
+                    }
+                  }
+                },
+                "required": [
+                  "pointsCount",
+                  "linksCount"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "stats"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that executes after the graph completes rebuilding with new data."
+    },
+    {
+      "name": "onGraphRebuildError",
+      "schema": {
+        "$comment": "(error: Error) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "$ref": "#/definitions/Error"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that executes when rebuilding the graph fails."
+    },
+    {
+      "name": "onGraphDataUpdated",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called when points or links data is replaced or modified at the local database."
+    },
+    {
+      "name": "onConfigUpdated",
+      "schema": {
+        "$comment": "() => void"
+      },
+      "description": "Callback function that will be called after the config was updated."
+    },
+    {
+      "name": "onRectSelected",
+      "schema": {
+        "$comment": "(selection: [[number, number], [number, number]] | null, pointIndices?: number[]) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "selection": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pointIndices": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "selection"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when area selection was performed."
+    },
+    {
+      "name": "onPolygonSelected",
+      "schema": {
+        "$comment": "(polygonPoints: [number, number][]) => void",
+        "type": "object",
+        "properties": {
+          "namedArgs": {
+            "type": "object",
+            "properties": {
+              "polygonPoints": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            },
+            "required": [
+              "polygonPoints"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "description": "Callback function that will be called when polygonal selection was performed."
+    },
+    {
+      "name": "enableSimulation",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls whether to enable force-directed layout simulation. If `undefined`, the simulation will be automatically enabled if there are no links or points have layout coordinates provided.\n\nWhen disabled (`false`):\n- Uses x/y values from data for point positions. If positions not provided, random positions will be used."
+    },
+    {
+      "name": "allowSourceTableMutation",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Allows `addPoints`, `addLinks`, `removePoints` and `removeLinks` to write to a source table you named in  {@link  points  }  or  {@link  links  } .\n\nThose methods write rows to the source rather than to a copy of it, so on a table you named they edit data Cosmograph was only given to read. Without this they refuse and log instead. Data Cosmograph loaded itself lives in a table it owns and is always mutable, so this has no effect there.\n\nIt does not affect indexing: a table you named is never altered to carry generated index columns, whatever this is set to."
+    },
+    {
+      "name": "rectangularSelectorClassName",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Specifies the CSS class to use for the rectangular selector."
+    },
+    {
+      "name": "polygonalSelectorStrokeColor",
+      "schema": {
+        "type": "string"
+      },
+      "description": "Stroke color for the lasso selection"
+    },
+    {
+      "name": "polygonalSelectorLineWidth",
+      "schema": {
+        "type": "number"
+      },
+      "description": "Line width for the lasso selection"
+    },
+    {
+      "name": "selectPointOnClick",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "string",
+            "const": "single"
+          }
+        ]
+      },
+      "description": "Controls whether to select a clicked point with the connected points.\n\n- When `true`: Selects the clicked point and all connected points to it\n- When `'single'`: Selects only the clicked point\n- Will also focus (render ring around) the clicked point if  {@link  focusPointOnClick }  is `undefined`"
+    },
+    {
+      "name": "selectPointOnLabelClick",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "string",
+            "const": "single"
+          }
+        ]
+      },
+      "description": "Controls whether to select a point with the connected points when the point's label is clicked.\n\n- When `true`: Selects the clicked point and all connected points to it\n- When `'single'`: Selects only the clicked point\n- Will also focus (render ring around) the clicked point if  {@link  focusPointOnClick }  is `undefined`"
+    },
+    {
+      "name": "selectLinkOnClick",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "string",
+            "const": "single"
+          }
+        ]
+      },
+      "description": "Controls whether to select a clicked link.\n\n- When `true`: selects the clicked link plus its two endpoint points.\n- When `'single'`: selects only the clicked link.\n- Holding Shift adds the clicked link to the current link selection; holding Alt removes it."
+    },
+    {
+      "name": "selectClusterOnLabelClick",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls whether to select points of a cluster when its label is clicked."
+    },
+    {
+      "name": "focusPointOnClick",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls whether to focus on a point when the point itself is clicked."
+    },
+    {
+      "name": "focusPointOnLabelClick",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Controls whether to focus on a point when the point's label is clicked."
+    },
+    {
+      "name": "componentsDisplayStateMode",
+      "schema": {
+        "type": [
+          "string",
+          "boolean"
+        ],
+        "enum": [
+          "loading",
+          false
+        ]
+      },
+      "description": "Controls display state messages behavior for all Cosmograph components.\n\n- When `undefined`: Show all state messages (loading, no data)\n- When `'loading'`: Show only loading state message, hide no data message\n- When `false`: Disable all state messages\n\nThis will be applied to all components unless explicitly overridden in component-specific configuration."
+    },
+    {
+      "name": "statusIndicatorMode",
+      "schema": {
+        "type": [
+          "string",
+          "boolean"
+        ],
+        "enum": [
+          "spinner",
+          "text",
+          false
+        ]
+      },
+      "description": "Chooses which kind of status indicator to show during loading or errors.\n\n- `'spinner'` (default): show a spinner during loading, falling back to text on errors.\n- `'text'`: always show descriptive messages.\n- `false`: hide the status indicator entirely."
+    },
+    {
+      "name": "disableLogging",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Disables logging of Cosmograph messages in the console."
+    },
+    {
+      "name": "quantileExtent",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "description": "Quantile bounds used for quantile-based visual domains and scales.\n\nThis affects histogram/timeline smart extents, automatic point size scaling, degree/count-based point and link size/color scales, and related range legend extents. It does not filter or remove data; it only trims visual domains to reduce the impact of outliers.",
+      "default": [
+        0.05,
+        0.95
+      ]
+    },
+    {
+      "name": "preservePointPositionsOnDataUpdate",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Preserve positions for points with same ids ( {@link  CosmographConfig.pointIdBy pointIdBy }  during point data update\n\nWhen `true`:\n- Points with same ids will stay where they were instead of generating new positions\n- New points get new positions (or positions from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  if set)\n- Preserved positions take priority over new coordinates from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  for existing points",
+      "default": false
+    },
+    {
+      "name": "resetSelectionOnEmptyCanvasClick",
+      "schema": {
+        "type": "boolean"
+      },
+      "description": "Reset selection on empty canvas click\n\nWhen `true`:\n- Resets the selection when the canvas is clicked and there are some points selected",
+      "default": true
+    },
+    {
+      "name": "unknownColor",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The color to use for points and links when their data is unknown and current coloring strategy can't resolve it`.",
+      "default": "rgba(205, 207, 213, 0.9)"
+    },
+    {
+      "name": "licenseKey",
+      "schema": {
+        "type": "string"
+      },
+      "description": "The key of the library license."
+    },
+    {
+      "name": "pointColor",
+      "schema": {
+        "type": "string",
+        "deprecated": "Use `pointDefaultColor` instead"
+      }
+    },
+    {
+      "name": "pointSize",
+      "schema": {
+        "type": "number",
+        "deprecated": "Use `pointDefaultSize` instead"
+      }
+    },
+    {
+      "name": "linkColor",
+      "schema": {
+        "type": "string",
+        "deprecated": "Use `linkDefaultColor` instead"
+      }
+    },
+    {
+      "name": "linkWidth",
+      "schema": {
+        "type": "number",
+        "deprecated": "Use `linkDefaultWidth` instead"
+      }
+    },
+    {
+      "name": "linkArrows",
+      "schema": {
+        "type": "boolean",
+        "deprecated": "Use `linkDefaultArrows` instead"
+      }
+    }
+  ]
+}
