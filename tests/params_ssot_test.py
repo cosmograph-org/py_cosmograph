@@ -17,6 +17,19 @@ def test_params_ssot_matches_typescript_sources():
     assert make_params_ssot() == committed
 
 
+def test_descriptions_are_fit_for_a_docstring():
+    """Descriptions land in help(cosmo), so no TSDoc markup and no hard line breaks."""
+    import json
+
+    from cosmograph._dev_utils.params_ssot import PARAMS_SSOT_PATH
+
+    with open(PARAMS_SSOT_PATH, encoding="utf-8") as file:
+        params = json.load(file)
+
+    assert [p["name"] for p in params if "{@link" in (p["description"] or "")] == []
+    assert [p["name"] for p in params if "\n" in (p["description"] or "")] == []
+
+
 def test_params_ssot_doctests():
     import doctest
 

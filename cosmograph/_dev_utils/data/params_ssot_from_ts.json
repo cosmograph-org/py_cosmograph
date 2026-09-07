@@ -3079,8 +3079,7 @@
     {
       "name": "pointLabelFontSize",
       "schema": {
-        "type": "number",
-        "default": ": 13"
+        "type": "number"
       },
       "description": "Specifies the font size to use for the point labels.",
       "default": 13
@@ -3096,8 +3095,7 @@
     {
       "name": "clusterLabelFontSize",
       "schema": {
-        "type": "number",
-        "default": ": 16"
+        "type": "number"
       },
       "description": "Specifies the font size to use for the cluster labels. If  {@link  CosmographConfig.scaleClusterLabels scaleClusterLabels }  is `true` (by default), the font size will be scaled based on the number of points in the cluster and the `clusterLabelFontSize` will be used as the baseline.",
       "default": 16
@@ -3131,8 +3129,7 @@
               }
             }
           }
-        ],
-        "default": ": `'background: #35374887; font-weight: 300; opacity: 0.9;'`"
+        ]
       },
       "description": "Specifies the CSS class or inline CSS string to use for the cluster labels. Inline `color` styles take priority over the computed cluster label color.",
       "default": ""
@@ -3459,11 +3456,7 @@
           "type": "number"
         },
         "minItems": 2,
-        "maxItems": 2,
-        "default": [
-          1,
-          9
-        ]
+        "maxItems": 2
       },
       "description": "Defines the range for automatic link width scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  linkWidthBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized links if no  {@link  linkWidthByFn }  provided.\n\nNote: Only works when  {@link  linkWidthBy }  column is provided and contains numeric values and when  {@link  linkWidthByFn }  is not set.",
       "default": [
@@ -3544,11 +3537,7 @@
           "type": "number"
         },
         "minItems": 2,
-        "maxItems": 2,
-        "default": [
-          0.2,
-          1
-        ]
+        "maxItems": 2
       },
       "description": "Defines the range for automatic link strength scaling. Takes [min, max] values in the range [0, 1].\n\nThis setting can be used to control the strength of the links during the simulation.\n\nNote: Only works when  {@link  linkStrengthBy }  column is provided and contains numeric values and when  {@link  linkStrengthByFn }  is not set. Has effect only during the active simulation.",
       "default": [
@@ -3641,8 +3630,7 @@
     {
       "name": "pointColorByMap",
       "schema": {
-        "$ref": "#/definitions/Record%3Cstring%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E",
-        "default": "`undefined`"
+        "$ref": "#/definitions/Record%3Cstring%2C(string%7C%5Bnumber%2Cnumber%2Cnumber%2Cnumber%5D)%3E"
       },
       "description": "An optional mapping of values to colors for the points in the visualization. The keys in the map should be string and the values can be either color strings or arrays of RGBA values.\n\n**Used when  {@link  pointColorStrategy }  is set to `'map'`.**"
     },
@@ -3675,8 +3663,7 @@
           "type": "number"
         },
         "minItems": 2,
-        "maxItems": 2,
-        "default": "`[2, 9]`"
+        "maxItems": 2
       },
       "description": "Defines the range for automatic point size scaling. Takes [min, max] values in pixels.\n\nWhen  {@link  pointSizeBy }  column contains numeric values, they will be automatically remapped to fit within this range to prevent oversized points.\n\n**Used when  {@link  pointSizeStrategy }  is set to `'auto'` or `'degree'`.**",
       "default": [
@@ -3756,8 +3743,7 @@
     {
       "name": "hidePointShapesForLoadedImages",
       "schema": {
-        "type": "boolean",
-        "default": true
+        "type": "boolean"
       },
       "description": "Hide point shapes (circle/square/etc.) for points whose images have been loaded. Useful when images should visually replace the underlying shape marker.",
       "default": true
@@ -4136,16 +4122,14 @@
     {
       "name": "enableSimulation",
       "schema": {
-        "type": "boolean",
-        "default": "`undefined`"
+        "type": "boolean"
       },
       "description": "Controls whether to enable force-directed layout simulation. If `undefined`, the simulation will be automatically enabled if there are no links or points have layout coordinates provided.\n\nWhen disabled (`false`):\n- Uses x/y values from data for point positions. If positions not provided, random positions will be used."
     },
     {
       "name": "allowSourceTableMutation",
       "schema": {
-        "type": "boolean",
-        "default": "`false`"
+        "type": "boolean"
       },
       "description": "Allows `addPoints`, `addLinks`, `removePoints` and `removeLinks` to write to a source table you named in  {@link  points  }  or  {@link  links  } .\n\nThose methods write rows to the source rather than to a copy of it, so on a table you named they edit data Cosmograph was only given to read. Without this they refuse and log instead. Data Cosmograph loaded itself lives in a table it owns and is always mutable, so this has no effect there.\n\nIt does not affect indexing: a table you named is never altered to carry generated index columns, whatever this is set to."
     },
@@ -4159,16 +4143,14 @@
     {
       "name": "polygonalSelectorStrokeColor",
       "schema": {
-        "type": "string",
-        "default": "#ffffff"
+        "type": "string"
       },
       "description": "Stroke color for the lasso selection"
     },
     {
       "name": "polygonalSelectorLineWidth",
       "schema": {
-        "type": "number",
-        "default": 2
+        "type": "number"
       },
       "description": "Line width for the lasso selection"
     },
@@ -4248,8 +4230,7 @@
         "enum": [
           "loading",
           false
-        ],
-        "default": "`undefined`"
+        ]
       },
       "description": "Controls display state messages behavior for all Cosmograph components.\n\n- When `undefined`: Show all state messages (loading, no data)\n- When `'loading'`: Show only loading state message, hide no data message\n- When `false`: Disable all state messages\n\nThis will be applied to all components unless explicitly overridden in component-specific configuration."
     },
@@ -4264,16 +4245,14 @@
           "spinner",
           "text",
           false
-        ],
-        "default": "spinner"
+        ]
       },
       "description": "Chooses which kind of status indicator to show during loading or errors.\n\n- `'spinner'` (default): show a spinner during loading, falling back to text on errors.\n- `'text'`: always show descriptive messages.\n- `false`: hide the status indicator entirely."
     },
     {
       "name": "disableLogging",
       "schema": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "description": "Disables logging of Cosmograph messages in the console."
     },
@@ -4285,8 +4264,7 @@
           "type": "number"
         },
         "minItems": 2,
-        "maxItems": 2,
-        "default": "`[0.05, 0.95]`"
+        "maxItems": 2
       },
       "description": "Quantile bounds used for quantile-based visual domains and scales.\n\nThis affects histogram/timeline smart extents, automatic point size scaling, degree/count-based point and link size/color scales, and related range legend extents. It does not filter or remove data; it only trims visual domains to reduce the impact of outliers.",
       "default": [
@@ -4297,8 +4275,7 @@
     {
       "name": "preservePointPositionsOnDataUpdate",
       "schema": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "description": "Preserve positions for points with same ids ( {@link  CosmographConfig.pointIdBy pointIdBy }  during point data update\n\nWhen `true`:\n- Points with same ids will stay where they were instead of generating new positions\n- New points get new positions (or positions from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  if set)\n- Preserved positions take priority over new coordinates from  {@link  CosmographConfig.pointXBy pointXBy } / {@link  CosmographConfig.pointYBy pointYBy }  for existing points",
       "default": false
@@ -4306,8 +4283,7 @@
     {
       "name": "resetSelectionOnEmptyCanvasClick",
       "schema": {
-        "type": "boolean",
-        "default": true
+        "type": "boolean"
       },
       "description": "Reset selection on empty canvas click\n\nWhen `true`:\n- Resets the selection when the canvas is clicked and there are some points selected",
       "default": true
@@ -4315,8 +4291,7 @@
     {
       "name": "unknownColor",
       "schema": {
-        "type": "string",
-        "default": "rgba(205, 207, 213, 0.9)"
+        "type": "string"
       },
       "description": "The color to use for points and links when their data is unknown and current coloring strategy can't resolve it`.",
       "default": "rgba(205, 207, 213, 0.9)"
@@ -4324,8 +4299,7 @@
     {
       "name": "licenseKey",
       "schema": {
-        "type": "string",
-        "default": "undefined"
+        "type": "string"
       },
       "description": "The key of the library license."
     },
