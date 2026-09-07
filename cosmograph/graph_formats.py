@@ -75,25 +75,26 @@ def networkx_to_points_and_links(
     """
     points = _frame(
         (
-            dict({point_id_col: node_id(node)}, **attributes)
+            _row({point_id_col: node_id(node)}, attributes, "node")
             for node, attributes in graph.nodes(data=True)
         ),
         columns=[point_id_col],
     )
     links = _frame(
         (
-            dict(
+            _row(
                 {
                     link_source_col: node_id(source),
                     link_target_col: node_id(target),
                 },
-                **attributes,
+                attributes,
+                "edge",
             )
             for source, target, attributes in graph.edges(data=True)
         ),
         columns=[link_source_col, link_target_col],
     )
-    return points, links
+    return _settle_mixed_columns(points), _settle_mixed_columns(links)
 
 
 def networkx_cosmo_kwargs(graph, **kwargs):
@@ -110,17 +111,55 @@ def networkx_cosmo_kwargs(graph, **kwargs):
     (3, 2)
     """
     points, links = networkx_to_points_and_links(graph)
-    defaults = {
-        "points": points,
-        "links": links,
-        "point_id_by": DFLT_POINT_ID_COL,
-        "link_source_by": DFLT_LINK_SOURCE_COL,
-        "link_target_by": DFLT_LINK_TARGET_COL,
-    }
+    defaults = {"points": points, "point_id_by": DFLT_POINT_ID_COL}
+    if len(links) > 0:
+        # A graph with no edges gets no links table: an empty one reaches the
+        # widget as an Arrow schema whose source/target columns are all null.
+        defaults.update(
+            links=links,
+            link_source_by=DFLT_LINK_SOURCE_COL,
+            link_target_by=DFLT_LINK_TARGET_COL,
+        )
     for name, value in defaults.items():
         if kwargs.get(name) is None:
             kwargs[name] = value
     return kwargs
+
+
+def _row(structure, attributes, kind):
+    """One table row: the structural columns plus the attributes.
+
+    An attribute sharing a name with a structural column would quietly replace
+    the node or edge it is meant to describe, and nothing downstream could tell.
+    """
+    collisions = sorted(set(structure) & set(attributes))
+    if collisions:
+        names = ", ".join(map(repr, collisions))
+        raise ValueError(
+            f"The graph has {kind} attribute(s) named {names}, which is what the "
+            f"id/source/target column(s) are called. Rename the attribute, or pass "
+            f"point_id_col=, link_source_col= or link_target_col= to move the "
+            f"structural column out of the way."
+        )
+    return dict(structure, **attributes)
+
+
+def _settle_mixed_columns(frame):
+    """Make any column holding more than one type into strings.
+
+    networkx attributes are per node and per edge, so a column can hold an int
+    for one node and a string for another. Arrow will not take that, and the
+    widget's conversion turns the refusal into an empty graph.
+    """
+    for column in frame.columns:
+        if frame[column].dtype != object:
+            continue
+        types = {type(value) for value in frame[column] if value is not None}
+        if len(types) > 1:
+            frame[column] = frame[column].map(
+                lambda value: value if value is None else str(value)
+            )
+    return frame
 
 
 def _frame(rows, columns):

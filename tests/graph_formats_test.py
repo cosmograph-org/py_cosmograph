@@ -117,3 +117,74 @@ def test_cosmo_complains_about_a_graph_plus_points_or_links():
 
     with pytest.raises(ValueError, match="networkx graph"):
         cosmo(nx.path_graph(3), points=pd.DataFrame({"id": ["a"]}))
+
+
+def test_an_attribute_named_like_a_structural_column_is_refused():
+    # Letting the attribute win would replace the node it describes, and nothing
+    # downstream could tell that the graph had been rewired.
+    graph = nx.Graph()
+    graph.add_node("a", id="something else")
+
+    with pytest.raises(ValueError, match="attribute\\(s\\) named 'id'"):
+        networkx_to_points_and_links(graph)
+
+
+def test_the_error_points_at_the_argument_that_fixes_it():
+    graph = nx.Graph()
+    graph.add_edge("a", "b", source="elsewhere")
+
+    with pytest.raises(ValueError, match="link_source_col"):
+        networkx_to_points_and_links(graph)
+
+    # ...and doing what it says works
+    _, links = networkx_to_points_and_links(graph, link_source_col="from")
+    assert list(links.columns) == ["from", "target", "source"]
+
+
+def test_a_mixed_type_attribute_still_reaches_the_widget():
+    # networkx attributes are per node, so a column can hold an int for one and a
+    # string for another. Arrow refuses that, and the widget turns a refusal into
+    # an empty graph.
+    from cosmograph import cosmo
+
+    graph = nx.Graph()
+    graph.add_node("a", note=1)
+    graph.add_node("b", note="two")
+    graph.add_edge("a", "b")
+
+    points, _ = networkx_to_points_and_links(graph)
+    assert points["note"].tolist() == ["1", "two"]
+    assert cosmo(graph)._ipc_points is not None
+
+
+def test_a_graph_with_no_edges_ships_no_links_table():
+    # An empty links table reaches the widget as all-null Arrow columns.
+    from cosmograph import cosmo
+
+    graph = nx.Graph()
+    graph.add_nodes_from(["a", "b", "c"])
+
+    widget = cosmo(graph)
+    assert len(widget.points) == 3
+    assert widget.links is None
+    assert widget.link_source_by is None
+
+
+def test_networkx_is_not_imported_unless_you_use_it():
+    # The promise is that networkx stays optional. Check it in a fresh process,
+    # since this test module imports networkx itself.
+    import subprocess
+    import sys
+
+    script = (
+        "import sys, pandas as pd\n"
+        "from cosmograph import cosmo\n"
+        "cosmo(points=pd.DataFrame({'id': ['a', 'b']}), point_id_by='id')\n"
+        "assert 'networkx' not in sys.modules, sorted(sys.modules)\n"
+        "print('ok')\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert "ok" in result.stdout
