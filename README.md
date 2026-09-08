@@ -153,20 +153,6 @@ Zooming in a bit:
 
 ![image](https://github.com/user-attachments/assets/e988950d-9f53-40c2-8b77-18cfb92efb50)
 
-### Points and links have to agree
-
-Cosmograph builds its point table from `points`, then joins `links` onto it by id. Two things follow from that, and both fail quietly:
-
-- A point with no links is drawn, but only if it is in the `points` table. Hand Cosmograph `links` on their own and the points get worked out from the link endpoints, so anything unlinked is not in the graph at all.
-- A link is dropped if either end is missing from the `points` table. No error, no warning -- the edge is just not there.
-
-So if your graph is part clusters, part loners, pass both tables, and make sure every id used in `links` appears in `points`:
-
-```python
-cosmo(points=points, links=links, point_id_by='id',
-      link_source_by='source', link_target_by='target')
-```
-
 ## 🔑 API Key Setup and Project Export
 
 ### Setting up API Key
@@ -224,6 +210,20 @@ graph.export_project_by_name("My Network Visualization")
 
 The exported project will be available on the [Cosmograph platform](https://run.cosmograph.app).
 
+
+## 🔗 Points and links have to agree
+
+Cosmograph builds its point table from `points`, then joins `links` onto it by id. Two things follow from that, and both fail quietly:
+
+- A point with no links is drawn, but only if it is in the `points` table. Hand Cosmograph `links` on their own and the points get worked out from the link endpoints, so anything unlinked is not in the graph at all.
+- A link is dropped if either end is missing from the `points` table. No error, no warning -- the edge is just not there.
+
+So if your graph is part clusters, part loners, pass both tables, and make sure every id used in `links` appears in `points`:
+
+```python
+cosmo(points=points, links=links, point_id_by='id',
+      link_source_by='source', link_target_by='target')
+```
 
 ## 🎉 More Examples
 
