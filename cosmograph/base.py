@@ -16,6 +16,8 @@ from cosmograph.util import (
 
 from cosmograph.config import get_api_key
 
+from cosmograph.graph_formats import is_networkx_graph, networkx_cosmo_kwargs
+
 cosmo_base_sig = cosmograph_base_signature()
 cosmo_base_params_doc_str = cosmograph_base_docs()
 
@@ -61,11 +63,19 @@ def prioritize_points(kwargs, data=None):
     The rules:
     - If `data` is not given (i.e. `None`), then `points` and `links` are returned as is.
     - If `data` is given, then:
+        - If it's a networkx graph, it is split into `points` and `links`, and the
+          id/source/target column names are filled in (see `graph_formats`).
         - If `points` is not given, then `points` is taken to be `data`.
         - If `links` is not given, then `links` is taken to be `data`.
         - If both `points` and `links` are given, raise an error.
     """
     if data is not None:
+        if is_networkx_graph(data):
+            if kwargs.get("points", None) is not None or kwargs.get("links", None) is not None:
+                raise ValueError(
+                    "Cannot specify `points` or `links` along with a networkx graph"
+                )
+            return networkx_cosmo_kwargs(data, **kwargs)
         if kwargs.get("points", None) is None:
             # If points is None, take data to be points (whether links is None or not)
             kwargs["points"] = data

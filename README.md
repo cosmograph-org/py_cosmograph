@@ -74,6 +74,27 @@ widget.selected_point_ids  # if you've selected some points and want to get info
 # etc.
 ```
 
+### From a networkx graph
+
+If your graph already lives in networkx, hand it straight to `cosmo`:
+
+```python
+import networkx as nx
+from cosmograph import cosmo
+
+cosmo(nx.karate_club_graph(), point_color_by='club')
+```
+
+Node and edge attributes come along as columns, so you can use them for color, size or labels. Nodes with no edges keep their point. Node ids are stringified, since networkx nodes can be tuples or arbitrary objects; pass `node_id=` to `networkx_to_points_and_links` if you want something else.
+
+To get at the tables yourself -- to add a column before plotting, say:
+
+```python
+from cosmograph import networkx_to_points_and_links
+
+points, links = networkx_to_points_and_links(my_graph)
+```
+
 ### Nicer example
 
 Let's download a big dataset of English words, plus some hyponym-hypernym relationships. 
