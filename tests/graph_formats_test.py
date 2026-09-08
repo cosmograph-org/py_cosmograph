@@ -188,3 +188,50 @@ def test_networkx_is_not_imported_unless_you_use_it():
     )
     assert result.returncode == 0, result.stderr
     assert "ok" in result.stdout
+
+
+def test_a_node_id_that_loses_a_distinction_is_refused():
+    # str() cannot tell the node 1 from the node "1", and networkx keeps both.
+    # Collapsing them would put one point where two belong and hand it both
+    # sets of links.
+    graph = nx.Graph()
+    graph.add_edge(1, "x")
+    graph.add_edge("1", "y")
+
+    with pytest.raises(ValueError, match="same point id to different nodes"):
+        networkx_to_points_and_links(graph)
+
+
+def test_the_error_names_the_nodes_that_collapsed():
+    graph = nx.Graph()
+    graph.add_edge(1, "x")
+    graph.add_edge("1", "y")
+
+    with pytest.raises(ValueError) as caught:
+        networkx_to_points_and_links(graph)
+
+    assert "'1' <- 1, '1'" in str(caught.value)
+    assert "node_id=" in str(caught.value)
+
+
+def test_cosmo_refuses_the_same_graph():
+    # The whole point: it must not quietly draw the wrong graph.
+    from cosmograph import cosmo
+
+    graph = nx.Graph()
+    graph.add_edge(1, "x")
+    graph.add_edge("1", "y")
+
+    with pytest.raises(ValueError, match="same point id to different nodes"):
+        cosmo(graph)
+
+
+def test_a_node_id_that_keeps_them_apart_works():
+    graph = nx.Graph()
+    graph.add_edge(1, "x")
+    graph.add_edge("1", "y")
+
+    points, _ = networkx_to_points_and_links(
+        graph, node_id=lambda node: f"{type(node).__name__}:{node}"
+    )
+    assert points["id"].tolist() == ["int:1", "str:x", "str:1", "str:y"]

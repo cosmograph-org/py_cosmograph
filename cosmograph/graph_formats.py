@@ -94,6 +94,7 @@ def networkx_to_points_and_links(
         ),
         columns=[link_source_col, link_target_col],
     )
+    _refuse_collapsed_ids(points[point_id_col], graph, node_id)
     return _settle_mixed_columns(points), _settle_mixed_columns(links)
 
 
@@ -142,6 +143,35 @@ def _row(structure, attributes, kind):
             f"structural column out of the way."
         )
     return dict(structure, **attributes)
+
+
+def _refuse_collapsed_ids(ids, graph, node_id):
+    """Refuse a `node_id` that gives two nodes the same point id.
+
+    networkx nodes are distinct by definition, so a repeated point id can only
+    mean `node_id` lost the difference between two of them -- the default `str`
+    does exactly that to `1` and `"1"`. Cosmograph draws one point per id, so
+    the two would become one point and their links would land on it together.
+    """
+    if not ids.duplicated().any():
+        return
+
+    by_id = {}
+    for node in graph.nodes():
+        by_id.setdefault(node_id(node), []).append(node)
+    collapsed = {name: nodes for name, nodes in by_id.items() if len(nodes) > 1}
+
+    shown = "; ".join(
+        f"{name!r} <- {', '.join(map(repr, nodes))}"
+        for name, nodes in list(collapsed.items())[:3]
+    )
+    if len(collapsed) > 3:
+        shown += f"; and {len(collapsed) - 3} more"
+    raise ValueError(
+        f"node_id gave the same point id to different nodes: {shown}. "
+        f"Cosmograph draws one point per id, so those nodes would end up as one "
+        f"point with each other's links. Pass a node_id= that tells them apart."
+    )
 
 
 def _settle_mixed_columns(frame):
