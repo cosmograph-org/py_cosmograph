@@ -175,6 +175,8 @@ graph.point_positions  # DataFrame with id, x, y -- one row per point
 
 The ids come from the widget, so they belong to those coordinates whatever order the widget put its points in. Coordinates are in Cosmograph's space coordinates -- the same system as `point_x_by` / `point_y_by`, bounded by `space_size` -- and are read the moment the request arrives, so pause the simulation first if you want a layout that will not move.
 
+`point_positions` is `None` until the latest request is answered, and is reset when you give the widget new `points` or `links`, so it never shows coordinates that belong to other data. The coordinates come back as float32, in one binary message, so this works on graphs with hundreds of thousands of points; the ids still travel as a list.
+
 ## 🔑 API Key Setup and Project Export
 
 ### Setting up API Key

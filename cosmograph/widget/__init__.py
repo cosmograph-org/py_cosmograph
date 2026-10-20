@@ -27,6 +27,11 @@ class Cosmograph(anywidget.AnyWidget):
     _esm = pathlib.Path(__file__).parent / "static" / js_file
     _css = pathlib.Path(__file__).parent / "static" / css_file
 
+    # State of request_point_positions(). Class-level defaults, because the
+    # points/links observers that reset them run inside super().__init__().
+    _point_positions_request = 0
+    _point_positions_reply = None
+
     # Configuration parameters for Cosmograph
     # List of all configuration parameters that JS side support can be found in ./js/config-props.ts
 
@@ -359,6 +364,7 @@ class Cosmograph(anywidget.AnyWidget):
         """
         points = change.new
         self._ipc_points = get_buffered_arrow_table(points)
+        self._forget_point_positions()
 
     @observe("links")
     def _on_links_changed(self, change):
@@ -378,6 +384,15 @@ class Cosmograph(anywidget.AnyWidget):
         """
         links = change.new
         self._ipc_links = get_buffered_arrow_table(links)
+        self._forget_point_positions()
+
+    def _forget_point_positions(self):
+        """Drop positions read for data that has just been replaced.
+
+        Bumping the request id also drops a reply still in flight for the old data.
+        """
+        self._point_positions_request += 1
+        self._point_positions_reply = None
 
     # Public cosmograph widget methods that can be called from Python
     # to interact with the Cosmograph 👇
@@ -530,44 +545,70 @@ class Cosmograph(anywidget.AnyWidget):
         Coordinates are read at the moment the widget receives the request. If
         the simulation is still running they are a snapshot of it; call
         :meth:`pause` or wait for it to settle first if you want a stable layout.
+
+        Each request supersedes the previous one: until it is answered,
+        :attr:`point_positions` is ``None``, and a late answer to an earlier
+        request is dropped rather than shown as this one's.
         """
-        self.send({"type": "get_point_positions"})
+        self._point_positions_request += 1
+        self._point_positions_reply = None
+        self.send(
+            {"type": "get_point_positions", "request_id": self._point_positions_request}
+        )
 
     @property
     def point_positions(self):
-        """The last point coordinates the widget sent, as a DataFrame.
+        """The point coordinates the widget sent for the latest request, as a DataFrame.
 
-        ``None`` until :meth:`request_point_positions` has been answered. An
-        empty DataFrame means the widget answered and has no points.
+        ``None`` until the latest :meth:`request_point_positions` has been
+        answered. An empty DataFrame means the widget answered and has no
+        points (or had not laid them out yet).
 
         Columns are ``id``, ``x`` and ``y``, one row per point. The ids come
         from the widget, in its own point order, so they are the ids that
         actually belong to those coordinates. There is no ``id`` column when
-        no ``point_id_by`` was given.
+        no ``point_id_by`` was given. Points whose coordinates are not finite
+        numbers are left out rather than reported as NaN.
 
         Coordinates are in Cosmograph's space coordinates, i.e. the same system
-        as ``point_x_by`` / ``point_y_by`` and bounded by ``space_size``.
+        as ``point_x_by`` / ``point_y_by`` and bounded by ``space_size``. They
+        are float32, which is what the renderer holds.
         """
-        return self._positions_to_frame(self._last_point_positions)
+        return self._positions_to_frame(self._point_positions_reply)
 
-    def _on_point_positions(self, payload):
-        """Handle a `point_positions` reply from the widget."""
-        self._last_point_positions = payload
+    def _on_point_positions(self, content, buffers):
+        """Keep a `point_positions` reply, if it answers the latest request."""
+        if content.get("request_id") != self._point_positions_request:
+            return  # an answer to a superseded request, or to data since replaced
+        self._point_positions_reply = (content, buffers)
 
-    def _positions_to_frame(self, payload):
-        """Turn a `point_positions` reply into a DataFrame."""
-        if payload is None:
+    @staticmethod
+    def _positions_to_frame(reply):
+        """Turn a `point_positions` reply into a DataFrame.
+
+        The coordinates arrive as one float32 buffer, ``x0, y0, x1, y1, ...``:
+        a JSON list of a large graph's positions would run to tens of megabytes.
+        """
+        if reply is None:
             return None
 
+        import numpy as np
         import pandas as pd
 
-        flat = payload.get("positions") or []
-        frame = pd.DataFrame({"x": flat[0::2], "y": flat[1::2]}, columns=["x", "y"])
+        content, buffers = reply
+        xy = np.frombuffer(buffers[0], dtype="<f4") if buffers else np.empty(0, "<f4")
+        count = len(xy) // 2
+        xy = xy[: count * 2].reshape(count, 2)
+        frame = pd.DataFrame({"x": xy[:, 0], "y": xy[:, 1]}, columns=["x", "y"])
 
-        ids = payload.get("ids")
-        if ids and len(ids) == len(frame):
+        ids = content.get("ids")
+        if ids and len(ids) == count:
             frame.insert(0, "id", list(ids))
 
+        # Before the renderer is ready, a point can have no coordinates yet.
+        finite = np.isfinite(xy).all(axis=1)
+        if not finite.all():
+            frame = frame[finite].reset_index(drop=True)
         return frame
 
     def export_project_by_name(self, project_name: str, debug: bool = False):
@@ -580,10 +621,10 @@ class Cosmograph(anywidget.AnyWidget):
         except Exception as e:
             raise RuntimeError(f"Failed to export project '{project_name}': {str(e)}") from e
 
-    def _handle_widget_message(self, _widget, content, _buffers=None):
+    def _handle_widget_message(self, _widget, content, buffers=None):
         """Route a custom message from the JS side to its handler."""
         if isinstance(content, dict) and content.get("type") == "point_positions":
-            self._on_point_positions(content)
+            self._on_point_positions(content, buffers)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -591,7 +632,6 @@ class Cosmograph(anywidget.AnyWidget):
         # than through a synced trait: traitlets stays quiet when a value is set
         # to something equal to what it already holds, and asking twice for the
         # coordinates of a settled graph is exactly that case.
-        self._last_point_positions = None
         self.on_msg(self._handle_widget_message)
 
         # Register this instance to receive API key updates
