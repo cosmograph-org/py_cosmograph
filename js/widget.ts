@@ -116,15 +116,24 @@ async function render({ model, el }: RenderProps) {
       cosmograph?.captureScreenshot()
     }
     if (msg.type === 'get_point_positions') {
-      // Positions are flat [x0, y0, x1, y1, ...]; Python pairs them up. The ids come
-      // from the widget too, so they are in the same order as the coordinates -- the
-      // point order here is not the row order of the points DataFrame.
-      const positions = cosmograph?.getPointPositions() ?? []
-      const indices = Array.from({ length: positions.length / 2 }, (_, i) => i)
-      const ids = await cosmograph?.getPointIdsByIndices(indices)
+      // Positions are flat [x0, y0, x1, y1, ...]; Python pairs them up. They go as one
+      // float32 buffer, not a JSON list: a large graph's coordinates as JSON run to tens
+      // of megabytes. Before the graph is ready this is empty, and Python says so.
+      const flat = cosmograph?.getPointPositions() ?? []
+      const count = Math.floor(flat.length / 2)
+      const xy = Float32Array.from(flat.slice(0, count * 2))
+      // The ids come from the widget too, so they are in the same order as the
+      // coordinates -- the point order here is not the row order of the points DataFrame.
+      const indices = Array.from({ length: count }, (_, i) => i)
+      const ids = count > 0 ? await cosmograph?.getPointIdsByIndices(indices) : []
       // Sent as a message, not a synced trait: asking twice for the coordinates of a
       // settled graph produces the same array, and traitlets would not report that.
-      model.send({ type: 'point_positions', positions: Array.from(positions), ids: ids ?? null })
+      // The request id lets Python drop an answer to a request it has since replaced.
+      model.send(
+        { type: 'point_positions', request_id: msg.request_id, ids: ids ?? null },
+        undefined,
+        [xy.buffer]
+      )
     }
   })
 
